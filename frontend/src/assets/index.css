@@ -76,7 +76,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-.ol-attribution {
-  display: none;
-}

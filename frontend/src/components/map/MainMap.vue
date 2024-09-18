@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat } from 'ol/proj'
 import { ref } from 'vue'
 
 const center = ref(fromLonLat([-68.3468, -23.1304]))
@@ -25,5 +25,9 @@ const zoom = ref(5)
 const rotation = ref(0)
 </script>
 
-<style scoped>
+<style>
+
+.ol-attribution {
+  display: none;
+}
 </style>

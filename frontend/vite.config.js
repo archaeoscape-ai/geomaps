@@ -2,8 +2,10 @@ import path from 'node:path';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 
+import svgLoader from 'vite-svg-loader'
 import tailwind from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
+
 
 export default defineConfig({
   css: {
@@ -21,7 +23,7 @@ export default defineConfig({
       usePolling: true,
     },
   },
-  plugins: [vue()],
+  plugins: [vue(), svgLoader()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
