@@ -26,8 +26,11 @@ const rotation = ref(0)
 </script>
 
 <style>
-
 .ol-attribution {
+  display: none;
+}
+
+.ol-control {
   display: none;
 }
 </style>
