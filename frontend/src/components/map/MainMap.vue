@@ -1,6 +1,6 @@
 <template>
   <div class="absolute inset-0">
-    <ol-map class="h-full">
+    <ol-map class="h-full" :controls="[]">
       <ol-view
         ref="view"
         :center="center"
@@ -27,10 +27,6 @@ const rotation = ref(0)
 
 <style>
 .ol-attribution {
-  display: none;
-}
-
-.ol-control {
   display: none;
 }
 </style>
