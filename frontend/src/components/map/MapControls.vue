@@ -2,9 +2,19 @@
 import { Plus, Minus } from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 
-defineProps({
+const props = defineProps({
   isPanelActive: Boolean,
+  map: Object,
 })
+
+function handleZoom(isZoomIn) {
+  if (!props.map) return
+
+  const map = props.map.map
+  const view = map.getView()
+  const newZoom = view.getZoom() + (isZoomIn ? 1 : -1)
+  view.animate({ zoom: newZoom, duration: 250 })
+}
 </script>
 
 <template>
@@ -16,11 +26,11 @@ defineProps({
     }"
   >
     <div class="flex flex-col gap-3">
-      <Button size="icon" variant="secondary">
+      <Button size="icon" variant="secondary" @click="handleZoom(true)">
         <Plus class="h-5 w-5" />
       </Button>
 
-      <Button size="icon" variant="secondary">
+      <Button size="icon" variant="secondary" @click="handleZoom(false)">
         <Minus class="h-5 w-5" />
       </Button>
     </div>

@@ -1,8 +1,8 @@
 <script setup>
-import { useLeftPanel } from '@/stores/LeftPanelStore'
+import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { storeToRefs } from 'pinia'
 
-const leftPanelStore = useLeftPanel()
+const leftPanelStore = useLeftPanelStore()
 const { activePanel, tabs } = storeToRefs(leftPanelStore)
 </script>
 

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
-export const useLeftPanel = defineStore('left-panel', () => {
+export const useLeftPanelStore = defineStore('left-panel', () => {
   const activePanel = ref(null)
 
   const tabs = computed(() => [

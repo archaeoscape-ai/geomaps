@@ -6,13 +6,13 @@ import RulerIcon from '@/assets/ruler-icon.svg?component'
 import NoteIcon from '@/assets/note-icon.svg?component'
 import SaveIcon from '@/assets/save-icon.svg?component'
 import LogoIcon from '@/assets/logo-icon.svg?component'
-import { useLeftPanel } from '@/stores/LeftPanelStore'
+import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 
 defineProps({
   isPanelActive: Boolean,
 })
 
-const leftPanelStore = useLeftPanel()
+const leftPanelStore = useLeftPanelStore()
 const { toggleMenu } = leftPanelStore
 </script>
 
