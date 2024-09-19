@@ -46,6 +46,7 @@ const onSubmit = form.handleSubmit((values) => {
         <FormMessage />
       </FormItem>
     </FormField>
-    <Button type="submit" class="w-full"> Login </Button>
+    <Button type="submit" class="w-full mt-4"> Login </Button>
   </form>
 </template>
+
