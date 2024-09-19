@@ -1,11 +1,9 @@
 <script setup>
-import { MapPin, LayersIcon, Share2 } from 'lucide-vue-next'
+import { MapPin, Share2 } from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 import GpsIcon from '@/assets/gps-icon.svg?component'
 import RulerIcon from '@/assets/ruler-icon.svg?component'
-import NoteIcon from '@/assets/note-icon.svg?component'
 import SaveIcon from '@/assets/save-icon.svg?component'
-import LogoIcon from '@/assets/logo-icon.svg?component'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 
 defineProps({
@@ -25,32 +23,23 @@ const { toggleMenu } = leftPanelStore
     }"
   >
     <div class="flex flex-col gap-3">
-      <Button size="icon" variant="secondary" @click="toggleMenu">
-        <LogoIcon />
-      </Button>
-
-      <Button size="icon">
+      <Button size="icon" @click="toggleMenu">
         <MapPin class="h-4.5 w-4.5" />
       </Button>
 
-      <Button size="icon">
-        <LayersIcon class="h-4.5 w-4.5" />
-      </Button>
-
+      <!-- TODO: Get current user location and add a pin -->
       <Button size="icon">
         <GpsIcon />
       </Button>
 
+      <!-- TODO: Distance -->
       <Button size="icon">
         <RulerIcon />
       </Button>
 
+      <!-- TODO: Share map -->
       <Button size="icon">
         <Share2 class="h-4.5 w-4.5" />
-      </Button>
-
-      <Button size="icon">
-        <NoteIcon />
       </Button>
 
       <Button size="icon">

@@ -11,7 +11,7 @@ const { activePanel, tabs } = storeToRefs(leftPanelStore)
     class="absolute z-10 h-full w-96 bg-[#F2F5F8] shadow-[0px_2px_8px_0px_#0000001F] transition-all"
     :class="{
       'translate-x-0': activePanel !== null,
-      '-translate-x-96': activePanel === null,
+      '-translate-x-full': activePanel === null,
     }"
   >
     <div class="flex items-center divide-x">
