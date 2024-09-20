@@ -35,6 +35,7 @@ const pagesToShow = computed(() => {
   } else {
     pages = range(1, pageCount.value)
   }
+
   return pages
 })
 
