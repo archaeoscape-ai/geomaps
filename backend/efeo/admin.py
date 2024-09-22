@@ -1,7 +1,7 @@
 from django.contrib import admin
 from leaflet.admin import LeafletGeoAdmin
 
-from efeo.models import Map, MapConfig, MapNote, SiteType
+from efeo.models import Map, MapConfig, MapNote, Site, SiteType
 
 
 @admin.register(Map)
@@ -24,3 +24,15 @@ class SiteTypeAdmin(admin.ModelAdmin):
 class MapNoteAdmin(LeafletGeoAdmin):
     list_display = ("created_on", "created_by", "title", "map")
     list_filter = ("map", "created_on")
+
+
+@admin.register(Site)
+class SiteAdmin(LeafletGeoAdmin):
+    list_display = (
+        "map",
+        "site_type",
+        "english_name",
+        "french_name",
+        "khmer_name",
+        "created_by",
+    )
