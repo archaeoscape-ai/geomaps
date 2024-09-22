@@ -1,12 +1,17 @@
 <script setup>
 import Button from '@/components/ui/button/Button.vue'
 import Pagination from '@/components/ui/pagination/Pagination.vue'
+import { useNoteStore } from '@/stores/NoteStore'
 import { Pencil, Trash, ZoomIn, X } from 'lucide-vue-next'
+import { storeToRefs } from 'pinia'
+
+const noteStore = useNoteStore()
+const { notes } = storeToRefs(noteStore)
 </script>
 
 <template>
   <div class="flex h-full flex-col">
-    <div class="flex flex-grow items-center justify-between p-4">
+    <div class="flex items-center justify-between p-4">
       <h2 class="font-bold">Map Notes</h2>
       <Button size="icon" variant="secondary" class="rounded-full bg-white">
         <X class="stroke-button-icon" />
@@ -17,12 +22,13 @@ import { Pencil, Trash, ZoomIn, X } from 'lucide-vue-next'
     </div>
     <div class="flex flex-grow flex-col gap-4 overflow-auto p-4">
       <div
-        class="flex flex-col justify-center gap-2 rounded-lg bg-primary-foreground bg-white px-4 py-2.5 shadow-sm divide-y"
-        v-for="_ in new Array(10).fill(1)"
+        class="flex flex-col justify-center gap-2 divide-y rounded-lg bg-primary-foreground bg-white px-4 py-2.5 shadow-sm"
+        v-for="note in notes.results"
+        :key="note.id"
       >
         <div class="flex flex-col gap-2">
-          <h3 class="text-sm font-semibold line-clamp-1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni cupiditate, facilis at et ad molestiae, optio exercitationem deserunt nulla doloremque dolor dolorum. Quo, aspernatur pariatur. Voluptates ipsa fugit recusandae quaerat?</h3>
-          <p class="text-sm line-clamp-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid porro cupiditate nihil! Amet dolorem maxime, quae nesciunt voluptate blanditiis praesentium accusantium laudantium ipsa placeat laboriosam fugiat cupiditate delectus necessitatibus cum.</p>
+          <h3 class="line-clamp-1 text-sm font-semibold">{{ note.title }}</h3>
+          <p class="line-clamp-3 text-sm">{{ note.body }}</p>
         </div>
         <div class="flex items-center gap-2 pt-2">
           <Button size="icon" variant="secondary" class="bg-white">
