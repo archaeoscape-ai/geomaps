@@ -2,16 +2,17 @@
 import { fromLonLat } from 'ol/proj'
 import { ref } from 'vue'
 import MapControls from './MapControls.vue'
-import { useMapStore } from '@/stores/MapStore';
-import { storeToRefs } from 'pinia';
-import NoteLayer from '@/components/notes/NoteLayer.vue';
+import { useMapStore } from '@/stores/MapStore'
+import { storeToRefs } from 'pinia'
+import NoteLayer from '@/components/notes/NoteLayer.vue'
 
 defineProps({
   isPanelActive: Boolean,
 })
 
-const mapStore = useMapStore();
-const { map } = storeToRefs(mapStore) 
+const mapStore = useMapStore()
+const { map } = storeToRefs(mapStore)
+
 
 const center = ref(fromLonLat([-68.3468, -23.1304]))
 const projection = ref('EPSG:3857')

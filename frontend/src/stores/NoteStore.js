@@ -42,17 +42,42 @@ export const useNoteStore = defineStore('note', () => {
   const selectedNoteDetail = ref(null)
   const isLoading = ref(false)
 
-  // Click on Add New Note
+  /**
+   * @type {import('vue').Ref<{ select: import('ol/interaction').Select } | null>}
+   */
+  const selectNoteInteractionRef = ref(null)
+
+  /**
+   * @type {import('vue').Ref<{ source: import('ol/source/Vector').default } | null>}
+   */
+  const noteSourceRef = ref(null)
+
+  /**
+   * @type {import('vue').Ref<{ overlay: import('ol/Overlay').default } | null>}
+   */
+  const noteOverlayRef = ref(null)
+
+  /**
+   * Check if user is in process of adding a new note by
+   * clicking the Add New Note button
+   */
   const isAddingNote = ref(false)
 
-  // Editing an existing node
+  /**
+   * Check if user is editing the note using Edit modal
+   */
   const isEditingNote = ref(false)
 
-  // After clicking Add New Note and show overlay
+  /**
+   * Check if user clicks on the map to add a new note marker
+   */
   const isCreatingNote = computed(() => {
     return selectedNote.value?.id === 'new-note'
   })
 
+  /**
+   * Note markers displaying on the map
+   */
   const displayedNotes = computed(() => {
     if (!selectedNote.value || !isCreatingNote.value) return notesGeom.value
     return [...notesGeom.value, selectedNote.value]
@@ -70,6 +95,7 @@ export const useNoteStore = defineStore('note', () => {
   }
 
   return {
+    // states
     notes,
     selectedNote,
     selectedNoteDetail,
@@ -77,7 +103,13 @@ export const useNoteStore = defineStore('note', () => {
     isEditingNote,
     displayedNotes,
     isLoading,
+    
+    // layer refs
+    selectNoteInteractionRef,
+    noteSourceRef,
+    noteOverlayRef,
 
+    // actions
     addNote,
     resetNoteOverlay,
   }

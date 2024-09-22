@@ -9,6 +9,8 @@ import RightPanelContainer from '@/components/panels/RightPanelContainer.vue'
 
 import { useRightPanelStore } from '@/stores/RightPanelStore'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
+import { useNoteStore } from '@/stores/NoteStore'
+import MapNoteOverlay from '../notes/MapNoteOverlay.vue'
 
 const leftPanelStore = useLeftPanelStore()
 const { activePanel } = storeToRefs(leftPanelStore)
@@ -21,7 +23,7 @@ const isRightPanelActive = computed(() => activeRightPanel.value !== null)
 </script>
 
 <template>
-  <div class="overflow-hidden w-full relative h-screen">
+  <div class="relative h-screen w-full overflow-hidden">
     <MainMap :isPanelActive="isLeftPanelActive" />
     <LeftPanelContainer :isPanelActive="isLeftPanelActive" />
     <LeftPanelButtons :isPanelActive="isLeftPanelActive" />
