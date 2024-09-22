@@ -1,0 +1,22 @@
+# python files
+*.pyc
+
+# VS code files
+*.code-workspace
+.vscode
+
+# project specific folders
+media
+staticfiles
+static
+geodata
+temp
+tiles
+logs
+data
+
+*.pgsql
+#*.sql
+
+# environment file variables
+.env
