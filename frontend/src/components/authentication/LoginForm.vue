@@ -6,6 +6,14 @@ import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useAuthStore } from '@/stores/AuthStore'
+import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const authStore = useAuthStore()
+const { error, isLoggingIn } = storeToRefs(authStore)
 
 const formSchema = toTypedSchema(
   z.object({
@@ -21,8 +29,16 @@ const form = useForm({
   validationSchema: formSchema,
 })
 
-const onSubmit = form.handleSubmit((values) => {
-  console.log('Form submitted!', values)
+const onSubmit = form.handleSubmit(async (values) => {
+  const { email, password } = values
+  await authStore.login({ email, password })
+
+  if (!error.value) {
+    await router.push('/')
+    return
+  }
+
+  console.log(error?.value)
 })
 </script>
 
@@ -46,7 +62,6 @@ const onSubmit = form.handleSubmit((values) => {
         <FormMessage />
       </FormItem>
     </FormField>
-    <Button type="submit" class="w-full mt-4"> Login </Button>
+    <Button type="submit" class="mt-4 w-full" :disabled="isLoggingIn"> Login </Button>
   </form>
 </template>
-
