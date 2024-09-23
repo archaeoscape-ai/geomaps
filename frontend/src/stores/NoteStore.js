@@ -135,6 +135,7 @@ export const useNoteStore = defineStore('note', () => {
     selectedNoteDetail,
     isAddingNote,
     isEditingNote,
+    isCreatingNote,
     displayedNotes,
     isLoading,
 
