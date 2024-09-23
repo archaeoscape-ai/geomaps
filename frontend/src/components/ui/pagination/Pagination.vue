@@ -11,7 +11,7 @@ const RIGHT_PAGE = 'RIGHT'
 
 const props = defineProps({
   totalRecords: { type: Number, required: true },
-  page: { type: Number, required: true },
+  page: { type: Number, required: false },
   pageSize: { type: Number, required: true },
 })
 
@@ -19,7 +19,7 @@ const { totalRecords } = toRefs(props)
 
 const { currentPage, pageCount, isFirstPage, isLastPage, prev, next } = useOffsetPagination({
   total: totalRecords,
-  page: props.page,
+  page: props.page || 1,
   pageSize: props.pageSize,
   onPageChange: fetchData,
   onPageSizeChange: fetchData,

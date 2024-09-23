@@ -27,9 +27,9 @@ function handleEditNote() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
-    <h3 class="line-clamp-1 text-sm font-semibold">{{ selectedNoteDetail.title }}</h3>
-    <p class="line-clamp-3 text-sm">{{ selectedNoteDetail.body }}</p>
+  <div class="flex flex-col gap-2" v-if="selectedNoteDetail">
+    <h3 class="line-clamp-1 text-sm font-semibold">{{ selectedNoteDetail?.title }}</h3>
+    <p class="line-clamp-3 text-sm">{{ selectedNoteDetail?.body }}</p>
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <div
@@ -41,13 +41,13 @@ function handleEditNote() {
         >
           {{ initials }}
         </div>
-        <p class="text-xs font-semibold">{{ selectedNoteDetail.owner_name }}</p>
+        <p class="text-xs font-semibold">{{ selectedNoteDetail?.owner_name }}</p>
       </div>
       <div class="flex items-center gap-2">
         <Button size="icon" variant="secondary" class="bg-white" @click="handleEditNote">
           <Pencil size="20" />
         </Button>
-        <DeleteNoteDialog :note-id="selectedNoteDetail.id">
+        <DeleteNoteDialog :note-id="selectedNoteDetail?.id">
           <Button size="icon" variant="secondary" class="bg-white">
             <Trash class="stroke-primary" size="20" />
           </Button>
