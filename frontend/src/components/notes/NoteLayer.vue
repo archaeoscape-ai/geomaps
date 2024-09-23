@@ -46,7 +46,7 @@ watch(selectedNote, (value) => {
 </script>
 
 <template>
-  <ol-vector-layer v-if="true">
+  <ol-vector-layer v-if="activePanel === RIGHT_PANELS.NOTE">
     <ol-source-vector ref="noteSourceRef">
       <ol-feature v-for="data in displayedNotes" :properties="data" :key="data.id">
         <ol-geom-point :coordinates="data.geom.coordinates"></ol-geom-point>
