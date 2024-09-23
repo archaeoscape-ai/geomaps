@@ -92,6 +92,16 @@ export const useNoteStore = defineStore('note', () => {
     notes.value.push(data)
   }
 
+  function addNewNoteMarker(coordinates) {
+    selectedNote.value = {
+      id: 'new-note',
+      geom: {
+        type: 'Point',
+        coordinates,
+      },
+    }
+  }
+
   function resetNoteOverlay() {
     selectedNote.value = null
     isAddingNote.value = false
@@ -146,6 +156,7 @@ export const useNoteStore = defineStore('note', () => {
 
     // actions
     addNote,
+    addNewNoteMarker,
     resetNoteOverlay,
     zoomInNote,
   }
