@@ -1,5 +1,6 @@
-import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { defineStore, storeToRefs } from 'pinia'
+import { computed, nextTick, ref } from 'vue'
+import { useMapStore } from './MapStore'
 
 const mockData = {
   count: 1,
@@ -12,8 +13,8 @@ const mockData = {
         type: 'Point',
         coordinates: [-8227603.583055657, 5724317.703220517],
       },
-      title: 'test',
-      body: 'test',
+      title: 'test title',
+      body: 'this is a body of a note',
       map: 536,
       owner_name: 'CS Admin',
       created_by: 75,
@@ -39,8 +40,11 @@ export const useNoteStore = defineStore('note', () => {
   const notes = ref(mockData)
   const notesGeom = ref(mockDataGeom)
   const selectedNote = ref(null)
-  const selectedNoteDetail = ref(null)
+  const selectedNoteDetail = ref(mockData.results[0])
   const isLoading = ref(false)
+
+  const mapStore = useMapStore()
+  const { map } = storeToRefs(mapStore)
 
   /**
    * @type {import('vue').Ref<{ select: import('ol/interaction').Select } | null>}
@@ -94,6 +98,36 @@ export const useNoteStore = defineStore('note', () => {
     isEditingNote.value = false
   }
 
+  // Programmatically dispatch event and select note feature
+  function zoomInNote(note) {
+    selectedNote.value = note
+    resetNoteOverlay()
+    const features = noteSourceRef.value.source.getFeaturesAtCoordinate(note.geom.coordinates)
+
+    if (features.length > 0) {
+      for (let i = 0; i < features.length; i++) {
+        const feature = features[i]
+        if (feature.get('id') === note.id) {
+          selectNoteInteractionRef.value.select.getFeatures().clear()
+          selectNoteInteractionRef.value.select.getFeatures().extend(features)
+
+          selectNoteInteractionRef.value.select.dispatchEvent({
+            type: 'select',
+            selected: [feature],
+            deselected: [],
+            payload: { note },
+          })
+
+          // nextTick(() => {
+          //   map.value.map.getView().setCenter(note.geom.coordinates)
+          // })
+        }
+      }
+    } else {
+      console.log('No features found at the given coordinate.')
+    }
+  }
+
   return {
     // states
     notes,
@@ -103,7 +137,7 @@ export const useNoteStore = defineStore('note', () => {
     isEditingNote,
     displayedNotes,
     isLoading,
-    
+
     // layer refs
     selectNoteInteractionRef,
     noteSourceRef,
@@ -112,5 +146,6 @@ export const useNoteStore = defineStore('note', () => {
     // actions
     addNote,
     resetNoteOverlay,
+    zoomInNote,
   }
 })
