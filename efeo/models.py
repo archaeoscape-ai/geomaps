@@ -3,9 +3,33 @@ import uuid
 from django.contrib.gis.db import models as geomodels
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone
+
+from .managers import AllObjectsManager, SoftDeleteManager
 
 
-class Map(models.Model):
+class SoftDeletableModel(models.Model):
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    objects = SoftDeleteManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        abstract = True
+
+    def delete(self, *args, **kwargs):
+        self.deleted_at = timezone.now()
+        self.save()
+
+    def hard_delete(self, *args, **kwargs):
+        super(SoftDeletableModel, self).delete(*args, **kwargs)
+
+    def restore(self):
+        self.deleted_at = None
+        self.save()
+
+
+class Map(SoftDeletableModel):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     center = geomodels.PointField(srid=4326, dim=2)
@@ -40,7 +64,7 @@ class SiteType(models.Model):
         return self.name
 
 
-class Site(models.Model):
+class Site(SoftDeletableModel):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
     map = models.ForeignKey("efeo.Map", related_name="sites", on_delete=models.CASCADE)
     site_type = models.ForeignKey("efeo.SiteType", null=True, on_delete=models.SET_NULL)
