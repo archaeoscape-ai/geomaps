@@ -57,7 +57,7 @@ const onSubmit = form.handleSubmit(async (values) => {
       <FormItem>
         <FormLabel>Password</FormLabel>
         <FormControl>
-          <Input type="text" v-bind="componentField" />
+          <Input type="password" v-bind="componentField" />
         </FormControl>
         <FormMessage />
       </FormItem>
