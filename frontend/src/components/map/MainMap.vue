@@ -6,8 +6,9 @@ import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import NoteLayer from '@/components/notes/NoteLayer.vue'
 import { useNoteStore } from '@/stores/NoteStore'
-import { BASEMAP_URLS } from '@/helpers/constants'
+import { BASEMAP_URLS, BASEMAPS } from '@/helpers/constants'
 import { XYZ } from 'ol/source'
+import TileLayer from 'ol/layer/Tile'
 
 defineProps({
   isPanelActive: Boolean,
@@ -36,16 +37,17 @@ function handleClickMap(event) {
 const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
 
 const baselayerRef = ref(null)
+const sourceRef = ref(null)
 
-onMounted(() => {
-  const source = new XYZ({ url: basemapUrl.value })
-  baselayerRef.value.tileLayer.setSource(source)
-})
+// onMounted(() => {
+//   sourceRef.value.source.setUrl(basemapUrl.value)
+// })
 
-watch(basemapUrl, () => {
-  const source = new XYZ({ url: basemapUrl.value })
-  baselayerRef.value.tileLayer.setSource(source)
-})
+// watch(basemapUrl, () => {
+//   sourceRef.value.source.setUrl(basemapUrl.value)
+//   sourceRef.value.source.refresh()
+//   baselayerRef.value.tileLayer.changed()
+// })
 </script>
 
 <template>
@@ -68,7 +70,7 @@ watch(basemapUrl, () => {
       />
       <ol-tile-layer ref="baselayerRef">
         <!-- BUG -->
-        <!-- <ol-source-xyz :url="basemapUrl" /> -->
+        <ol-source-xyz :url="basemapUrl" />
       </ol-tile-layer>
 
       <NoteLayer />

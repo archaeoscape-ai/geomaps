@@ -15,9 +15,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.441.0",
-    "ol": "^10.1.0",
     "ol-contextmenu": "^5.5.0",
-    "ol-ext": "^4.0.23",
     "pinia": "^2.2.2",
     "radix-vue": "^1.9.5",
     "tailwind-merge": "^2.5.2",
@@ -25,9 +23,11 @@
     "vee-validate": "^4.13.2",
     "vue": "^3.4.37",
     "vue-router": "^4.4.5",
-    "vue3-openlayers": "^11.2.0",
     "vuedraggable": "^4.1.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "vue3-openlayers": "^8.1.0",
+    "ol": "^9.1.0",
+    "ol-ext": "^4.0.18"
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",
