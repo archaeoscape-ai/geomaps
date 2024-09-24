@@ -34,7 +34,7 @@ function toggleShowLegend() {
               layerConfigStore.updateLayerVisibility(props.parentId, props.item.layerId, value)
           "
         />
-        <Label class="cursor-pointer" :for="`${props.item.layerId}`">
+        <Label class="cursor-pointer font-semibold" :for="`${props.item.layerId}`">
           {{ props.item.alias }}
         </Label>
       </div>

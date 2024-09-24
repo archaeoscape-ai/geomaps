@@ -48,7 +48,7 @@ watch(allLayersExpanded, (newValue) => {
               (value) => layerConfigStore.setLayerItemsActiveState(props.layer, value)
             "
           />
-          <Label class="cursor-pointer" :for="props.layer.id">{{ props.layer.title }}</Label>
+          <Label class="cursor-pointer font-semibold" :for="props.layer.id">{{ props.layer.title }}</Label>
         </div>
 
         <ChevronDown
