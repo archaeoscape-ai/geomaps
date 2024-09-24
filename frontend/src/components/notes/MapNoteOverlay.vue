@@ -6,11 +6,12 @@ import MapNoteDetails from './MapNoteDetails.vue'
 import { watch } from 'vue'
 
 const noteStore = useNoteStore()
+const { getNoteById } = noteStore
 const { selectedNote, isCreatingNote, isEditingNote } = storeToRefs(noteStore)
 
 watch(selectedNote, (note) => {
-  if (note) {
-    console.log('load note detail')
+  if (note && note.id !== 'new-note') {
+    getNoteById(1, note.id)
   }
 })
 </script>

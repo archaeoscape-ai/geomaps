@@ -9,8 +9,7 @@ import RightPanelContainer from '@/components/panels/RightPanelContainer.vue'
 
 import { useRightPanelStore } from '@/stores/RightPanelStore'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
-import { useNoteStore } from '@/stores/NoteStore'
-import MapNoteOverlay from '../notes/MapNoteOverlay.vue'
+import BaseMapButtons from '@/components/map/BaseMapButtons.vue'
 
 const leftPanelStore = useLeftPanelStore()
 const { activePanel } = storeToRefs(leftPanelStore)
@@ -29,11 +28,7 @@ const isRightPanelActive = computed(() => activeRightPanel.value !== null)
     <LeftPanelButtons :isPanelActive="isLeftPanelActive" />
     <RightPanelButtons :isPanelActive="isRightPanelActive" />
     <RightPanelContainer :isPanelActive="isRightPanelActive" />
-
-    <div class="absolute bottom-4 right-4 flex flex-col gap-4 bg-red-100">
-      <button>1</button>
-      <button>2</button>
-    </div>
+    <BaseMapButtons :isPanelActive="isRightPanelActive" />
   </div>
 </template>
 

@@ -6,10 +6,11 @@ import { X, Plus } from 'lucide-vue-next'
 import NoteCard from '../notes/NoteCard.vue'
 import { storeToRefs } from 'pinia'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
+import { onMounted, watch } from 'vue'
 
 const noteStore = useNoteStore()
-const { resetNoteOverlay } = noteStore
-const { notes, isAddingNote } = storeToRefs(noteStore)
+const { notes, isAddingNote, page, pageSize } = storeToRefs(noteStore)
+const { resetNoteOverlay, getNotes, getNotesGeom } = noteStore
 
 const rightPanelStore = useRightPanelStore()
 const { activePanel } = storeToRefs(rightPanelStore)
@@ -21,6 +22,21 @@ function handleCreateNote() {
     isAddingNote.value = true
   }
 }
+
+onMounted(() => {
+  getNotes(1)
+  getNotesGeom(1)
+})
+
+function handleFetchNotes({ currentPage, currentPageSize }) {
+  page.value = currentPage
+  pageSize.value = currentPageSize
+  getNotes(1)
+}
+
+watch(notes, () => {
+  console.log(notes.value)
+})
 </script>
 
 <template>
@@ -38,7 +54,7 @@ function handleCreateNote() {
     </div>
     <div class="px-4">
       <Button
-        class="w-full flex items-center gap-1"
+        class="flex w-full items-center gap-1"
         @click="handleCreateNote"
         :variant="isAddingNote ? 'outline' : 'default'"
       >
@@ -48,10 +64,15 @@ function handleCreateNote() {
       </Button>
     </div>
     <div class="flex flex-grow flex-col gap-4 overflow-auto p-4">
-      <NoteCard :note="note" v-for="note in notes.results" :key="note.id" />
+      <NoteCard :note="note" v-for="note in notes?.results" :key="note.id" />
     </div>
     <div class="flex justify-center p-3">
-      <Pagination :totalRecords="10" :page="1" :pageSize="5" />
+      <Pagination
+        :totalRecords="notes?.count || 0"
+        :page="page"
+        :pageSize="pageSize"
+        @fetchData="handleFetchNotes"
+      />
     </div>
   </div>
 </template>

@@ -5,6 +5,7 @@ import GpsIcon from '@/assets/gps-icon.svg?component'
 import RulerIcon from '@/assets/ruler-icon.svg?component'
 import SaveIcon from '@/assets/save-icon.svg?component'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 defineProps({
   isPanelActive: Boolean,
@@ -23,28 +24,71 @@ const { toggleMenu } = leftPanelStore
     }"
   >
     <div class="flex flex-col gap-3">
-      <Button size="icon" @click="toggleMenu">
-        <MapPin class="h-4.5 w-4.5" />
-      </Button>
-
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button size="icon" @click="toggleMenu">
+              <MapPin class="h-4.5 w-4.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <p>Sites</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <!-- TODO: Get current user location and add a pin -->
-      <Button size="icon">
-        <GpsIcon />
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button size="icon">
+              <GpsIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <p>GPS</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
       <!-- TODO: Distance -->
-      <Button size="icon">
-        <RulerIcon />
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button size="icon">
+              <RulerIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <p>Measure</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
       <!-- TODO: Share map -->
-      <Button size="icon">
-        <Share2 class="h-4.5 w-4.5" />
-      </Button>
-
-      <Button size="icon">
-        <SaveIcon />
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button size="icon">
+              <Share2 class="h-4.5 w-4.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <p>Share</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button size="icon">
+              <SaveIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <p>Save</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   </div>
 </template>

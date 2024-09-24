@@ -1,18 +1,20 @@
 <script setup>
 import { fromLonLat } from 'ol/proj'
-import { ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import MapControls from './MapControls.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import NoteLayer from '@/components/notes/NoteLayer.vue'
 import { useNoteStore } from '@/stores/NoteStore'
+import { BASEMAP_URLS } from '@/helpers/constants'
+import { XYZ } from 'ol/source'
 
 defineProps({
   isPanelActive: Boolean,
 })
 
 const mapStore = useMapStore()
-const { map } = storeToRefs(mapStore)
+const { map, basemap } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
 const { addNewNoteMarker } = noteStore
@@ -30,6 +32,20 @@ function handleClickMap(event) {
     return
   }
 }
+
+const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
+
+const baselayerRef = ref(null)
+
+onMounted(() => {
+  const source = new XYZ({ url: basemapUrl.value })
+  baselayerRef.value.tileLayer.setSource(source)
+})
+
+watch(basemapUrl, () => {
+  const source = new XYZ({ url: basemapUrl.value })
+  baselayerRef.value.tileLayer.setSource(source)
+})
 </script>
 
 <template>
@@ -50,8 +66,9 @@ function handleClickMap(event) {
         :zoom="zoom"
         :projection="projection"
       />
-      <ol-tile-layer>
-        <ol-source-osm />
+      <ol-tile-layer ref="baselayerRef">
+        <!-- BUG -->
+        <!-- <ol-source-xyz :url="basemapUrl" /> -->
       </ol-tile-layer>
 
       <NoteLayer />

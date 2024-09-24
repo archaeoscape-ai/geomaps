@@ -1,4 +1,5 @@
 <script setup>
+import { watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -10,7 +11,8 @@ import { useNoteStore } from '@/stores/NoteStore'
 import { storeToRefs } from 'pinia'
 
 const noteStore = useNoteStore()
-const { selectedNoteDetail, isCreatingNote } = storeToRefs(noteStore)
+const { addNote, updateNote } = noteStore
+const { selectedNote, selectedNoteDetail, isCreatingNote } = storeToRefs(noteStore)
 
 const formSchema = toTypedSchema(
   z.object({
@@ -27,14 +29,28 @@ const form = useForm({
   },
 })
 
-const onSubmit = form.handleSubmit((values) => {
-  console.log('Form submitted!', values)
+const onSubmit = form.handleSubmit(async (values) => {
+  const data = {
+    ...values,
+    geom: selectedNote.value.geom,
+  }
+
+  if (isCreatingNote.value) {
+    await addNote(1, data)
+  } else {
+    await updateNote(1, selectedNote.value.id, data)
+  }
+})
+
+watch(selectedNoteDetail, () => {
+  form.setFieldValue('title', selectedNoteDetail.value?.title)
+  form.setFieldValue('body', selectedNoteDetail.value?.body)
 })
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <h3 class="text-base font-bold">{{  isCreatingNote ? 'Create Note' : 'Update Note' }}</h3>
+    <h3 class="text-base font-bold">{{ isCreatingNote ? 'Create Note' : 'Update Note' }}</h3>
     <form @submit="onSubmit" class="flex w-80 flex-col gap-4">
       <FormField v-slot="{ componentField }" name="title">
         <FormItem>

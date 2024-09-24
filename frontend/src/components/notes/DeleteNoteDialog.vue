@@ -11,7 +11,9 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import Button from '@/components/ui/button/Button.vue'
+import { useNoteStore } from '@/stores/NoteStore'
 import { Loader2 } from 'lucide-vue-next'
+import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 
 const props = defineProps({
@@ -22,13 +24,13 @@ const props = defineProps({
 })
 
 const open = ref(false)
-const isLoading = ref(false)
 
-async function confirm(event) {
-  console.log(event, props.noteId)
-  isLoading.value = true
-  await new Promise((resolve) => setTimeout(() => resolve('Hello'), 1000))
-  isLoading.value = false
+const noteStore = useNoteStore()
+const { isLoading } = storeToRefs(noteStore)
+const { deleteNote } = noteStore
+
+async function confirm() {
+  await deleteNote(1, props.noteId)
   open.value = false
 }
 </script>

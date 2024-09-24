@@ -1,3 +1,4 @@
+import { BASEMAPS } from '@/helpers/constants'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -7,13 +8,10 @@ export const useMapStore = defineStore('map', () => {
    */
   const map = ref(null)
 
-  function setMap(m) {
-    map.value = m
-  }
+  const basemap = ref(BASEMAPS.OSM)
 
   return {
     map,
-
-    setMap,
+    basemap,
   }
 })

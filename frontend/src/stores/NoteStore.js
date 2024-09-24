@@ -1,50 +1,22 @@
-import { defineStore, storeToRefs } from 'pinia'
-import { computed, nextTick, ref } from 'vue'
-import { useMapStore } from './MapStore'
-
-const mockData = {
-  count: 1,
-  next: null,
-  previous: null,
-  results: [
-    {
-      id: 261,
-      geom: {
-        type: 'Point',
-        coordinates: [-8227603.583055657, 5724317.703220517],
-      },
-      title: 'test title',
-      body: 'this is a body of a note',
-      map: 536,
-      owner_name: 'CS Admin',
-      created_by: 75,
-      created_on: '2024-09-19T20:49:45.894061Z',
-      updated_on: '2024-09-19T20:49:45.894091Z',
-      is_shared: false,
-    },
-  ],
-}
-
-const mockDataGeom = [
-  {
-    id: 261,
-    geom: {
-      type: 'Point',
-      coordinates: [-8227603.583055657, 5724317.703220517],
-    },
-    is_shared: false,
-  },
-]
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import {
+  addNewNote,
+  deleteCurrentNote,
+  fetchNoteById,
+  fetchNoteGeoms,
+  fetchNotes,
+  updateCurrentNote,
+} from '@/api-services/NoteService'
 
 export const useNoteStore = defineStore('note', () => {
-  const notes = ref(mockData)
-  const notesGeom = ref(mockDataGeom)
+  const notes = ref(null)
+  const notesGeom = ref([])
   const selectedNote = ref(null)
-  const selectedNoteDetail = ref(mockData.results[0])
+  const selectedNoteDetail = ref()
   const isLoading = ref(false)
-
-  const mapStore = useMapStore()
-  const { map } = storeToRefs(mapStore)
+  const page = ref(1)
+  const pageSize = ref(10)
 
   /**
    * @type {import('vue').Ref<{ select: import('ol/interaction').Select } | null>}
@@ -87,9 +59,57 @@ export const useNoteStore = defineStore('note', () => {
     return [...notesGeom.value, selectedNote.value]
   })
 
-  function addNote(data) {
-    // TODO
-    notes.value.push(data)
+  async function getNotes(mapId) {
+    isLoading.value = true
+    const data = await fetchNotes(mapId, {
+      limit: pageSize.value,
+      offset: (page.value - 1) * pageSize.value,
+    })
+    notes.value = data
+    isLoading.value = false
+  }
+
+  async function getNotesGeom(mapId) {
+    isLoading.value = true
+    const data = await fetchNoteGeoms(mapId)
+    notesGeom.value = data
+    isLoading.value = false
+  }
+
+  async function addNote(mapId, data) {
+    isLoading.value = true
+    await addNewNote(mapId, data)
+    await getNotesGeom(mapId)
+    await getNotes(mapId)
+    isLoading.value = false
+    resetNoteOverlay()
+    // toast.success('Note successfully added')
+  }
+
+  async function updateNote(mapId, noteId, data) {
+    isLoading.value = true
+    await updateCurrentNote(mapId, noteId, data)
+    await getNotes(mapId)
+    isLoading.value = false
+    resetNoteOverlay()
+    // toast.success('Note successfully updated')
+  }
+
+  async function deleteNote(mapId, noteId) {
+    isLoading.value = true
+    await deleteCurrentNote(mapId, noteId)
+    await getNotesGeom(mapId)
+    await getNotes(mapId)
+    isLoading.value = false
+    resetNoteOverlay()
+    // toast.success('Note successfully deleted')
+  }
+
+  async function getNoteById(mapId, noteId) {
+    isLoading.value = true
+    const data = await fetchNoteById(mapId, noteId)
+    selectedNoteDetail.value = data
+    isLoading.value = false
   }
 
   function addNewNoteMarker(coordinates) {
@@ -104,6 +124,7 @@ export const useNoteStore = defineStore('note', () => {
 
   function resetNoteOverlay() {
     selectedNote.value = null
+    selectedNoteDetail.value = null
     isAddingNote.value = false
     isEditingNote.value = false
   }
@@ -148,6 +169,8 @@ export const useNoteStore = defineStore('note', () => {
     isCreatingNote,
     displayedNotes,
     isLoading,
+    page,
+    pageSize,
 
     // layer refs
     selectNoteInteractionRef,
@@ -159,5 +182,10 @@ export const useNoteStore = defineStore('note', () => {
     addNewNoteMarker,
     resetNoteOverlay,
     zoomInNote,
+    getNotes,
+    getNotesGeom,
+    updateNote,
+    deleteNote,
+    getNoteById,
   }
 })

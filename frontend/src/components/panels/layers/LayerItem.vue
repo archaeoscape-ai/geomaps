@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import Switch from '@/components/ui/switch/Switch.vue'
 import Label from '@/components/ui/label/Label.vue'
 import Slider from '@/components/ui/slider/Slider.vue'
@@ -34,7 +34,7 @@ function toggleShowLegend() {
               layerConfigStore.updateLayerVisibility(props.parentId, props.item.layerId, value)
           "
         />
-        <Label class="cursor-pointer" :for="`${props.item.layerId}`">
+        <Label class="cursor-pointer font-semibold" :for="`${props.item.layerId}`">
           {{ props.item.alias }}
         </Label>
       </div>

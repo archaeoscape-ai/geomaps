@@ -5,6 +5,7 @@ import NoteIcon from '@/assets/note-icon.svg?component'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
 import LogoIcon from '@/assets/logo-icon.svg?component'
 import { RIGHT_PANELS } from '@/helpers/constants'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 defineProps({
   isPanelActive: Boolean,
@@ -27,12 +28,31 @@ const { openPanel } = rightPanelStore
         <LogoIcon />
       </Button>
 
-      <Button size="icon" @click="openPanel(RIGHT_PANELS.LAYER)">
-        <LayersIcon class="h-4.5 w-4.5" />
-      </Button>
-      <Button size="icon" @click="openPanel(RIGHT_PANELS.NOTE)">
-        <NoteIcon />
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button size="icon" @click="openPanel(RIGHT_PANELS.LAYER)">
+              <LayersIcon class="h-4.5 w-4.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="left">
+            <p>Layers</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button size="icon" @click="openPanel(RIGHT_PANELS.NOTE)">
+              <NoteIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="left">
+            <p>Notes</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   </div>
 </template>
