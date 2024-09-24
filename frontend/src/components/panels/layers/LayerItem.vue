@@ -25,7 +25,7 @@ function toggleShowLegend() {
   <Card class="mt-4">
     <CardHeader class="flex flex-row justify-between p-2">
       <div class="flex items-center gap-2">
-        <GripVertical class="drag-handle cursor-pointer text-muted-foreground" />
+        <GripVertical class="drag-handle cursor-pointer stroke-button-icon" />
         <Switch
           :id="`${props.item.layerId}`"
           :checked="props.item.isActive"
@@ -40,12 +40,12 @@ function toggleShowLegend() {
       </div>
 
       <ChevronDown
-        class="cursor-pointer text-muted-foreground"
+        class="cursor-pointer stroke-button-icon"
         @click="layerConfigStore.updateLayerExpandedState(props.item, true)"
         v-if="!layerConfigStore.isLayerExpanded(props.item.layerId)"
       />
       <ChevronUp
-        class="cursor-pointer text-muted-foreground"
+        class="cursor-pointer stroke-button-icon"
         @click="layerConfigStore.updateLayerExpandedState(props.item, false)"
         v-else
       />
@@ -58,16 +58,16 @@ function toggleShowLegend() {
       <div class="flex w-full flex-col gap-4 px-1">
         <div class="flex items-center gap-4">
           <span
-            class="cursor-pointer text-muted-foreground"
+            class="cursor-pointer stroke-button-icon"
             @click="() => console.log('zoom to extent')"
           >
             <Scan />
           </span>
-          <span class="cursor-pointer text-muted-foreground" @click="toggleShowLegend">
+          <span class="cursor-pointer stroke-button-icon" @click="toggleShowLegend">
             <List />
           </span>
           <span
-            class="cursor-pointer text-muted-foreground"
+            class="cursor-pointer stroke-button-icon"
             @click="() => console.log('identify layer')"
           >
             <Info />
