@@ -40,7 +40,7 @@ watch(allLayersExpanded, (newValue) => {
     <Card>
       <CardContent class="p-2">
         <div class="flex items-center gap-2">
-          <GripVertical class="drag-handle cursor-pointer text-muted-foreground" />
+          <GripVertical class="drag-handle cursor-pointer stroke-button-icon" />
           <Switch
             :id="props.layer.id"
             :checked="isParentActive"
@@ -48,16 +48,18 @@ watch(allLayersExpanded, (newValue) => {
               (value) => layerConfigStore.setLayerItemsActiveState(props.layer, value)
             "
           />
-          <Label class="cursor-pointer font-semibold" :for="props.layer.id">{{ props.layer.title }}</Label>
+          <Label class="cursor-pointer font-semibold" :for="props.layer.id">{{
+            props.layer.title
+          }}</Label>
         </div>
 
         <ChevronDown
-          class="cursor-pointer text-muted-foreground"
+          class="cursor-pointer stroke-button-icon"
           @click="handleParentExpansion"
           v-if="!parentExpanded"
         />
         <ChevronUp
-          class="cursor-pointer text-muted-foreground"
+          class="cursor-pointer stroke-button-icon"
           @click="handleParentExpansion"
           v-else
         />

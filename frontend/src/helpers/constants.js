@@ -21,5 +21,27 @@ export const BASEMAPS = {
 
 export const BASEMAP_URLS = {
   [BASEMAPS.OSM]: 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  [BASEMAPS.ESRI]: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  [BASEMAPS.ESRI]:
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+}
+
+export const LEFT_PANELS = {
+  CREATE: 'create',
+  IDENTIFY: 'identify',
+  LIST: 'sites',
+}
+
+export const LEFT_PANEL_MAPPING = {
+  [LEFT_PANELS.LIST]: {
+    id: LEFT_PANELS.LIST,
+    name: 'Sites',
+  },
+  [LEFT_PANELS.CREATE]: {
+    id: LEFT_PANELS.CREATE,
+    name: 'Create',
+  },
+  [LEFT_PANELS.IDENTIFY]: {
+    id: LEFT_PANELS.IDENTIFY,
+    name: 'Identify/Edit',
+  },
 }

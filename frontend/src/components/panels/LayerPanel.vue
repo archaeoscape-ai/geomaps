@@ -41,7 +41,7 @@ const list = computed({
       <div class="relative w-full">
         <Input id="search" type="text" placeholder="Search layers" class="pl-10" />
         <span class="absolute inset-y-0 start-0 flex items-center justify-center px-2">
-          <Search class="size-5 text-muted-foreground" />
+          <Search class="size-5 stroke-button-icon" />
         </span>
       </div>
     </div>
