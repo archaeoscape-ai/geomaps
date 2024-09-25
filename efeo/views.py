@@ -10,6 +10,7 @@ from efeo.models import Map, MapConfig, MapNote, Site, SiteType
 from efeo.permissions import AdminOrStandardPermission, MapNotePermission
 from efeo.serializers import (
     MapConfigSerializer,
+    MapDetailSerializer,
     MapNoteGeomSerializer,
     MapNoteSerializer,
     MapSerializer,
@@ -20,6 +21,11 @@ from efeo.serializers import (
 
 class MapListView(generics.ListAPIView):
     serializer_class = MapSerializer
+    queryset = Map.objects.all()
+
+
+class MapDetailView(generics.RetrieveAPIView):
+    serializer_class = MapDetailSerializer
     queryset = Map.objects.all()
 
 
