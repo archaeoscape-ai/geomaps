@@ -37,7 +37,6 @@ const componentMapping = {
       </div>
 
       <!-- panel content -->
-
       <component v-if="activePanel" :is="componentMapping[activePanel.id]" />
     </div>
   </div>

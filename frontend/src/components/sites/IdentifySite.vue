@@ -1,32 +1,48 @@
 <script setup>
-import { useLeftPanelStore } from '@/stores/LeftPanelStore'
+import { storeToRefs } from 'pinia'
 import { useSiteStore } from '@/stores/SiteStore'
 import Button from '@/components/ui/button/Button.vue'
-import { X } from 'lucide-vue-next'
-import { storeToRefs } from 'pinia'
-
-const leftPanelStore = useLeftPanelStore()
-const { activePanel, tabs } = storeToRefs(leftPanelStore)
+import CreateSiteForm from '@/components/sites/CreateSiteForm.vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import SiteDetail from '@/components/sites/SiteDetail.vue'
+import LeftPanelWrapper from '@/components/panels/LeftPanelWrapper.vue'
+import DeleteSiteDialog from './DeleteSiteDialog.vue'
+import { Trash } from 'lucide-vue-next'
 
 const siteStore = useSiteStore()
-const { selectedSite } = storeToRefs(siteStore)
+const { selectedSite, isEditingSite } = storeToRefs(siteStore)
+
+const heading = computed(() => {
+  return isEditingSite.value ? 'Update Site' : 'Site Details'
+})
+
+function toggleSiteEdit() {
+  isEditingSite.value = !isEditingSite.value
+}
+
+onBeforeUnmount(() => (isEditingSite.value = false))
 </script>
 
 <template>
-  <div class="p-4">
-    <div class="flex items-center justify-between">
-      <h2 class="font-bold">Sites</h2>
-      <div class="flex gap-4">
-        <Button
-          size="icon"
-          variant="secondary"
-          class="rounded-full bg-white"
-          @click="activePanel = null"
-        >
-          <X class="stroke-button-icon" />
+  <LeftPanelWrapper :header="heading">
+    <template v-slot:header-actions>
+      <DeleteSiteDialog :site-id="selectedSite.id" v-if="selectedSite">
+        <Button size="xs">
+          <p>Delete</p>
         </Button>
-      </div>
-    </div>
+      </DeleteSiteDialog>
+      <Button @click="toggleSiteEdit" size="xs" v-if="selectedSite">
+        <p>{{ isEditingSite ? 'Cancle' : 'Edit' }}</p>
+      </Button>
+    </template>
+  </LeftPanelWrapper>
+
+  <div class="flex flex-grow flex-col gap-4 overflow-auto" v-if="selectedSite">
+    <CreateSiteForm v-if="isEditingSite" class="px-4" />
+    <SiteDetail v-else />
   </div>
-  <h1>site details</h1>
+
+  <div v-else class="flex flex-grow items-center justify-center">
+    <p class="text-sm italic text-muted-foreground">Please select a site</p>
+  </div>
 </template>

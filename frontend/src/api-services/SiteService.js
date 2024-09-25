@@ -7,7 +7,7 @@ export async function getMapSites(mapId, params) {
 }
 
 export async function createSite(mapId, data) {
-  const response = await axios.post(`${mapSiteResource}/${mapId}/`, data)
+  const response = await axios.post(`${mapSiteResource}/${mapId}/sites/`, data)
   return response.data
 }
 
@@ -23,5 +23,10 @@ export async function updateSite(siteId, data) {
 
 export async function deleteSite(siteId) {
   const response = await axios.delete(`${siteResource}/${siteId}/`)
+  return response.data
+}
+
+export async function getSiteTypes(params) {
+  const response = await axios.get(`/api/efeo/site-types/`, { params })
   return response.data
 }

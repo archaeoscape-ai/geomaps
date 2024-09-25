@@ -68,7 +68,7 @@ watch(selectedNote, (value) => {
   <ol-overlay :autoPan="true" ref="noteOverlayRef" :stopEvent="true" :offset="[32, -16]">
     <div class="rounded bg-white shadow-[0px_0px_6px_4px_#0000001F]">
       <MapNoteOverlay />
-      <div class="absolute h-4 w-4 top-3 -left-2 rotate-45 bg-white"></div>
+      <div class="absolute -left-2 top-3 h-4 w-4 rotate-45 bg-white"></div>
     </div>
   </ol-overlay>
 </template>

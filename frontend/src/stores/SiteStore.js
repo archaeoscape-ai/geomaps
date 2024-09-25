@@ -1,15 +1,34 @@
-import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { defineStore } from 'pinia'
 import * as siteService from '@/api-services/SiteService'
 
 export const useSiteStore = defineStore('site', () => {
+  /**
+   * @type {import('vue').Ref<{ source: import('ol/source/Vector').default } | null>}
+   */
+  const identifySiteSourceRef = ref(null)
+
   const isLoading = ref(false)
+  const isCreatingSite = ref(false)
+  const isEditingSite = ref(false)
 
   const sites = ref(null)
   const page = ref(0)
   const pageSize = ref(10)
   const searchText = ref('')
   const selectedSite = ref(null)
+  const siteMarker = ref(null)
+
+  const siteTypes = ref(null)
+
+  async function getSiteTypes() {
+    const params = {
+      limit: -1,
+      offset: 0,
+    }
+    const data = await siteService.getSiteTypes(params)
+    siteTypes.value = data
+  }
 
   async function getSites(mapId) {
     if (isLoading.value) return
@@ -29,8 +48,24 @@ export const useSiteStore = defineStore('site', () => {
     }
   }
 
-  function setSelectedSite(site) {
-    selectedSite.value = site
+  async function createSite(mapId, data) {
+    const res = await siteService.createSite(mapId, data)
+    selectedSite.value = res
+  }
+
+  async function updateSite(siteId, data) {
+    const res = await siteService.updateSite(siteId, data)
+    selectedSite.value = res
+  }
+
+  function setSiteMarker(coordinates) {
+    siteMarker.value = coordinates
+  }
+
+  async function deleteSite(siteId) {
+    await siteService.deleteSite(siteId)
+    selectedSite.value = null
+    siteMarker.value = null
   }
 
   return {
@@ -39,8 +74,17 @@ export const useSiteStore = defineStore('site', () => {
     pageSize,
     searchText,
     selectedSite,
+    siteTypes,
+    isCreatingSite,
+    identifySiteSourceRef,
+    siteMarker,
+    isEditingSite,
 
     getSites,
-    setSelectedSite,
+    getSiteTypes,
+    updateSite,
+    createSite,
+    setSiteMarker,
+    deleteSite,
   }
 })
