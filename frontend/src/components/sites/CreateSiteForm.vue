@@ -1,0 +1,144 @@
+<script setup>
+import { computed, onMounted, watch } from 'vue'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as z from 'zod'
+import { Button } from '@/components/ui/button'
+import { storeToRefs } from 'pinia'
+import { useSiteStore } from '@/stores/SiteStore'
+import { useMapStore } from '@/stores/MapStore'
+import { transform } from 'ol/proj'
+import FormInputField from '../ui/input/FormInputField.vue'
+import FormTextareaField from '../ui/textarea/FormTextareaField.vue'
+import FormCheckboxField from '../ui/checkbox/FormCheckboxField.vue'
+import FormSelectField from '../ui/select/FormSelectField.vue'
+
+const mapStore = useMapStore()
+const { currentMap } = storeToRefs(mapStore)
+
+const siteStore = useSiteStore()
+const { selectedSite, siteTypes, isCreatingSite, siteMarker, isEditingSite } =
+  storeToRefs(siteStore)
+
+onMounted(async () => {
+  await siteStore.getSiteTypes()
+})
+
+const formSchema = toTypedSchema(
+  z.object({
+    english_name: z.string().min(1, { message: 'This field has to be filled' }),
+    french_name: z.string().optional(),
+    khmer_name: z.string().optional(),
+    latitude: z.number().or(z.string()).pipe(z.coerce.number().gte(-90).lt(90)),
+    longitude: z.number().or(z.string()).pipe(z.coerce.number().gte(-180).lt(180)),
+    alternative_name: z.string().optional(),
+    alternative_khmer_name: z.string().optional(),
+    description: z.string().optional(),
+    ik_id_starred: z.boolean().default(false).optional(),
+    site_type: z.string().optional(),
+    inventaire_khmere_id: z.string().optional(),
+    monuments_hostoriques_id: z.string().optional(),
+  }),
+)
+
+const initialFormValues = computed(() => ({
+  english_name: selectedSite.value?.english_name || '',
+  french_name: selectedSite.value?.french_name || '',
+  khmer_name: selectedSite.value?.khmer_name || '',
+  alternative_name: selectedSite.value?.alternative_name || '',
+  alternative_khmer_name: selectedSite.value?.alternative_khmer_name || '',
+  description: selectedSite.value?.description || '',
+  ik_id_starred: selectedSite.value?.ik_id_starred || false,
+  site_type: selectedSite.value?.site_type?.toString() || '',
+  latitude: selectedSite.value?.location.coordinates[1] || '',
+  longitude: selectedSite.value?.location.coordinates[0] || '',
+}))
+
+const form = useForm({
+  validationSchema: formSchema,
+  initialValues: initialFormValues.value,
+})
+
+const onSubmit = form.handleSubmit(async (values) => {
+  try {
+    const data = {
+      ...values,
+      location: {
+        type: 'Point',
+        coordinates: [values.longitude, values.latitude],
+      },
+    }
+    if (selectedSite.value && isEditingSite.value) {
+      await siteStore.updateSite(selectedSite.value.id, data)
+    } else {
+      await siteStore.createSite(currentMap.value.id, data)
+    }
+  } catch (error) {
+    if (error.status === 400) {
+      for (const [fieldName, errorMessage] of Object.entries(error.response.data)) {
+        form.setFieldError(fieldName, errorMessage)
+      }
+      return
+    }
+    console.log(error)
+  }
+})
+
+function setFieldValue() {
+  form.resetForm({ values: initialFormValues.value })
+}
+
+watch(isCreatingSite, (newValue) => {
+  if (newValue) {
+    form.resetForm({
+      values: {
+        english_name: '',
+        french_name: '',
+        khmer_name: '',
+        alternative_name: '',
+        alternative_khmer_name: '',
+        description: '',
+        ik_id_starred: false,
+        site_type: '',
+        longitude: '',
+        latitude: '',
+      },
+    })
+  } else {
+    setFieldValue()
+  }
+})
+
+watch(siteMarker, (newValue) => {
+  if (newValue) {
+    const coords = transform(newValue, 'EPSG:3857', 'EPSG:4326')
+
+    form.setFieldValue('latitude', coords[1])
+    form.setFieldValue('longitude', coords[0])
+  }
+})
+</script>
+
+<template>
+  <div class="flex flex-col gap-4">
+    <form @submit="onSubmit" class="flex flex-col gap-4">
+      <FormSelectField name="site_type" label="Site Type" :options="siteTypes?.results" />
+      <hr />
+      <FormInputField name="english_name" label="English Name" />
+      <FormInputField name="french_name" label="French Name" />
+      <FormInputField name="khmer_name" label="Khmer Name" />
+      <FormInputField name="alternative_name" label="Alternative Name" />
+      <FormInputField name="alternative_khmer_name" label="Alternative Khmer Name" />
+      <FormInputField name="latitude" label="Latitude" />
+      <FormInputField name="longitude" label="Longitude" />
+      <FormTextareaField name="description" label="Description" />
+
+      <hr />
+      <FormCheckboxField name="ik_id_starred" label="IK ID Starred" />
+      <FormInputField name="inventaire_khmere_id" label="Inventaire Khmere (IK) ID" />
+      <FormInputField name="monuments_hostoriques_id" label="Monuments Historiques (MH) ID" />
+
+      <Button type="submit" class="my-4 w-full">Save</Button>
+    </form>
+  </div>
+</template>

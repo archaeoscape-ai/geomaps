@@ -1,28 +1,18 @@
 <script setup>
-import { useMapStore } from '@/stores/MapStore'
-import { useNoteStore } from '@/stores/NoteStore'
-import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import ConfirmationAlertDialog from '../ui/alert-dialog/ConfirmationAlertDialog.vue'
+import { useSiteStore } from '@/stores/SiteStore'
 
 const props = defineProps({
-  noteId: {
-    type: Number,
-    required: true,
-  },
+  siteId: { type: Number, required: false },
 })
 
 const open = ref(false)
 
-const mapStore = useMapStore()
-const { currentMap } = storeToRefs(mapStore)
-
-const noteStore = useNoteStore()
-const { isLoading } = storeToRefs(noteStore)
-const { deleteNote } = noteStore
+const siteStore = useSiteStore()
 
 async function confirm() {
-  await deleteNote(currentMap.value.id, props.noteId)
+  await siteStore.deleteSite(props.siteId)
   open.value = false
 }
 
@@ -38,12 +28,12 @@ function tiggerDialog() {
 <template>
   <ConfirmationAlertDialog
     :open="open"
-    title="Delete Note"
-    description="Are you sure you want to remove this note"
+    title="Delete Site"
+    description="Are you sure you want to remove this site"
     @cancel="cancelDeletion"
     @confirm="confirm"
     @tiggerDialog="tiggerDialog"
-    :isLoading="isLoading"
+    :isLoading="false"
   >
     <slot />
   </ConfirmationAlertDialog>

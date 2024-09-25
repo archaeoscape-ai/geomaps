@@ -1,0 +1,44 @@
+<script setup>
+import { storeToRefs } from 'pinia'
+import { useLeftPanelStore } from '@/stores/LeftPanelStore'
+import { Button } from '@/components/ui/button'
+import { X } from 'lucide-vue-next'
+import { useSiteStore } from '@/stores/SiteStore'
+
+const leftPanelStore = useLeftPanelStore()
+const { activePanel } = storeToRefs(leftPanelStore)
+
+const siteStore = useSiteStore()
+const { selectedSite } = storeToRefs(siteStore)
+
+function handlePanelClose() {
+  activePanel.value = null
+  selectedSite.value = null
+  siteStore.setSiteMarker(null)
+}
+
+defineProps({
+  header: { type: String, required: true },
+})
+</script>
+
+<template>
+  <div class="p-4">
+    <div class="flex items-center justify-between">
+      <h2 class="font-bold">{{ header }}</h2>
+      <div class="flex gap-4">
+        <slot name="header-actions" />
+        <Button
+          size="icon"
+          variant="secondary"
+          class="rounded-full bg-white"
+          @click="handlePanelClose"
+        >
+          <X class="stroke-button-icon" />
+        </Button>
+      </div>
+    </div>
+  </div>
+
+  <slot />
+</template>
