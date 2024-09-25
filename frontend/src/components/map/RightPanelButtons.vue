@@ -3,9 +3,10 @@ import { LayersIcon } from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 import NoteIcon from '@/assets/note-icon.svg?component'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
-import LogoIcon from '@/assets/logo-icon.svg?component'
 import { RIGHT_PANELS } from '@/helpers/constants'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { DropdownMenu } from '../ui/dropdown-menu'
+import MainMenu from './MainMenu.vue'
 
 defineProps({
   isPanelActive: Boolean,
@@ -24,9 +25,7 @@ const { openPanel } = rightPanelStore
     }"
   >
     <div class="flex flex-col gap-3">
-      <Button size="icon" variant="secondary">
-        <LogoIcon />
-      </Button>
+      <MainMenu />
 
       <TooltipProvider>
         <Tooltip>

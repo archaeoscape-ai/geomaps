@@ -3,11 +3,12 @@ import HomeView from '@/components/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/AuthStore'
 import { getActivePinia, storeToRefs } from 'pinia'
+import NotFound from '@/components/views/NotFound.vue'
 
 const routes = [
   { path: '/login', component: LoginView, name: 'login' },
   {
-    path: '/',
+    path: '/:id(\\d+)?',
     component: HomeView,
     name: 'home',
     meta: {
@@ -15,6 +16,7 @@ const routes = [
       requiresAuth: true,
     },
   },
+  { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound },
 ]
 
 const router = createRouter({
@@ -28,7 +30,7 @@ router.beforeEach(async (to, from) => {
   const { isLoggedIn, user } = storeToRefs(authStore)
 
   getActivePinia()._s.forEach((store) => {
-    if (store.$id !== 'auth') {
+    if (store.$id !== 'auth' && store.$id !== 'map') {
       store.$reset()
     }
   })

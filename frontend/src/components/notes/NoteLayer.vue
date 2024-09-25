@@ -5,6 +5,7 @@ import { useRightPanelStore } from '@/stores/RightPanelStore'
 import { storeToRefs } from 'pinia'
 import { ref, watch } from 'vue'
 import MapNoteOverlay from './MapNoteOverlay.vue'
+import { useMapStore } from '@/stores/MapStore'
 
 const strokeColor = ref('rgba(255, 255, 255, 0.4)')
 const fillColor = ref('#FFFFFF')

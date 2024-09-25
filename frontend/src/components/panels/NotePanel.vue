@@ -7,6 +7,10 @@ import NoteCard from '../notes/NoteCard.vue'
 import { storeToRefs } from 'pinia'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
 import { onMounted, watch } from 'vue'
+import { useMapStore } from '@/stores/MapStore'
+
+const mapStore = useMapStore()
+const { currentMap } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
 const { notes, isAddingNote, page, pageSize } = storeToRefs(noteStore)
@@ -19,19 +23,20 @@ function handleCreateNote() {
   if (isAddingNote.value) {
     resetNoteOverlay()
   } else {
+    console.log('here')
     isAddingNote.value = true
   }
 }
 
 onMounted(() => {
-  getNotes(1)
-  getNotesGeom(1)
+  getNotes(currentMap.value.id)
+  getNotesGeom(currentMap.value.id)
 })
 
 function handleFetchNotes({ currentPage, currentPageSize }) {
   page.value = currentPage
   pageSize.value = currentPageSize
-  getNotes(1)
+  getNotes(currentMap.value.id)
 }
 
 watch(notes, () => {
