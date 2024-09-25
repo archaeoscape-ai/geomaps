@@ -1,12 +1,12 @@
 <script setup>
-import { fromLonLat } from 'ol/proj'
 import { computed, ref } from 'vue'
 import MapControls from './MapControls.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import NoteLayer from '@/components/notes/NoteLayer.vue'
 import { useNoteStore } from '@/stores/NoteStore'
-import { BASEMAP_URLS } from '@/helpers/constants'
+import { BASEMAP_URLS, RIGHT_PANELS } from '@/helpers/constants'
+import { useRightPanelStore } from '@/stores/RightPanelStore'
 
 defineProps({
   isPanelActive: Boolean,
@@ -18,6 +18,9 @@ const { mapRef, basemap, zoom, center } = storeToRefs(mapStore)
 const noteStore = useNoteStore()
 const { addNewNoteMarker } = noteStore
 const { isAddingNote } = storeToRefs(noteStore)
+
+const rightPanelStore = useRightPanelStore()
+const { activePanel } = storeToRefs(rightPanelStore)
 
 const projection = ref('EPSG:3857')
 const rotation = ref(0)
@@ -34,14 +37,16 @@ const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
 </script>
 
 <template>
-  <div class="absolute inset-0">
+  <div
+    class="absolute inset-0"
+    :class="{
+      'hover:cursor-crosshair': isAddingNote,
+    }"
+  >
     <ol-map
       class="h-full"
       :controls="[]"
       ref="mapRef"
-      :class="{
-        'hover:cursor-crosshair': isAddingNote,
-      }"
       @click="handleClickMap"
     >
       <ol-view
@@ -55,7 +60,7 @@ const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
         <ol-source-xyz :url="basemapUrl" />
       </ol-tile-layer>
 
-      <NoteLayer />
+      <NoteLayer v-if="activePanel === RIGHT_PANELS.NOTE"/>
     </ol-map>
 
     <MapControls :is-panel-active="isPanelActive" :map="mapRef" />

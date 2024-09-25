@@ -9,10 +9,14 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 import { useNoteStore } from '@/stores/NoteStore'
 import { storeToRefs } from 'pinia'
+import { useMapStore } from '@/stores/MapStore'
 
 const noteStore = useNoteStore()
 const { addNote, updateNote } = noteStore
 const { selectedNote, selectedNoteDetail, isCreatingNote } = storeToRefs(noteStore)
+
+const mapStore = useMapStore()
+const { currentMap } = storeToRefs(mapStore)
 
 const formSchema = toTypedSchema(
   z.object({
@@ -36,9 +40,9 @@ const onSubmit = form.handleSubmit(async (values) => {
   }
 
   if (isCreatingNote.value) {
-    await addNote(1, data)
+    await addNote(currentMap.value.id, data)
   } else {
-    await updateNote(1, selectedNote.value.id, data)
+    await updateNote(currentMap.value.id, selectedNote.value.id, data)
   }
 })
 

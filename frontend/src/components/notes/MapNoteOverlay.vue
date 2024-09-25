@@ -4,6 +4,10 @@ import { useNoteStore } from '@/stores/NoteStore'
 import CreateMapNote from './CreateMapNote.vue'
 import MapNoteDetails from './MapNoteDetails.vue'
 import { watch } from 'vue'
+import { useMapStore } from '@/stores/MapStore'
+
+const mapStore = useMapStore()
+const { currentMap } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
 const { getNoteById } = noteStore
@@ -11,7 +15,7 @@ const { selectedNote, isCreatingNote, isEditingNote } = storeToRefs(noteStore)
 
 watch(selectedNote, (note) => {
   if (note && note.id !== 'new-note') {
-    getNoteById(1, note.id)
+    getNoteById(currentMap.value.id, note.id)
   }
 })
 </script>
