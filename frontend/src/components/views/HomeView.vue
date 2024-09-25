@@ -12,6 +12,7 @@ import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import BaseMapButtons from '@/components/map/BaseMapButtons.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { useRoute, useRouter } from 'vue-router'
+import { useNoteStore } from '@/stores/NoteStore'
 
 const router = useRouter()
 const route = useRoute()
@@ -25,6 +26,9 @@ const { activePanel } = storeToRefs(leftPanelStore)
 
 const rightPanelStore = useRightPanelStore()
 const { activePanel: activeRightPanel } = storeToRefs(rightPanelStore)
+
+const noteStore = useNoteStore()
+const { noteSourceRef } = storeToRefs(noteStore)
 
 const isLeftPanelActive = computed(() => activePanel.value !== null)
 const isRightPanelActive = computed(() => activeRightPanel.value !== null)

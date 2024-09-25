@@ -38,6 +38,7 @@ watch(selectedNote, (value) => {
     noteOverlayRef.value.setPosition(null)
   }
 })
+
 </script>
 
 <template>
