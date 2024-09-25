@@ -5,6 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
+from .enum import LayerType, WmsImageType
 from .managers import AllObjectsManager, SoftDeleteManager
 
 
@@ -36,6 +37,10 @@ class Map(SoftDeletableModel):
     zoom_level = models.PositiveIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(24)]
     )
+
+    wms_layers = models.ManyToManyField("efeo.WmsLayer", blank=True)
+    xyz_layers = models.ManyToManyField("efeo.XYZLayer", blank=True)
+    vector_tile_layers = models.ManyToManyField("efeo.VectorTileLayer", blank=True)
 
     def __str__(self) -> str:
         return self.title
@@ -106,3 +111,45 @@ class MapNote(models.Model):
     class Meta:
         verbose_name = "Note"
         verbose_name_plural = "Notes"
+
+
+class AbstractLayer(models.Model):
+    alias = models.CharField(max_length=128)
+    abstract = models.TextField(blank=True)
+    description = models.TextField(blank=True)
+
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.alias
+
+    class Meta:
+        abstract = True
+
+
+class WmsLayer(AbstractLayer):
+    wms_url = models.URLField(max_length=255)
+    image_type = models.CharField(
+        max_length=32, choices=WmsImageType.choices, default="png"
+    )
+    layer_type = models.CharField(
+        max_length=64, choices=LayerType.choices, default="VECTOR"
+    )
+    use_as_tile_layer = models.BooleanField(default=False)
+
+    @property
+    def is_raster(self):
+        return self.geoserver_layer.layer_type == "RASTER"
+
+    @property
+    def is_vector(self):
+        return self.geoserver_layer.layer_type == "VECTOR"
+
+
+class XYZLayer(AbstractLayer):
+    tiles_url = models.URLField("Tiles URL", max_length=255)
+
+
+class VectorTileLayer(AbstractLayer):
+    tiles_url = models.URLField("Tiles URL", max_length=255)
