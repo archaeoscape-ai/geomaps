@@ -11,6 +11,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import Button from '@/components/ui/button/Button.vue'
+import { useMapStore } from '@/stores/MapStore'
 import { useNoteStore } from '@/stores/NoteStore'
 import { Loader2 } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
@@ -25,12 +26,15 @@ const props = defineProps({
 
 const open = ref(false)
 
+const mapStore = useMapStore()
+const { currentMap } = storeToRefs(mapStore)
+
 const noteStore = useNoteStore()
 const { isLoading } = storeToRefs(noteStore)
 const { deleteNote } = noteStore
 
 async function confirm() {
-  await deleteNote(1, props.noteId)
+  await deleteNote(currentMap.value.id, props.noteId)
   open.value = false
 }
 </script>

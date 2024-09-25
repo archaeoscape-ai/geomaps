@@ -19,9 +19,7 @@ export const useMapStore = defineStore('map', () => {
   const isLoading = ref(false)
 
   const center = computed(() => {
-    const res = currentMap.value ? fromLonLat(currentMap.value.center.coordinates) : fromLonLat([0, 0])
-    console.log(res)
-    return res
+    return currentMap.value ? fromLonLat(currentMap.value.center.coordinates) : fromLonLat([0, 0])
   })
 
   const zoom = computed(() => {
@@ -36,7 +34,6 @@ export const useMapStore = defineStore('map', () => {
   }
 
   function setMapById(id) {
-    console.log(listMaps.value.results, id)
     const map = listMaps.value.results.find((m) => m.id === Number.parseInt(id))
     if (map) {
       currentMap.value = map
@@ -46,7 +43,6 @@ export const useMapStore = defineStore('map', () => {
   function setDefaultMap() {
     if (listMaps.value.count > 0) {
       currentMap.value = _.sortBy(listMaps.value.results, 'id')[0]
-      console.log(currentMap.value)
     }
   }
 

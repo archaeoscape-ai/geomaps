@@ -23,7 +23,6 @@ function handleCreateNote() {
   if (isAddingNote.value) {
     resetNoteOverlay()
   } else {
-    console.log('here')
     isAddingNote.value = true
   }
 }
@@ -38,10 +37,6 @@ function handleFetchNotes({ currentPage, currentPageSize }) {
   pageSize.value = currentPageSize
   getNotes(currentMap.value.id)
 }
-
-watch(notes, () => {
-  console.log(notes.value)
-})
 </script>
 
 <template>

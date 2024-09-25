@@ -14,7 +14,7 @@ import LogoIcon from '@/assets/logo-icon.svg?component'
 import { LogOut } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/AuthStore'
 import { storeToRefs } from 'pinia'
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useMapStore } from '@/stores/MapStore'
 import { useRoute, useRouter } from 'vue-router'
 import { sortBy } from 'lodash'
@@ -30,9 +30,6 @@ const { listMaps } = storeToRefs(mapStore)
 
 const currentIndex = ref(1)
 
-onMounted(() => {
-  console.log('mounted')
-})
 
 watch(
   () => route.params.id,
