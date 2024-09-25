@@ -1,7 +1,5 @@
 <script setup>
-import { RIGHT_PANELS } from '@/helpers/constants'
 import { useNoteStore } from '@/stores/NoteStore'
-import { useRightPanelStore } from '@/stores/RightPanelStore'
 import { storeToRefs } from 'pinia'
 import { ref, watch } from 'vue'
 import MapNoteOverlay from './MapNoteOverlay.vue'
@@ -14,9 +12,6 @@ const noteStore = useNoteStore()
 const { displayedNotes, selectedNote, selectNoteInteractionRef, noteSourceRef, noteOverlayRef } =
   storeToRefs(noteStore)
 const { resetNoteOverlay } = noteStore
-
-const rightPanelStore = useRightPanelStore()
-const { activePanel } = storeToRefs(rightPanelStore)
 
 function featureSelected(event) {
   const deselectedFeatures = event.deselected
@@ -43,10 +38,11 @@ watch(selectedNote, (value) => {
     noteOverlayRef.value.setPosition(null)
   }
 })
+
 </script>
 
 <template>
-  <ol-vector-layer v-if="activePanel === RIGHT_PANELS.NOTE">
+  <ol-vector-layer>
     <ol-source-vector ref="noteSourceRef">
       <ol-feature v-for="data in displayedNotes" :properties="data" :key="data.id">
         <ol-geom-point :coordinates="data.geom.coordinates"></ol-geom-point>

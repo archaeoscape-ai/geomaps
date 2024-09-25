@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import MainMap from '@/components/map/MainMap.vue'
 import LeftPanelButtons from '@/components/map/LeftPanelButtons.vue'
@@ -10,6 +10,16 @@ import RightPanelContainer from '@/components/panels/RightPanelContainer.vue'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import BaseMapButtons from '@/components/map/BaseMapButtons.vue'
+import { useMapStore } from '@/stores/MapStore'
+import { useRoute, useRouter } from 'vue-router'
+import { useNoteStore } from '@/stores/NoteStore'
+
+const router = useRouter()
+const route = useRoute()
+
+const mapStore = useMapStore()
+const { currentMap } = storeToRefs(mapStore)
+const { getListMaps, setMapById, setDefaultMap } = mapStore
 
 const leftPanelStore = useLeftPanelStore()
 const { activePanel } = storeToRefs(leftPanelStore)
@@ -17,8 +27,34 @@ const { activePanel } = storeToRefs(leftPanelStore)
 const rightPanelStore = useRightPanelStore()
 const { activePanel: activeRightPanel } = storeToRefs(rightPanelStore)
 
+const noteStore = useNoteStore()
+const { noteSourceRef } = storeToRefs(noteStore)
+
 const isLeftPanelActive = computed(() => activePanel.value !== null)
 const isRightPanelActive = computed(() => activeRightPanel.value !== null)
+
+onMounted(() => {
+  async function initialize() {
+    await getListMaps()
+    if (!route.params.id) {
+      setDefaultMap()
+      router.push({ name: 'home', params: { id: currentMap.value.id } })
+    } else {
+      setMapById(route.params.id)
+    }
+  }
+
+  initialize()
+})
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    if (newId) {
+      setMapById(newId)
+    }
+  },
+)
 </script>
 
 <template>

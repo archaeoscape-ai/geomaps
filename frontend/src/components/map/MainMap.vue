@@ -1,29 +1,28 @@
 <script setup>
-import { fromLonLat } from 'ol/proj'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import MapControls from './MapControls.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import NoteLayer from '@/components/notes/NoteLayer.vue'
 import { useNoteStore } from '@/stores/NoteStore'
-import { BASEMAP_URLS, BASEMAPS } from '@/helpers/constants'
-import { XYZ } from 'ol/source'
-import TileLayer from 'ol/layer/Tile'
+import { BASEMAP_URLS, RIGHT_PANELS } from '@/helpers/constants'
+import { useRightPanelStore } from '@/stores/RightPanelStore'
 
 defineProps({
   isPanelActive: Boolean,
 })
 
 const mapStore = useMapStore()
-const { map, basemap } = storeToRefs(mapStore)
+const { mapRef, basemap, zoom, center } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
 const { addNewNoteMarker } = noteStore
 const { isAddingNote } = storeToRefs(noteStore)
 
-const center = ref(fromLonLat([-68.3468, -23.1304]))
+const rightPanelStore = useRightPanelStore()
+const { activePanel } = storeToRefs(rightPanelStore)
+
 const projection = ref('EPSG:3857')
-const zoom = ref(3)
 const rotation = ref(0)
 
 function handleClickMap(event) {
@@ -35,30 +34,19 @@ function handleClickMap(event) {
 }
 
 const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
-
-const baselayerRef = ref(null)
-const sourceRef = ref(null)
-
-// onMounted(() => {
-//   sourceRef.value.source.setUrl(basemapUrl.value)
-// })
-
-// watch(basemapUrl, () => {
-//   sourceRef.value.source.setUrl(basemapUrl.value)
-//   sourceRef.value.source.refresh()
-//   baselayerRef.value.tileLayer.changed()
-// })
 </script>
 
 <template>
-  <div class="absolute inset-0">
+  <div
+    class="absolute inset-0"
+    :class="{
+      'hover:cursor-crosshair': isAddingNote,
+    }"
+  >
     <ol-map
       class="h-full"
       :controls="[]"
-      ref="map"
-      :class="{
-        'hover:cursor-crosshair': isAddingNote,
-      }"
+      ref="mapRef"
       @click="handleClickMap"
     >
       <ol-view
@@ -68,15 +56,14 @@ const sourceRef = ref(null)
         :zoom="zoom"
         :projection="projection"
       />
-      <ol-tile-layer ref="baselayerRef">
-        <!-- BUG -->
+      <ol-tile-layer>
         <ol-source-xyz :url="basemapUrl" />
       </ol-tile-layer>
 
-      <NoteLayer />
+      <NoteLayer v-if="activePanel === RIGHT_PANELS.NOTE"/>
     </ol-map>
 
-    <MapControls :is-panel-active="isPanelActive" :map="map" />
+    <MapControls :is-panel-active="isPanelActive" :map="mapRef" />
   </div>
 </template>
 

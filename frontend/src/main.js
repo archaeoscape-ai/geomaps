@@ -9,9 +9,23 @@ import router from './router'
 import { createPinia } from 'pinia'
 import { useAuthStore } from './stores/AuthStore'
 import { getCookie } from '@/helpers/cookies'
+import _ from 'lodash'
 
 const app = createApp(App)
 const pinia = createPinia()
+
+pinia.use(({ store }) => {
+  const initialState = _.cloneDeep(store.$state)
+  store.$reset = () => {
+    // Custom reset
+    if (typeof store.reset === 'function') {
+      store.reset()
+    }
+    store.$patch(($state) => {
+      Object.assign($state, initialState)
+    })
+  }
+})
 
 app.use(router)
 app.use(OpenLayersMap)

@@ -159,6 +159,23 @@ export const useNoteStore = defineStore('note', () => {
     }
   }
 
+  function reset() {
+    noteSourceRef.value?.source.clear()
+    noteSourceRef.value?.source.changed()
+    notes.value = null
+    notesGeom.value = []
+    selectedNote.value = null
+    selectedNoteDetail.value = null
+    isLoading.value = false
+    page.value = 1
+    pageSize.value = 10
+    selectNoteInteractionRef.value = null
+    noteSourceRef.value = null
+    noteOverlayRef.value = null
+    isAddingNote.value = false
+    isEditingNote.value = false
+  }
+
   return {
     // states
     notes,
@@ -187,5 +204,6 @@ export const useNoteStore = defineStore('note', () => {
     updateNote,
     deleteNote,
     getNoteById,
+    reset,
   }
 })

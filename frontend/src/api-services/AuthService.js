@@ -9,5 +9,6 @@ export async function logout() {
 }
 
 export async function getAuthUser() {
-  return axios.get('/api/accounts/me/', { allowParallel: true })
+  const response = await axios.get('/api/accounts/me/', { allowParallel: true })
+  return response.data
 }

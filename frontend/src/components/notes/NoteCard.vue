@@ -13,8 +13,6 @@ const props = defineProps({
   },
 })
 
-console.log(props.note)
-
 const noteStore = useNoteStore()
 const { isEditingNote } = storeToRefs(noteStore)
 const { zoomInNote } = noteStore
