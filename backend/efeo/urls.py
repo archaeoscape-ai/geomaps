@@ -4,6 +4,7 @@ from efeo import views
 
 urlpatterns = [
     path("maps/", views.MapListView.as_view(), name="map-list"),
+    path("maps/<int:pk>/", views.MapDetailView.as_view(), name="map-detail"),
     path(
         "maps/<int:pk>/config/",
         views.MapConfigView.as_view(),

@@ -1,12 +1,65 @@
 from rest_framework import serializers
 
-from efeo.models import Map, MapConfig, MapNote, Site, SiteType
+from efeo.models import (
+    Map,
+    MapConfig,
+    MapNote,
+    Site,
+    SiteType,
+    VectorTileLayer,
+    WmsLayer,
+    XYZLayer,
+)
+
+
+class WmsLayerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WmsLayer
+        fields = "__all__"
+
+
+class XYZLayerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = XYZLayer
+        fields = "__all__"
+
+
+class VectorTileLayerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VectorTileLayer
+        fields = "__all__"
 
 
 class MapSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Map
-        fields = ("id", "title", "zoom_level", "center")
+        fields = (
+            "id",
+            "title",
+            "zoom_level",
+            "center",
+        )
+
+
+class MapDetailSerializer(serializers.ModelSerializer):
+
+    wms_layers = WmsLayerSerializer(many=True)
+    xyz_layers = XYZLayerSerializer(many=True)
+    vector_tile_layers = VectorTileLayerSerializer(many=True)
+
+    class Meta:
+        model = Map
+        fields = (
+            "id",
+            "title",
+            "zoom_level",
+            "center",
+            "wms_layers",
+            "xyz_layers",
+            "vector_tile_layers",
+        )
+        read_only_fields = ("wms_layers", "xyz_layers", "vector_tile_layers")
 
 
 class MapConfigSerializer(serializers.ModelSerializer):
