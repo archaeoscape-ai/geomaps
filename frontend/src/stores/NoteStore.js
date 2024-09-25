@@ -160,8 +160,8 @@ export const useNoteStore = defineStore('note', () => {
   }
 
   function reset() {
-    noteSourceRef.value.source.clear()
-    noteSourceRef.value.source.changed()
+    noteSourceRef.value?.source.clear()
+    noteSourceRef.value?.source.changed()
     notes.value = null
     notesGeom.value = []
     selectedNote.value = null
