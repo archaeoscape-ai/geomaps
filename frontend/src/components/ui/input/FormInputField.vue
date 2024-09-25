@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 const props = defineProps({
   label: String,
   name: String,
+  type: { type: String, default: 'text' },
 })
 </script>
 
@@ -13,7 +14,7 @@ const props = defineProps({
     <FormItem>
       <FormLabel>{{ label }}</FormLabel>
       <FormControl>
-        <Input type="text" v-bind="componentField" />
+        <Input :type="type" v-bind="componentField" />
       </FormControl>
       <FormMessage />
     </FormItem>
