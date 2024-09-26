@@ -68,6 +68,7 @@ const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
         <ol-source-xyz :url="basemapUrl" />
       </ol-tile-layer>
 
+      <GeolocationLayer />
       <NoteLayer v-if="activePanel === RIGHT_PANELS.NOTE" />
 
       <SiteIdentifyLayer />

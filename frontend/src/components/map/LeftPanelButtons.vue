@@ -1,15 +1,20 @@
 <script setup>
-import { MapPin, Share2 } from 'lucide-vue-next'
+import { MapPin, Navigation, NavigationIcon, Share2 } from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 import GpsIcon from '@/assets/gps-icon.svg?component'
 import RulerIcon from '@/assets/ruler-icon.svg?component'
 import SaveIcon from '@/assets/save-icon.svg?component'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { useMapStore } from '@/stores/MapStore'
+import { storeToRefs } from 'pinia'
 
 defineProps({
   isPanelActive: Boolean,
 })
+
+const mapStore = useMapStore()
+const { tracking } = storeToRefs(mapStore)
 
 const leftPanelStore = useLeftPanelStore()
 const { toggleMenu } = leftPanelStore
@@ -40,8 +45,15 @@ const { toggleMenu } = leftPanelStore
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button size="icon">
-              <GpsIcon />
+            <Button
+              size="icon"
+              @click="tracking = !tracking"
+              :class="{
+                'bg-primary-darker': tracking,
+              }"
+            >
+              <GpsIcon v-if="!tracking" />
+              <NavigationIcon v-else size="18" class="relative right-[1px] top-[1px]" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">
