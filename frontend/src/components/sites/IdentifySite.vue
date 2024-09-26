@@ -27,7 +27,7 @@ onBeforeUnmount(() => (isEditingSite.value = false))
   <LeftPanelWrapper :header="heading">
     <template v-slot:header-actions v-if="selectedSite">
       <DeleteSiteDialog :site-id="selectedSite?.id">
-        <Button size="icon" variant="secondary" @click="toggleSiteEdit">
+        <Button size="icon" variant="secondary">
           <Trash class="stroke-primary" size="20" />
         </Button>
       </DeleteSiteDialog>
