@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -19,6 +19,8 @@ const { currentMap } = storeToRefs(mapStore)
 const siteStore = useSiteStore()
 const { selectedSite, siteTypes, isCreatingSite, siteMarker, isEditingSite } =
   storeToRefs(siteStore)
+
+const isSubmitting = ref(false)
 
 onMounted(async () => {
   await siteStore.getSiteTypes()
@@ -61,6 +63,7 @@ const form = useForm({
 
 const onSubmit = form.handleSubmit(async (values) => {
   try {
+    isSubmitting.value = true
     const data = {
       ...values,
       location: {
@@ -81,6 +84,8 @@ const onSubmit = form.handleSubmit(async (values) => {
       return
     }
     console.log(error)
+  } finally {
+    isSubmitting.value = false
   }
 })
 
@@ -138,7 +143,7 @@ watch(siteMarker, (newValue) => {
       <FormInputField name="inventaire_khmere_id" label="Inventaire Khmere (IK) ID" />
       <FormInputField name="monuments_hostoriques_id" label="Monuments Historiques (MH) ID" />
 
-      <Button type="submit" class="my-4 w-full">Save</Button>
+      <Button type="submit" class="my-4 w-full" :disabled="isSubmitting">Save</Button>
     </form>
   </div>
 </template>

@@ -4,58 +4,49 @@ import { storeToRefs } from 'pinia'
 
 const siteStore = useSiteStore()
 const { selectedSite } = storeToRefs(siteStore)
+
+const siteFields = [
+  { label: 'Site Type', key: 'site_type_name' },
+  { label: 'English Name', key: 'english_name' },
+  { label: 'French Name', key: 'french_name' },
+  { label: 'Khmer Name', key: 'khmer_name' },
+  { label: 'Alternative Name', key: 'alternative_name' },
+  { label: 'Alternative Khmer Name', key: 'alternative_khmer_name' },
+  { label: 'Latitude', key: 'location.coordinates[1]' },
+  { label: 'Longitude', key: 'location.coordinates[0]' },
+  { label: 'Description', key: 'description' },
+  { label: 'IK ID Starred', key: 'ik_id_starred', isBoolean: true },
+]
+
+function getValue(site, key) {
+  return key.split('.').reduce((o, i) => {
+    if (o && i.includes('[')) {
+      const [property, index] = i.split(/\[|\]/).filter(Boolean)
+      return o[property] ? o[property][index] : undefined
+    }
+    return o ? o[i] : undefined
+  }, site)
+}
 </script>
 
 <template>
   <div class="text-sm">
-    <div class="grid grid-cols-2 gap-3 bg-blue-100 px-4 py-2">
-      <div class="font-semibold">Site Type</div>
-      <div>{{ selectedSite.site_type_name }}</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 bg-white px-4 py-2">
-      <div class="font-semibold">English Name</div>
-      <div>{{ selectedSite.english_name }}</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 bg-blue-100 px-4 py-2">
-      <div class="font-semibold">French Name</div>
-      <div>{{ selectedSite.french_name }}</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 bg-white px-4 py-2">
-      <div class="font-semibold">Khmer Name</div>
-      <div>{{ selectedSite.khmer_name }}</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 bg-blue-100 px-4 py-2">
-      <div class="font-semibold">Alternative Name</div>
-      <div>{{ selectedSite.alternative_name }}</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 bg-white px-4 py-2">
-      <div class="font-semibold">Alternative Khmer Name</div>
-      <div>{{ selectedSite.alternative_khmer_name }}</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 bg-blue-100 px-4 py-2">
-      <div class="font-semibold">Latitude</div>
-      <div>{{ selectedSite.location.coordinates[1] }}</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 bg-white px-4 py-2">
-      <div class="font-semibold">Longitude</div>
-      <div>{{ selectedSite.location.coordinates[0] }}</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 bg-blue-100 px-4 py-2">
-      <div class="font-semibold">Description Name</div>
-      <div>{{ selectedSite.description }}</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 bg-white px-4 py-2">
-      <div class="font-semibold">IK ID Starred</div>
-      <div>{{ selectedSite.ik_id_starred ? 'Yes' : 'No' }}</div>
+    <div
+      v-for="(field, index) in siteFields"
+      :key="field.key"
+      :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
+    >
+      <div class="grid grid-cols-2 gap-3 px-4 py-2">
+        <div class="font-semibold">{{ field.label }}</div>
+        <div>
+          <template v-if="field.isBoolean">
+            {{ getValue(selectedSite, field.key) ? 'Yes' : 'No' }}
+          </template>
+          <template v-else>
+            {{ getValue(selectedSite, field.key) }}
+          </template>
+        </div>
+      </div>
     </div>
   </div>
 </template>
