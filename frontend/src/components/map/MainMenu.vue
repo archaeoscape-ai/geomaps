@@ -30,7 +30,6 @@ const { listMaps } = storeToRefs(mapStore)
 
 const currentIndex = ref(1)
 
-
 watch(
   () => route.params.id,
   (id) => {
@@ -52,15 +51,19 @@ watch(currentIndex, () => {
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent class="mr-4 w-56">
-      <DropdownMenuLabel>{{ user.email }}</DropdownMenuLabel>
+      <DropdownMenuLabel>{{ user?.email }}</DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuRadioGroup v-model="currentIndex" class="max-h-[300px] overflow-auto">
-        <DropdownMenuRadioItem :value="map.id" v-for="map in sortBy(listMaps.results, 'id')" :key="map.id">
+        <DropdownMenuRadioItem
+          :value="map.id"
+          v-for="map in sortBy(listMaps.results, 'id')"
+          :key="map.id"
+        >
           {{ map.title }}
         </DropdownMenuRadioItem>
       </DropdownMenuRadioGroup>
       <DropdownMenuSeparator />
-      <DropdownMenuItem>
+      <DropdownMenuItem @click="authStore.logout">
         <div class="flex items-center gap-2">
           <LogOut size="16" />
           Log out
