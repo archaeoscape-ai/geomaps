@@ -3,6 +3,8 @@ import { useMapStore } from '@/stores/MapStore'
 import { fromLonLat } from 'ol/proj'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref, watch } from 'vue'
+import Button from '@/components/ui/button/Button.vue'
+import { Trash } from 'lucide-vue-next'
 
 const position = ref([])
 const positionFeature = ref(null)
@@ -101,9 +103,13 @@ const selectInteactionFilter = (feature) => {
 
       <ol-overlay :autoPan="true" ref="overlayRef" :stopEvent="true" :offset="[20, -18]">
         <div class="rounded bg-white shadow-[0px_0px_6px_4px_#0000001F]">
-          <div class="flex flex-col gap-2 p-4 text-sm">
-            <p>Your location is:</p>
-            <p class="font-medium">{{ position.join(', ') }}</p>
+          <div class="flex flex-col gap-1 p-4 pb-1 text-sm">
+            <p>
+              Your location is: <span class="font-semibold">{{ position.join(', ') }}</span>
+            </p>
+            <Button variant="link" class="self-start p-0" @click="tracking = false">
+              Remove Point
+            </Button>
           </div>
           <div class="absolute -left-2 top-3 h-4 w-4 rotate-45 bg-white"></div>
         </div>
