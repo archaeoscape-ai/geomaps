@@ -12,6 +12,7 @@ import FormInputField from '../ui/input/FormInputField.vue'
 import FormTextareaField from '../ui/textarea/FormTextareaField.vue'
 import FormCheckboxField from '../ui/checkbox/FormCheckboxField.vue'
 import FormSelectField from '../ui/select/FormSelectField.vue'
+import { useToast } from '../ui/toast'
 
 const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
@@ -21,6 +22,7 @@ const { selectedSite, siteTypes, isCreatingSite, siteMarker, isEditingSite } =
   storeToRefs(siteStore)
 
 const isSubmitting = ref(false)
+const { toast } = useToast()
 
 onMounted(async () => {
   await siteStore.getSiteTypes()
@@ -73,8 +75,10 @@ const onSubmit = form.handleSubmit(async (values) => {
     }
     if (selectedSite.value && isEditingSite.value) {
       await siteStore.updateSite(selectedSite.value.id, data)
+      toast({ description: 'Site updated!' })
     } else {
       await siteStore.createSite(currentMap.value.id, data)
+      toast({ description: 'Site created!' })
     }
   } catch (error) {
     if (error.status === 400) {
@@ -83,6 +87,7 @@ const onSubmit = form.handleSubmit(async (values) => {
       }
       return
     }
+    toast({ description: 'Could not save site!', variant: 'destructive' })
     console.log(error)
   } finally {
     isSubmitting.value = false
