@@ -26,10 +26,13 @@ function handleCardClick() {
 </script>
 
 <template>
-  <Card class="cursor-pointer" @click="handleCardClick">
+  <Card
+    :class="['cursor-pointer', selectedSite?.id === props.site.id ? 'border border-gray-400' : '']"
+    @click="handleCardClick"
+  >
     <CardContent class="p-2">
       <div class="flex w-full items-center justify-between">
-        <p class="font-semibold">{{ site.id }}:{{ site.english_name }}</p>
+        <p class="text-sm font-semibold">{{ site.id }}: {{ site.english_name }}</p>
         <ChevronRight class="stroke-button-icon" />
       </div>
     </CardContent>
