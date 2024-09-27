@@ -5,8 +5,8 @@ import { LEFT_PANELS } from '@/helpers/constants'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 
-const strokeColor = ref('rgba(255, 255, 255, 0.4)')
-const fillColor = ref('#FFFFFF')
+const strokeColor = ref('rgba(255, 255, 255, 0.2)')
+const fillColor = ref('#3ca23c')
 const radius = ref(10)
 
 const leftPanelStore = useLeftPanelStore()

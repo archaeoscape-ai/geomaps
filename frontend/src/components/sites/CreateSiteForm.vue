@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -12,6 +12,7 @@ import FormInputField from '../ui/input/FormInputField.vue'
 import FormTextareaField from '../ui/textarea/FormTextareaField.vue'
 import FormCheckboxField from '../ui/checkbox/FormCheckboxField.vue'
 import FormSelectField from '../ui/select/FormSelectField.vue'
+import { useToast } from '../ui/toast'
 
 const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
@@ -19,6 +20,9 @@ const { currentMap } = storeToRefs(mapStore)
 const siteStore = useSiteStore()
 const { selectedSite, siteTypes, isCreatingSite, siteMarker, isEditingSite } =
   storeToRefs(siteStore)
+
+const isSubmitting = ref(false)
+const { toast } = useToast()
 
 onMounted(async () => {
   await siteStore.getSiteTypes()
@@ -61,6 +65,7 @@ const form = useForm({
 
 const onSubmit = form.handleSubmit(async (values) => {
   try {
+    isSubmitting.value = true
     const data = {
       ...values,
       location: {
@@ -70,8 +75,10 @@ const onSubmit = form.handleSubmit(async (values) => {
     }
     if (selectedSite.value && isEditingSite.value) {
       await siteStore.updateSite(selectedSite.value.id, data)
+      toast({ description: 'Site updated!' })
     } else {
       await siteStore.createSite(currentMap.value.id, data)
+      toast({ description: 'Site created!' })
     }
   } catch (error) {
     if (error.status === 400) {
@@ -80,7 +87,10 @@ const onSubmit = form.handleSubmit(async (values) => {
       }
       return
     }
+    toast({ description: 'Could not save site!', variant: 'destructive' })
     console.log(error)
+  } finally {
+    isSubmitting.value = false
   }
 })
 
@@ -138,7 +148,7 @@ watch(siteMarker, (newValue) => {
       <FormInputField name="inventaire_khmere_id" label="Inventaire Khmere (IK) ID" />
       <FormInputField name="monuments_hostoriques_id" label="Monuments Historiques (MH) ID" />
 
-      <Button type="submit" class="my-4 w-full">Save</Button>
+      <Button type="submit" class="my-4 w-full" :disabled="isSubmitting">Save</Button>
     </form>
   </div>
 </template>

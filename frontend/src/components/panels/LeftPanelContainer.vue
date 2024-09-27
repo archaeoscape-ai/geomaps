@@ -1,6 +1,6 @@
 <script setup>
-import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { storeToRefs } from 'pinia'
+import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import CreateSite from '@/components/sites/CreateSite.vue'
 import IdentifySite from '@/components/sites/IdentifySite.vue'
 import SitePanel from '@/components/panels/SitePanel.vue'
@@ -29,8 +29,9 @@ const componentMapping = {
         <button
           v-for="(tab, index) in tabs"
           :key="tab.id"
-          class="flex h-8 flex-grow items-center justify-center bg-primary text-center text-xs font-bold text-primary-foreground"
+          class="flex h-8 flex-grow items-center justify-center text-center text-sm font-bold text-primary-foreground"
           @click="leftPanelStore.setTab(index)"
+          :class="[activePanel?.id === tab.id ? 'bg-primary-darker' : 'bg-primary']"
         >
           {{ tab.name }}
         </button>

@@ -7,7 +7,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import SiteDetail from '@/components/sites/SiteDetail.vue'
 import LeftPanelWrapper from '@/components/panels/LeftPanelWrapper.vue'
 import DeleteSiteDialog from './DeleteSiteDialog.vue'
-import { Trash } from 'lucide-vue-next'
+import { Ban, Pencil, Trash } from 'lucide-vue-next'
 
 const siteStore = useSiteStore()
 const { selectedSite, isEditingSite } = storeToRefs(siteStore)
@@ -25,14 +25,15 @@ onBeforeUnmount(() => (isEditingSite.value = false))
 
 <template>
   <LeftPanelWrapper :header="heading">
-    <template v-slot:header-actions>
-      <DeleteSiteDialog :site-id="selectedSite.id" v-if="selectedSite">
-        <Button size="xs">
-          <p>Delete</p>
+    <template v-slot:header-actions v-if="selectedSite">
+      <DeleteSiteDialog :site-id="selectedSite?.id">
+        <Button size="icon" variant="secondary">
+          <Trash class="stroke-primary" size="20" />
         </Button>
       </DeleteSiteDialog>
-      <Button @click="toggleSiteEdit" size="xs" v-if="selectedSite">
-        <p>{{ isEditingSite ? 'Cancle' : 'Edit' }}</p>
+      <Button @click="toggleSiteEdit" size="icon" variant="secondary">
+        <Ban size="20" v-if="isEditingSite" />
+        <Pencil size="20" v-else />
       </Button>
     </template>
   </LeftPanelWrapper>

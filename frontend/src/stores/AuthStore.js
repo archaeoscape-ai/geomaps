@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore, getActivePinia } from 'pinia'
 import { ref } from 'vue'
 import * as authService from '@/api-services/AuthService'
 import { removeCookie, setCookie } from '@/helpers/cookies'
@@ -43,6 +43,7 @@ export const useAuthStore = defineStore('auth', () => {
           store.$reset()
         }
       })
+      window.location.href = '/login'
     } catch (err) {
       error.value = err
     } finally {
