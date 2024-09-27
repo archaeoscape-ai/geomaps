@@ -16,7 +16,8 @@ export const useMapStore = defineStore('map', () => {
   const listMaps = ref([])
   const currentMap = ref(null)
 
-  const tracking = ref(false)
+  const trackingLocation = ref(false)
+  const measuringDistance = ref(false)
 
   const isLoading = ref(false)
 
@@ -55,7 +56,8 @@ export const useMapStore = defineStore('map', () => {
     currentMap,
     center,
     zoom,
-    tracking,
+    trackingLocation,
+    measuringDistance,
 
     getListMaps,
     setMapById,

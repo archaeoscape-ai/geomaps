@@ -19,7 +19,7 @@ const selectInteractionRef = ref()
 const overlayRef = ref()
 
 const mapStore = useMapStore()
-const { tracking, mapRef } = storeToRefs(mapStore)
+const { trackingLocation, mapRef } = storeToRefs(mapStore)
 
 const geoLocChange = (event) => {
   position.value = event.target.getPosition()
@@ -31,10 +31,10 @@ onMounted(() => {
   geolocationRef.value.geoLoc.setTracking(false)
 })
 
-watch(tracking, () => {
-  geolocationRef.value.geoLoc.setTracking(tracking.value)
+watch(trackingLocation, () => {
+  geolocationRef.value.geoLoc.setTracking(trackingLocation.value)
   geolocationRef.value.geoLoc.changed()
-  if (!tracking.value) {
+  if (!trackingLocation.value) {
     overlayRef.value.setPosition(null)
   } else if (position.value) {
     mapRef.value.map.getView().setCenter(fromLonLat(position.value))
@@ -68,14 +68,14 @@ const selectInteactionFilter = (feature) => {
     ref="geolocationRef"
     :projection="projection"
     @change:position="geoLocChange"
-    :tracking="tracking"
+    :trackingLocation="trackingLocation"
   >
     <template>
       <ol-vector-layer :zIndex="2" ref="vectorLayer">
         <ol-source-vector>
           <ol-feature
             ref="positionFeature"
-            v-if="tracking"
+            v-if="trackingLocation"
             :properties="{ name: 'current-location' }"
           >
             <ol-geom-point :coordinates="fromLonLat(position)"></ol-geom-point>
@@ -107,7 +107,7 @@ const selectInteactionFilter = (feature) => {
             <p>
               Your location is: <span class="font-semibold">{{ position.join(', ') }}</span>
             </p>
-            <Button variant="link" class="self-start p-0" @click="tracking = false">
+            <Button variant="link" class="self-start p-0" @click="trackingLocation = false">
               Remove Point
             </Button>
           </div>

@@ -14,7 +14,7 @@ defineProps({
 })
 
 const mapStore = useMapStore()
-const { tracking } = storeToRefs(mapStore)
+const { trackingLocation, measuringDistance } = storeToRefs(mapStore)
 
 const leftPanelStore = useLeftPanelStore()
 const { toggleMenu } = leftPanelStore
@@ -47,12 +47,12 @@ const { toggleMenu } = leftPanelStore
           <TooltipTrigger as-child>
             <Button
               size="icon"
-              @click="tracking = !tracking"
+              @click="trackingLocation = !trackingLocation"
               :class="{
-                'bg-primary-darker': tracking,
+                'bg-primary-darker': trackingLocation,
               }"
             >
-              <GpsIcon v-if="!tracking" />
+              <GpsIcon v-if="!trackingLocation" />
               <NavigationIcon v-else size="18" class="relative right-[1px] top-[1px]" />
             </Button>
           </TooltipTrigger>
@@ -66,7 +66,12 @@ const { toggleMenu } = leftPanelStore
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button size="icon">
+            <Button size="icon"
+              @click="measuringDistance = !measuringDistance"
+              :class="{
+                'bg-primary-darker': measuringDistance,
+              }"
+            >
               <RulerIcon />
             </Button>
           </TooltipTrigger>
