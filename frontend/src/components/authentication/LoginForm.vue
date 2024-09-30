@@ -8,8 +8,9 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/stores/AuthStore'
 import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
+const route = useRoute()
 const router = useRouter()
 
 const authStore = useAuthStore()
@@ -34,7 +35,12 @@ const onSubmit = form.handleSubmit(async (values) => {
   await authStore.login({ email, password })
 
   if (!error.value) {
-    await router.push('/')
+    console.log(route, route.query)
+    await router.push({
+      name: 'home',
+      params: { id: route.query.mapId },
+      query: { ...route.query, mapId: undefined },
+    })
     return
   }
 

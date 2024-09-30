@@ -43,18 +43,23 @@ router.beforeEach(async (to, from) => {
       await getAuthUser()
     } catch (err) {
       resetLoginState()
-      return { name: 'login' }
+      return { name: 'login', query: to.query }
     }
   }
 
   // If the user is authenticated and accessing the login, redirect to home
   if (isLoggedIn.value && user.value && to.name === 'login') {
-    return { name: 'home' }
+    return { name: 'home', query: to.query }
   }
 
   // If the user is authenticated and accessing a page, let them through
   if (isLoggedIn.value && user.value) {
     return true
+  }
+
+  // Redirect to login page if user is accessing a map through share url
+  if (Object.keys(to.query).length > 0 && !isLoggedIn.value && to.path !== '/login') {
+    return { name: 'login', query: { ...to.query, mapId: to.params.id } }
   }
 
   // If the route requires authentication and the user is not logged in, redirect to login

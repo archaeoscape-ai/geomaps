@@ -10,6 +10,7 @@ import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import ShareDialog from './ShareDialog.vue'
 import { DialogTrigger } from '@/components/ui/dialog'
+import { useRouter } from 'vue-router'
 
 defineProps({
   isPanelActive: Boolean,
@@ -24,7 +25,10 @@ const { toggleMenu } = leftPanelStore
 function reset() {
   measuringDistance.value = false
   // console.log("hello world")
+
 }
+
+const router = useRouter()
 </script>
 
 <template>
@@ -110,7 +114,7 @@ function reset() {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button size="icon">
+            <Button size="icon" @click="router.push({ name: 'home', params: { id: 2 }, query: {what: 'what' }})">
               <SaveIcon />
             </Button>
           </TooltipTrigger>

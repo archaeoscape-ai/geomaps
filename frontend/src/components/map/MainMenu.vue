@@ -28,18 +28,22 @@ const { user } = storeToRefs(authStore)
 const mapStore = useMapStore()
 const { listMaps } = storeToRefs(mapStore)
 
-const currentIndex = ref(1)
+const currentIndex = ref(null)
 
 watch(
   () => route.params.id,
   (id) => {
-    currentIndex.value = Number.parseInt(id)
+    if (id) {
+      currentIndex.value = Number.parseInt(id)
+    }
   },
   { immediate: true },
 )
 
-watch(currentIndex, () => {
-  router.push({ name: 'home', params: { id: currentIndex.value } })
+watch(currentIndex, (newValue, oldValue) => {
+  if (oldValue !== null) {
+    router.push({ name: 'home', params: { id: currentIndex.value } })
+  }
 })
 </script>
 
