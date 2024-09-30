@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -38,7 +38,13 @@ const onSubmit = form.handleSubmit(async (values) => {
     return
   }
 
-  console.log(error?.value)
+  if (error.value?.status === 401) {
+    form.setFieldError('email', error.value.response.data.detail)
+  } else if (error.value?.status === 400) {
+    for (const [fieldName, errorMessage] of Object.entries(error.value.response.data)) {
+      form.setFieldError(fieldName, errorMessage)
+    }
+  }
 })
 </script>
 
