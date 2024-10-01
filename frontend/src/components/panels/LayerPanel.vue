@@ -13,14 +13,19 @@ import { X } from 'lucide-vue-next'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
 
 const layerConfigStore = useMapLayerConfigStore()
-const { layerConfig, allLayersToggledOn, allLayersExpanded } = storeToRefs(layerConfigStore)
+const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText } =
+  storeToRefs(layerConfigStore)
 
 const rightPanelStore = useRightPanelStore()
 const { activePanel } = storeToRefs(rightPanelStore)
 
 const list = computed({
-  get: () => layerConfig.value,
+  get: () => tempLayerConfig.value,
 })
+
+function searchLayer(evt) {
+  searchText.value = evt.target.value
+}
 </script>
 
 <template>
@@ -39,7 +44,13 @@ const list = computed({
 
     <div class="px-4">
       <div class="relative w-full">
-        <Input id="search" type="text" placeholder="Search layers" class="pl-10" />
+        <Input
+          id="search"
+          type="text"
+          placeholder="Search layers"
+          class="pl-10"
+          @input="searchLayer"
+        />
         <span class="absolute inset-y-0 start-0 flex items-center justify-center px-2">
           <Search class="size-5 stroke-button-icon" />
         </span>

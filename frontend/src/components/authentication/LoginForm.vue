@@ -1,14 +1,13 @@
-<script setup lang="ts">
+<script setup>
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/stores/AuthStore'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
+import FormInputField from '@/components/ui/input/FormInputField.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -44,30 +43,21 @@ const onSubmit = form.handleSubmit(async (values) => {
     return
   }
 
-  console.log(error?.value)
+  if (error.value?.status === 401) {
+    form.setFieldError('email', error.value.response.data.detail)
+  } else if (error.value?.status === 400) {
+    for (const [fieldName, errorMessage] of Object.entries(error.value.response.data)) {
+      form.setFieldError(fieldName, errorMessage)
+    }
+  }
 })
 </script>
 
 <template>
   <form @submit="onSubmit" class="flex w-80 flex-col gap-4">
-    <FormField v-slot="{ componentField }" name="email">
-      <FormItem>
-        <FormLabel>Email Address</FormLabel>
-        <FormControl>
-          <Input type="text" v-bind="componentField" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
-    <FormField v-slot="{ componentField }" name="password">
-      <FormItem>
-        <FormLabel>Password</FormLabel>
-        <FormControl>
-          <Input type="password" v-bind="componentField" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
+    <FormInputField name="email" label="Email Address" type="email" />
+    <FormInputField name="password" label="Password" type="password" />
+
     <Button type="submit" class="mt-4 w-full" :disabled="isLoggingIn"> Login </Button>
   </form>
 </template>

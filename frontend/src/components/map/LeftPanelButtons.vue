@@ -11,6 +11,7 @@ import { storeToRefs } from 'pinia'
 import ShareDialog from './ShareDialog.vue'
 import { DialogTrigger } from '@/components/ui/dialog'
 import { useRouter } from 'vue-router'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
 defineProps({
   isPanelActive: Boolean,
@@ -18,6 +19,8 @@ defineProps({
 
 const mapStore = useMapStore()
 const { trackingLocation, measuringDistance } = storeToRefs(mapStore)
+const layerConfigStore = useMapLayerConfigStore()
+const { hasLayerConfigChanged } = storeToRefs(layerConfigStore)
 
 const leftPanelStore = useLeftPanelStore()
 const { toggleMenu } = leftPanelStore
@@ -114,7 +117,14 @@ const router = useRouter()
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button size="icon" @click="router.push({ name: 'home', params: { id: 2 }, query: {what: 'what' }})">
+            <Button
+              size="icon"
+              :class="
+                hasLayerConfigChanged
+                  ? 'bg-primary-darker hover:bg-primary-darker/90'
+                  : 'bg-primary'
+              "
+            >
               <SaveIcon />
             </Button>
           </TooltipTrigger>
