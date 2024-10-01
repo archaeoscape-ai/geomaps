@@ -1,3 +1,4 @@
+import os
 import uuid
 
 from django.contrib.gis.db import models as geomodels
@@ -5,8 +6,12 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
+from setup.storage import DataStorage
+
 from .enum import LayerType, WmsImageType
 from .managers import AllObjectsManager, SoftDeleteManager
+
+FS = DataStorage()
 
 
 class SoftDeletableModel(models.Model):
@@ -28,6 +33,44 @@ class SoftDeletableModel(models.Model):
     def restore(self):
         self.deleted_at = None
         self.save()
+
+
+class WorksiteResourceType(models.Model):
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
+
+
+class SiteResourceType(models.Model):
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
+
+
+def get_site_resource_dir(instance, filename):
+    return os.path.join(str(instance.site.uid), "resources", filename)
+
+
+class SiteResource(models.Model):
+    site = models.ForeignKey(
+        "efeo.Site", related_name="resources", on_delete=models.CASCADE
+    )
+    resource_type = models.ForeignKey("efeo.SiteResourceType", on_delete=models.PROTECT)
+    caption = models.CharField(max_length=128, blank=True)
+    author = models.CharField(max_length=255, blank=True)
+    resource_date = models.DateField(blank=True, null=True)
+    resource_file = models.FileField(
+        max_length=255, storage=FS, upload_to=get_site_resource_dir
+    )
+    notes = models.TextField(blank=True)
+
+    created_by = models.ForeignKey(
+        "accounts.User", blank=True, null=True, on_delete=models.SET_NULL
+    )
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
 
 
 class Map(SoftDeletableModel):
