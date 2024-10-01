@@ -5,6 +5,8 @@ from efeo.models import (
     MapConfig,
     MapNote,
     Site,
+    SiteResource,
+    SiteResourceType,
     SiteType,
     VectorTileLayer,
     WmsLayer,
@@ -125,3 +127,27 @@ class MapNoteGeomSerializer(serializers.ModelSerializer):
     class Meta:
         model = MapNote
         fields = ("id", "geom")
+
+
+class SiteResourceTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SiteResourceType
+        fields = ("id", "name")
+
+
+class SiteResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SiteResource
+        fields = (
+            "id",
+            "site",
+            "resource_type",
+            "caption",
+            "author",
+            "resource_date",
+            "resource_file",
+            "notes",
+            "created_by",
+            "created_on",
+        )
+        read_only_fields = ("site", "created_by", "created_on")

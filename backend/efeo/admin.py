@@ -6,6 +6,8 @@ from efeo.models import (
     MapConfig,
     MapNote,
     Site,
+    SiteResource,
+    SiteResourceType,
     SiteType,
     VectorTileLayer,
     WmsLayer,
@@ -41,6 +43,16 @@ class SiteTypeAdmin(admin.ModelAdmin):
     list_display = ("name",)
 
 
+@admin.register(SiteResourceType)
+class SiteResourceTypeAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
+@admin.register(SiteResource)
+class SiteResourceAdmin(admin.ModelAdmin):
+    list_display = ("site", "resource_type", "created_by", "created_on")
+
+
 @admin.register(MapNote)
 class MapNoteAdmin(LeafletGeoAdmin):
     list_display = ("created_on", "created_by", "title", "map")
@@ -72,4 +84,5 @@ class XYZLayerAdmin(admin.ModelAdmin):
 
 @admin.register(VectorTileLayer)
 class VectorTileLayerAdmin(admin.ModelAdmin):
+    list_display = ("alias", "tiles_url", "created_on")
     list_display = ("alias", "tiles_url", "created_on")
