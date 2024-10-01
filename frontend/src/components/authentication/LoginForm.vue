@@ -4,11 +4,11 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/stores/AuthStore'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
+import FormInputField from '@/components/ui/input/FormInputField.vue'
 
 const router = useRouter()
 
@@ -50,24 +50,9 @@ const onSubmit = form.handleSubmit(async (values) => {
 
 <template>
   <form @submit="onSubmit" class="flex w-80 flex-col gap-4">
-    <FormField v-slot="{ componentField }" name="email">
-      <FormItem>
-        <FormLabel>Email Address</FormLabel>
-        <FormControl>
-          <Input type="text" v-bind="componentField" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
-    <FormField v-slot="{ componentField }" name="password">
-      <FormItem>
-        <FormLabel>Password</FormLabel>
-        <FormControl>
-          <Input type="password" v-bind="componentField" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
+    <FormInputField name="email" label="Email Address" type="email" />
+    <FormInputField name="password" label="Password" type="password" />
+
     <Button type="submit" class="mt-4 w-full" :disabled="isLoggingIn"> Login </Button>
   </form>
 </template>

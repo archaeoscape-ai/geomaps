@@ -6,10 +6,15 @@ import RulerIcon from '@/assets/ruler-icon.svg?component'
 import SaveIcon from '@/assets/save-icon.svg?component'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
+import { storeToRefs } from 'pinia'
 
 defineProps({
   isPanelActive: Boolean,
 })
+
+const layerConfigStore = useMapLayerConfigStore()
+const { hasLayerConfigChanged } = storeToRefs(layerConfigStore)
 
 const leftPanelStore = useLeftPanelStore()
 const { toggleMenu } = leftPanelStore
@@ -80,7 +85,14 @@ const { toggleMenu } = leftPanelStore
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button size="icon">
+            <Button
+              size="icon"
+              :class="
+                hasLayerConfigChanged
+                  ? 'bg-primary-darker hover:bg-primary-darker/90'
+                  : 'jbhbh bg-primary'
+              "
+            >
               <SaveIcon />
             </Button>
           </TooltipTrigger>

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import Switch from '@/components/ui/switch/Switch.vue'
 import Label from '@/components/ui/label/Label.vue'
 import Slider from '@/components/ui/slider/Slider.vue'
-import { GripVertical, ChevronDown, ChevronUp, Scan, Info, List } from 'lucide-vue-next'
+import { GripVertical, ChevronDown, ChevronUp, Scan, List } from 'lucide-vue-next'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
@@ -57,20 +57,11 @@ function toggleShowLegend() {
     >
       <div class="flex w-full flex-col gap-4 px-1">
         <div class="flex items-center gap-4">
-          <span
-            class="cursor-pointer stroke-button-icon"
-            @click="() => console.log('zoom to extent')"
-          >
-            <Scan />
+          <span class="cursor-pointer" @click="() => console.log('zoom to extent')">
+            <Scan size="20" class="stroke-button-icon" />
           </span>
-          <span class="cursor-pointer stroke-button-icon" @click="toggleShowLegend">
-            <List />
-          </span>
-          <span
-            class="cursor-pointer stroke-button-icon"
-            @click="() => console.log('identify layer')"
-          >
-            <Info />
+          <span class="cursor-pointer" @click="toggleShowLegend">
+            <List class="stroke-button-icon" />
           </span>
         </div>
         <div>

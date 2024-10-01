@@ -11,7 +11,7 @@ import { storeToRefs } from 'pinia'
 
 const parentExpanded = ref(false)
 const layerConfigStore = useMapLayerConfigStore()
-const { allLayersExpanded } = storeToRefs(layerConfigStore)
+const { allLayersExpanded, searchText } = storeToRefs(layerConfigStore)
 
 const isParentActive = computed(() => props.layer.items.every((item) => item.isActive))
 
@@ -76,7 +76,11 @@ watch(allLayersExpanded, (newValue) => {
         :animation="250"
       >
         <template #item="{ element }">
-          <LayerItem :item="element" :parentId="props.layer.id" />
+          <LayerItem
+            :item="element"
+            :parentId="props.layer.id"
+            v-if="element.alias.toLowerCase().includes(searchText.toLowerCase())"
+          />
         </template>
       </draggable>
     </div>
