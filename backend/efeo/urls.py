@@ -12,6 +12,11 @@ urlpatterns = [
     ),
     path("site-types/", views.SiteTypeListView.as_view(), name="site-type-list"),
     path(
+        "site-resource-types/",
+        views.SiteResourceTypeListView.as_view(),
+        name="site-resource-type-list",
+    ),
+    path(
         "maps/<int:pk>/sites/",
         views.MapSiteListView.as_view(),
         name="map-sites",
@@ -20,6 +25,16 @@ urlpatterns = [
         "sites/<int:pk>/",
         views.SiteDetailView.as_view(),
         name="site-detail",
+    ),
+    path(
+        "sites/<int:pk>/resources/",
+        views.SiteResourceListView.as_view(),
+        name="site-resource-detail",
+    ),
+    path(
+        "site-resources/<int:pk>/",
+        views.SiteResourceDetailView.as_view(),
+        name="site-resource-detail",
     ),
     path(
         "maps/<int:pk>/notes/",

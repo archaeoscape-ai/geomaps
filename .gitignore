@@ -15,6 +15,7 @@ tiles
 logs
 data
 
+*.sql
 *.pgsql
 #*.sql
 
