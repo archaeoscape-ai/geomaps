@@ -6,14 +6,28 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from efeo.filters import CaseInsensitiveOrderingFilter
-from efeo.models import Map, MapConfig, MapNote, Site, SiteType
-from efeo.permissions import AdminOrStandardPermission, MapNotePermission
+from efeo.models import (
+    Map,
+    MapConfig,
+    MapNote,
+    Site,
+    SiteResource,
+    SiteResourceType,
+    SiteType,
+)
+from efeo.permissions import (
+    AdminOrCreatorPermission,
+    AdminOrStandardPermission,
+    MapNotePermission,
+)
 from efeo.serializers import (
     MapConfigSerializer,
     MapDetailSerializer,
     MapNoteGeomSerializer,
     MapNoteSerializer,
     MapSerializer,
+    SiteResourceSerializer,
+    SiteResourceTypeSerializer,
     SiteSerializer,
     SiteTypeSerializer,
 )
@@ -83,6 +97,11 @@ class SiteTypeListView(generics.ListAPIView):
     queryset = SiteType.objects.all()
 
 
+class SiteResourceTypeListView(generics.ListAPIView):
+    serializer_class = SiteResourceTypeSerializer
+    queryset = SiteResourceType.objects.all()
+
+
 class MapSiteListView(generics.ListCreateAPIView):
     serializer_class = SiteSerializer
     permission_classes = [AdminOrStandardPermission]
@@ -113,6 +132,25 @@ class SiteDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [AdminOrStandardPermission]
     serializer_class = SiteSerializer
     queryset = Site.objects.all()
+
+
+class SiteResourceListView(generics.ListCreateAPIView):
+    permission_classes = [AdminOrStandardPermission]
+    serializer_class = SiteResourceSerializer
+
+    def get_queryset(self):
+        site = get_object_or_404(Site, pk=self.kwargs["pk"])
+        return SiteResource.objects.filter(site=site)
+
+    def perform_create(self, serializer):
+        site = get_object_or_404(Site, pk=self.kwargs["pk"])
+        serializer.save(site=site, created_by=self.request.user)
+
+
+class SiteResourceDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [AdminOrCreatorPermission]
+    serializer_class = SiteResourceSerializer
+    queryset = SiteResource.objects.all()
 
 
 class MapNoteList(generics.ListCreateAPIView):
