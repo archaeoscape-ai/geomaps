@@ -5,14 +5,26 @@ import CreateSite from '@/components/sites/CreateSite.vue'
 import IdentifySite from '@/components/sites/IdentifySite.vue'
 import SitePanel from '@/components/panels/SitePanel.vue'
 import { LEFT_PANELS } from '@/helpers/constants'
+import { useNoteStore } from '@/stores/NoteStore'
+import { useMapStore } from '@/stores/MapStore'
 
 const leftPanelStore = useLeftPanelStore()
 const { activePanel, tabs } = storeToRefs(leftPanelStore)
+
+const mapStore = useMapStore()
+const { measuringDistance } = storeToRefs(mapStore)
+
+const noteStore = useNoteStore()
+const { isAddingNote } = storeToRefs(noteStore)
 
 const componentMapping = {
   [LEFT_PANELS.CREATE]: CreateSite,
   [LEFT_PANELS.IDENTIFY]: IdentifySite,
   [LEFT_PANELS.LIST]: SitePanel,
+}
+
+function shouldDisable(id) {
+  return id === LEFT_PANELS.CREATE && (isAddingNote.value || measuringDistance.value)
 }
 </script>
 
@@ -27,11 +39,16 @@ const componentMapping = {
     <div class="flex h-full flex-col">
       <div class="flex items-center divide-x">
         <button
-          v-for="(tab, index) in tabs"
+          v-for="tab in tabs"
           :key="tab.id"
           class="flex h-8 flex-grow items-center justify-center text-center text-sm font-bold text-primary-foreground"
-          @click="leftPanelStore.setTab(index)"
-          :class="[activePanel?.id === tab.id ? 'bg-primary-darker' : 'bg-primary']"
+          @click="leftPanelStore.setTab(tab.id)"
+          :class="{
+            'bg-primary-darker': activePanel?.id === tab.id,
+            'bg-primary': activePanel?.id !== tab.id,
+            'opacity-70': shouldDisable(tab.id),
+          }"
+          :disabled="shouldDisable(tab.id)"
         >
           {{ tab.name }}
         </button>

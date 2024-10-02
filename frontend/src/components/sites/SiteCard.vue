@@ -5,6 +5,7 @@ import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { useSiteStore } from '@/stores/SiteStore'
 import { ChevronRight } from 'lucide-vue-next'
 import { transform } from 'ol/proj'
+import { LEFT_PANELS } from '@/helpers/constants'
 
 const props = defineProps({
   site: { type: Object, required: true },
@@ -21,7 +22,7 @@ function handleCardClick() {
   const siteMarker = transform(props.site.location.coordinates, 'EPSG:4326', 'EPSG:3857')
 
   siteStore.setSiteMarker(siteMarker)
-  leftPanelStore.setTab(1)
+  leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
 }
 </script>
 

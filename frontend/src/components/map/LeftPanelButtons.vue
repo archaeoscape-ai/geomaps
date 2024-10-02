@@ -12,6 +12,10 @@ import ShareDialog from './ShareDialog.vue'
 import { DialogTrigger } from '@/components/ui/dialog'
 import { useRouter } from 'vue-router'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
+import { LEFT_PANELS } from '@/helpers/constants'
+import { useNoteStore } from '@/stores/NoteStore'
+import { useSiteStore } from '@/stores/SiteStore'
+import { disable } from 'ol/rotationconstraint'
 
 defineProps({
   isPanelActive: Boolean,
@@ -19,19 +23,22 @@ defineProps({
 
 const mapStore = useMapStore()
 const { trackingLocation, measuringDistance } = storeToRefs(mapStore)
+
+const noteStore = useNoteStore()
+const { isAddingNote } = storeToRefs(noteStore)
+
+const siteStore = useSiteStore()
+const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
+
 const layerConfigStore = useMapLayerConfigStore()
 const { hasLayerConfigChanged } = storeToRefs(layerConfigStore)
 
 const leftPanelStore = useLeftPanelStore()
 const { toggleMenu } = leftPanelStore
 
-function reset() {
-  measuringDistance.value = false
-  // console.log("hello world")
-
+function handleMeasureDistance() {
+  measuringDistance.value = !measuringDistance.value
 }
-
-const router = useRouter()
 </script>
 
 <template>
@@ -82,10 +89,11 @@ const router = useRouter()
           <TooltipTrigger as-child>
             <Button
               size="icon"
-              @click="measuringDistance = !measuringDistance"
+              @click="handleMeasureDistance"
               :class="{
                 'bg-primary-darker': measuringDistance,
               }"
+              :disabled="isAddingNote || isCreatingSite || isEditingSite"
             >
               <RulerIcon />
             </Button>
@@ -102,7 +110,7 @@ const router = useRouter()
           <Tooltip>
             <TooltipTrigger as-child>
               <DialogTrigger as-child>
-                <Button size="icon" @click="reset">
+                <Button size="icon">
                   <Share2 class="h-4.5 w-4.5" />
                 </Button>
               </DialogTrigger>

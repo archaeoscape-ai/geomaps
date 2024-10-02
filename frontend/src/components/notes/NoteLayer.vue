@@ -1,17 +1,21 @@
 <script setup>
 import { useNoteStore } from '@/stores/NoteStore'
 import { storeToRefs } from 'pinia'
-import { ref, watch } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 import MapNoteOverlay from './MapNoteOverlay.vue'
+import { useSiteStore } from '@/stores/SiteStore'
 
 const strokeColor = ref('rgba(255, 255, 255, 0.4)')
 const fillColor = ref('#FFFFFF')
 const radius = ref(10)
 
 const noteStore = useNoteStore()
-const { displayedNotes, selectedNote, selectNoteInteractionRef, noteSourceRef, noteOverlayRef } =
+const { displayedNotes, selectedNote, selectNoteInteractionRef, noteSourceRef, noteOverlayRef, isAddingNote } =
   storeToRefs(noteStore)
 const { resetNoteOverlay } = noteStore
+
+const siteStore = useSiteStore()
+const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
 
 function featureSelected(event) {
   const deselectedFeatures = event.deselected
@@ -39,12 +43,23 @@ watch(selectedNote, (value) => {
   }
 })
 
+const selectInteactionFilter = (feature) => {
+  return !isCreatingSite.value && !isEditingSite.value && feature.getProperties().type === 'note'
+}
+
+onUnmounted(() => {
+  isAddingNote.value = false 
+})
 </script>
 
 <template>
   <ol-vector-layer>
     <ol-source-vector ref="noteSourceRef">
-      <ol-feature v-for="data in displayedNotes" :properties="data" :key="data.id">
+      <ol-feature
+        v-for="data in displayedNotes"
+        :properties="{ ...data, type: 'note' }"
+        :key="data.id"
+      >
         <ol-geom-point :coordinates="data.geom.coordinates"></ol-geom-point>
         <ol-style>
           <ol-style-circle :radius="radius">
@@ -56,7 +71,11 @@ watch(selectedNote, (value) => {
     </ol-source-vector>
   </ol-vector-layer>
 
-  <ol-interaction-select @select="featureSelected" ref="selectNoteInteractionRef">
+  <ol-interaction-select
+    @select="featureSelected"
+    ref="selectNoteInteractionRef"
+    :filter="selectInteactionFilter"
+  >
     <ol-style>
       <ol-style-circle :radius="16">
         <ol-style-fill :color="fillColor"></ol-style-fill>

@@ -16,12 +16,12 @@ import { ref, watch } from 'vue'
 import { Copy, CopyCheck } from 'lucide-vue-next'
 
 const open = ref(false)
+const sharedUrl = ref('')
 
 const { copy, copied } = useClipboard()
+
 const mapStore = useMapStore()
 const { mapRef, currentMap } = storeToRefs(mapStore)
-
-const sharedUrl = ref('')
 
 function setSharedUrl() {
   if (!mapRef.value || !currentMap.value) return

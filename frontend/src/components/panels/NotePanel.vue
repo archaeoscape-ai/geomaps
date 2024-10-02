@@ -6,15 +6,19 @@ import { X, Plus } from 'lucide-vue-next'
 import NoteCard from '../notes/NoteCard.vue'
 import { storeToRefs } from 'pinia'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
-import { onMounted, watch } from 'vue'
+import { onMounted } from 'vue'
 import { useMapStore } from '@/stores/MapStore'
+import { useSiteStore } from '@/stores/SiteStore'
 
 const mapStore = useMapStore()
-const { currentMap } = storeToRefs(mapStore)
+const { currentMap, measuringDistance } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
 const { notes, isAddingNote, page, pageSize } = storeToRefs(noteStore)
 const { resetNoteOverlay, getNotes, getNotesGeom } = noteStore
+
+const siteStore = useSiteStore()
+const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
 
 const rightPanelStore = useRightPanelStore()
 const { activePanel } = storeToRefs(rightPanelStore)
@@ -57,6 +61,7 @@ function handleFetchNotes({ currentPage, currentPageSize }) {
         class="flex w-full items-center gap-1"
         @click="handleCreateNote"
         :variant="isAddingNote ? 'outline' : 'default'"
+        :disabled="isCreatingSite || isEditingSite || measuringDistance"
       >
         <p>{{ isAddingNote ? 'Click on the map to create note' : 'Create Note' }}</p>
         <X size="16" v-if="isAddingNote" />

@@ -13,6 +13,7 @@ import FormTextareaField from '../ui/textarea/FormTextareaField.vue'
 import FormCheckboxField from '../ui/checkbox/FormCheckboxField.vue'
 import FormSelectField from '../ui/select/FormSelectField.vue'
 import { useToast } from '../ui/toast'
+import Separator from '../ui/separator/Separator.vue'
 
 const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
@@ -133,17 +134,23 @@ watch(siteMarker, (newValue) => {
   <div class="flex flex-col gap-4">
     <form @submit="onSubmit" class="flex flex-col gap-4">
       <FormSelectField name="site_type" label="Site Type" :options="siteTypes?.results" />
-      <hr />
+
+      <Separator />
+
       <FormInputField name="english_name" label="English Name" />
       <FormInputField name="french_name" label="French Name" />
       <FormInputField name="khmer_name" label="Khmer Name" />
       <FormInputField name="alternative_name" label="Alternative Name" />
       <FormInputField name="alternative_khmer_name" label="Alternative Khmer Name" />
+
+      <Separator />
+
       <FormInputField name="latitude" label="Latitude" />
       <FormInputField name="longitude" label="Longitude" />
       <FormTextareaField name="description" label="Description" />
 
-      <hr />
+      <Separator />
+
       <FormCheckboxField name="ik_id_starred" label="IK ID Starred" />
       <FormInputField name="inventaire_khmere_id" label="Inventaire Khmere (IK) ID" />
       <FormInputField name="monuments_hostoriques_id" label="Monuments Historiques (MH) ID" />
