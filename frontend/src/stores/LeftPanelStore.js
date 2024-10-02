@@ -1,3 +1,4 @@
+import { LEFT_PANELS } from '@/helpers/constants'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
@@ -6,15 +7,15 @@ export const useLeftPanelStore = defineStore('left-panel', () => {
 
   const tabs = computed(() => [
     {
-      id: 'sites',
+      id: LEFT_PANELS.LIST,
       name: 'Sites',
     },
     {
-      id: 'identify',
+      id: LEFT_PANELS.IDENTIFY,
       name: 'Identify/Edit',
     },
     {
-      id: 'create',
+      id: LEFT_PANELS.CREATE,
       name: 'Create',
     },
   ])
@@ -27,8 +28,8 @@ export const useLeftPanelStore = defineStore('left-panel', () => {
     }
   }
 
-  function setTab(tabIndex) {
-    activePanel.value = tabs.value[tabIndex]
+  function setTab(id) {
+    activePanel.value = tabs.value.find(tab => tab.id === id)
   }
 
   return {

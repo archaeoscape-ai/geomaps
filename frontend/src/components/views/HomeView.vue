@@ -30,17 +30,24 @@ const { activePanel: activeRightPanel } = storeToRefs(rightPanelStore)
 const isLeftPanelActive = computed(() => activePanel.value !== null)
 const isRightPanelActive = computed(() => activeRightPanel.value !== null)
 
-onMounted(() => {
-  async function initialize() {
-    await getListMaps()
-    if (!route.params.id) {
-      setDefaultMap()
-      router.push({ name: 'home', params: { id: currentMap.value.id } })
-    } else {
-      setMapById(route.params.id)
+function redirectToDefaultMap() {
+  setDefaultMap()
+  router.push({ name: 'home', params: { id: currentMap.value.id }, query: route.query })
+}
+
+async function initialize() {
+  await getListMaps()
+  if (!route.params.id) {
+    redirectToDefaultMap()
+  } else {
+    setMapById(route.params.id)
+    if (!currentMap.value) {
+      redirectToDefaultMap()
     }
   }
+}
 
+onMounted(() => {
   initialize()
 })
 

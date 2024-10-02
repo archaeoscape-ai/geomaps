@@ -11,6 +11,8 @@ import { XYZ } from 'ol/source'
 import TileLayer from 'ol/layer/Tile'
 import SiteIdentifyLayer from '@/components/sites/SiteIdentifyLayer.vue'
 import { useSiteStore } from '@/stores/SiteStore'
+import MeasureLayer from './MeasureLayer.vue'
+import GeolocationLayer from './GeolocationLayer.vue'
 
 defineProps({
   isPanelActive: Boolean,
@@ -68,6 +70,8 @@ const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
         <ol-source-xyz :url="basemapUrl" />
       </ol-tile-layer>
 
+      <GeolocationLayer />
+      <MeasureLayer />
       <NoteLayer v-if="activePanel === RIGHT_PANELS.NOTE" />
 
       <SiteIdentifyLayer />

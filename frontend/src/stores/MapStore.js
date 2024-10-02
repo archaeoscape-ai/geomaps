@@ -4,8 +4,10 @@ import { fromLonLat } from 'ol/proj'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import _ from 'lodash'
+import { useRoute } from 'vue-router'
 
 export const useMapStore = defineStore('map', () => {
+  const route = useRoute()
   /**
    * @type {import('vue').Ref<{ map: import('ol/Map').default } | null>}
    */
@@ -16,13 +18,26 @@ export const useMapStore = defineStore('map', () => {
   const listMaps = ref([])
   const currentMap = ref(null)
 
+  const trackingLocation = ref(false)
+  const measuringDistance = ref(false)
+
   const isLoading = ref(false)
 
   const center = computed(() => {
+    const queryLng = Number(route.query.lng)
+    const queryLat = Number(route.query.lat)
+
+    if (!Number.isNaN(queryLng) && !Number.isNaN(queryLat)) {
+      return fromLonLat([queryLng, queryLat])
+    }
+
     return currentMap.value ? fromLonLat(currentMap.value.center.coordinates) : fromLonLat([0, 0])
   })
 
   const zoom = computed(() => {
+    if (route.query.zoom) {
+      return route.query.zoom
+    }
     return currentMap.value?.zoom_level
   })
 
@@ -53,6 +68,8 @@ export const useMapStore = defineStore('map', () => {
     currentMap,
     center,
     zoom,
+    trackingLocation,
+    measuringDistance,
 
     getListMaps,
     setMapById,
