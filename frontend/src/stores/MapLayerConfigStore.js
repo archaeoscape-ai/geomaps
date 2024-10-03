@@ -1,77 +1,28 @@
 import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
-import { isEqual, cloneDeep } from 'lodash'
+import { computed, ref } from 'vue'
+import { cloneDeep, isEqual, reverse } from 'lodash'
+import { fetchMapById, fetchMapLayerConfig } from '@/api-services/MapService'
+import { LAYER_TYPE, LAYER_TYPE_LABEL } from '@/helpers/constants'
 
 export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   const searchText = ref('')
-
   const expandedLayer = ref(new Map())
 
-  const layerConfig = ref([
-    {
-      title: 'Vector Layers',
-      id: 'vector-layers',
-      items: [
-        {
-          layerId: 101,
-          alias: 'Layer 101',
-          opacity: 80,
-          isActive: true,
-          isIdentifiable: false,
-        },
-        {
-          layerId: 102,
-          alias: 'Layer 102',
-          opacity: 90,
-          isActive: false,
-          isIdentifiable: false,
-        },
-        {
-          layerId: 103,
-          alias: 'Layer 103',
-          opacity: 70,
-          isActive: true,
-          isIdentifiable: false,
-        },
-        {
-          layerId: 104,
-          alias: 'Layer 104',
-          opacity: 100,
-          isActive: false,
-          isIdentifiable: false,
-        },
-      ],
-    },
-    {
-      title: 'WMS Layers',
-      id: 'wms-layers',
-      items: [
-        {
-          layerId: 105,
-          alias: 'Layer 105',
-          opacity: 80,
-          isActive: true,
-          isIdentifiable: false,
-        },
-        {
-          layerId: 106,
-          alias: 'Layer 106',
-          opacity: 90,
-          isActive: false,
-          isIdentifiable: false,
-        },
-        {
-          layerId: 107,
-          alias: 'Layer 107',
-          opacity: 70,
-          isActive: true,
-          isIdentifiable: false,
-        },
-      ],
-    },
-  ])
+  const mapDetail = ref(null)
+  const layerConfig = ref([])
+  const tempLayerConfig = ref([])
+  const isLoading = ref(false)
 
-  const tempLayerConfig = ref(cloneDeep(layerConfig.value))
+  const currentLayers = computed(() => {
+    if (!mapDetail.value) return []
+    const res = {}
+
+    for (const layerType of Object.values(LAYER_TYPE)) {
+      res[layerType] = [...mapDetail.value[layerType].map((l) => l.id)]
+    }
+
+    return res
+  })
 
   const allLayersToggledOn = computed(() => {
     return tempLayerConfig.value.every((layer) => layer.items.every((item) => item.isActive))
@@ -84,6 +35,90 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   })
 
   const hasLayerConfigChanged = computed(() => !isEqual(layerConfig.value, tempLayerConfig.value))
+
+  /**
+   * Initialize empty map config from map detail
+   */
+  function initializeTempLayerConfig() {
+    for (const layerType of Object.values(LAYER_TYPE)) {
+      tempLayerConfig.value.push({
+        id: layerType,
+        title: LAYER_TYPE_LABEL[layerType],
+        items: [
+          ...mapDetail.value[layerType].map((l) => ({
+            layerId: l.id,
+            alias: l.alias,
+            isActive: true,
+            opacity: 100,
+          })),
+        ],
+      })
+    }
+    console.log(tempLayerConfig.value)
+  }
+
+  async function getMapLayerConfig(id) {
+    isLoading.value = true
+    const data = await fetchMapLayerConfig(id)
+    if (data.config) {
+      layerConfig.value = data.config
+      tempLayerConfig.value = cloneDeep(layerConfig.value)
+    }
+
+    isLoading.value = false
+  }
+
+  async function getMapDetail(id) {
+    isLoading.value = true
+    const data = await fetchMapById(id)
+    mapDetail.value = data
+    isLoading.value = false
+  }
+
+  function syncLayerConfig() {
+    // console.log(layerConfig.value, mapDetail.value, tempLayerConfig.value)
+    if (tempLayerConfig.value.length === 0) {
+      initializeTempLayerConfig()
+    } else {
+      // Delete extra layer in temp config
+      for (const layerGroup of tempLayerConfig.value) {
+        const type = layerGroup.id
+        const items = layerGroup.items
+        const idsToRemove = []
+
+        for (let i = 0; i < items.length; i++) {
+          if (!currentLayers.value[type].includes(items[i].id)) {
+            idsToRemove.push(i)
+          }
+        }
+
+        reverse(idsToRemove).forEach((i) => {
+          items.splice(i, 1)
+        })
+      }
+
+      // Add new layers to config
+      for (const layerGroup of tempLayerConfig.value) {
+        const type = layerGroup.id
+        const items = layerGroup.items
+        const idsInTempLayerConfig = items.map((layer) => layer.layerId)
+
+        for (const id of currentLayers.value[type]) {
+          if (!idsInTempLayerConfig.includes(id)) {
+            const layer = mapDetail.value[type].find((layer) => layer.id === id)
+            items.push({
+              layerId: layer.id,
+              alias: layer.alias,
+              isActive: true,
+              opacity: 100,
+            })
+          }
+        }
+      }
+    }
+
+    console.log(layerConfig.value, tempLayerConfig.value)
+  }
 
   /**
    * Retrieves a specific layer object from the configuration by parent layer group ID and layer ID.
@@ -186,14 +221,14 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     layer.opacity = value
   }
 
-  watch(
-    tempLayerConfig,
-    (newValue) => {
-      console.log(newValue)
-      // update the layer index on the map based on the new position
-    },
-    { deep: true },
-  )
+  // watch(
+  //   tempLayerConfig,
+  //   (newValue) => {
+  //     console.log(newValue)
+  //     // update the layer index on the map based on the new position
+  //   },
+  //   { deep: true },
+  // )
 
   return {
     searchText,
@@ -203,7 +238,11 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     allLayersToggledOn,
     allLayersExpanded,
     hasLayerConfigChanged,
+    mapDetail,
 
+    getMapLayerConfig,
+    getMapDetail,
+    syncLayerConfig,
     setLayerItemsActiveState,
     setAllLayersActiveState,
     updateLayerVisibility,
@@ -211,5 +250,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     setAllLayersExpandedState,
     updateLayerExpandedState,
     updateLayerOpacity,
+    initializeTempLayerConfig,
   }
 })

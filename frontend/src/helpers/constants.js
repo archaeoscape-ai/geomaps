@@ -45,3 +45,15 @@ export const LEFT_PANEL_MAPPING = {
     name: 'Identify/Edit',
   },
 }
+
+export const LAYER_TYPE = {
+  VECTOR: 'vector_tile_layers',
+  WMS: 'wms_layers',
+  XYZ: 'xyz_layers',
+}
+
+export const LAYER_TYPE_LABEL = {
+  [LAYER_TYPE.VECTOR]: 'Vector Layers',
+  [LAYER_TYPE.WMS]: 'WMS Layers',
+  [LAYER_TYPE.XYZ]: 'XYZ Layers',
+}

@@ -13,6 +13,7 @@ import BaseMapButtons from '@/components/map/BaseMapButtons.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { useRoute, useRouter } from 'vue-router'
 import Toaster from '../ui/toast/Toaster.vue'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
 const router = useRouter()
 const route = useRoute()
@@ -20,6 +21,9 @@ const route = useRoute()
 const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
 const { getListMaps, setMapById, setDefaultMap } = mapStore
+
+const mapLayerConfigStore = useMapLayerConfigStore()
+const { getMapLayerConfig, getMapDetail, syncLayerConfig } = mapLayerConfigStore
 
 const leftPanelStore = useLeftPanelStore()
 const { activePanel } = storeToRefs(leftPanelStore)
@@ -45,6 +49,11 @@ async function initialize() {
       redirectToDefaultMap()
     }
   }
+
+  const p1 = getMapLayerConfig(currentMap.value.id)
+  const p2 = getMapDetail(currentMap.value.id)
+  await Promise.all([ p1, p2 ])
+  syncLayerConfig()
 }
 
 onMounted(() => {

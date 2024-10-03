@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import MapControls from './MapControls.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
@@ -13,6 +13,7 @@ import SiteIdentifyLayer from '@/components/sites/SiteIdentifyLayer.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import MeasureLayer from './MeasureLayer.vue'
 import GeolocationLayer from './GeolocationLayer.vue'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
 defineProps({
   isPanelActive: Boolean,
@@ -20,6 +21,10 @@ defineProps({
 
 const mapStore = useMapStore()
 const { mapRef, basemap, zoom, center } = storeToRefs(mapStore)
+
+const mapLayerConfigStore = useMapLayerConfigStore()
+const { initializeTempLayerConfig } = mapLayerConfigStore
+const { mapDetail, layerConfig, tempLayerConfig } = storeToRefs(mapLayerConfigStore)
 
 const noteStore = useNoteStore()
 const { addNewNoteMarker } = noteStore
