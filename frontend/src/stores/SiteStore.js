@@ -14,7 +14,7 @@ export const useSiteStore = defineStore('site', () => {
 
   const sites = ref(null)
   const page = ref(0)
-  const pageSize = ref(10)
+  const pageSize = ref(-1)
   const searchText = ref('')
   const selectedSite = ref(null)
   const siteMarker = ref(null)

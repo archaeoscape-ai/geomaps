@@ -1,5 +1,6 @@
 <script setup>
 import { storeToRefs } from 'pinia'
+import { watch } from 'vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useMapStore } from '@/stores/MapStore'
 import { useNoteStore } from '@/stores/NoteStore'
@@ -10,6 +11,7 @@ import SiteDetail from '@/components/sites/SiteDetail.vue'
 import LeftPanelWrapper from '@/components/panels/LeftPanelWrapper.vue'
 import DeleteSiteDialog from './DeleteSiteDialog.vue'
 import { Ban, Pencil, Trash } from 'lucide-vue-next'
+import { transform } from 'ol/proj'
 
 const mapStore = useMapStore()
 const { measuringDistance } = storeToRefs(mapStore)
@@ -26,9 +28,18 @@ const heading = computed(() => {
 
 function toggleSiteEdit() {
   isEditingSite.value = !isEditingSite.value
+  const siteMarker = transform(selectedSite.value?.location?.coordinates, 'EPSG:4326', 'EPSG:3857')
+  siteStore.setSiteMarker(siteMarker)
 }
 
 onBeforeUnmount(() => (isEditingSite.value = false))
+
+watch(selectedSite, (newValue) => {
+  if (newValue) {
+    const siteMarker = transform(newValue?.location?.coordinates, 'EPSG:4326', 'EPSG:3857')
+    siteStore.setSiteMarker(siteMarker)
+  }
+})
 </script>
 
 <template>

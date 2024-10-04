@@ -89,7 +89,6 @@ const onSubmit = form.handleSubmit(async (values) => {
       return
     }
     toast({ description: 'Could not save site!', variant: 'destructive' })
-    console.log(error)
   } finally {
     isSubmitting.value = false
   }
@@ -140,8 +139,8 @@ watch(siteMarker, (newValue) => {
       <FormInputField name="english_name" label="English Name" />
       <FormInputField name="french_name" label="French Name" />
       <FormInputField name="khmer_name" label="Khmer Name" />
-      <FormInputField name="alternative_name" label="Alternative Name" />
-      <FormInputField name="alternative_khmer_name" label="Alternative Khmer Name" />
+      <FormInputField name="alternative_name" label="Alternative Name(s)" />
+      <FormInputField name="alternative_khmer_name" label="Alternative Khmer Name(s)" />
 
       <Separator />
 

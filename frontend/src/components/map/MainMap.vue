@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import MapControls from './MapControls.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
@@ -9,7 +9,7 @@ import { BASEMAP_URLS, RIGHT_PANELS } from '@/helpers/constants'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
 import { XYZ } from 'ol/source'
 import TileLayer from 'ol/layer/Tile'
-import SiteIdentifyLayer from '@/components/sites/SiteIdentifyLayer.vue'
+import SiteLayer from '@/components/sites/SiteLayer.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import MeasureLayer from './MeasureLayer.vue'
 import GeolocationLayer from './GeolocationLayer.vue'
@@ -19,7 +19,7 @@ defineProps({
 })
 
 const mapStore = useMapStore()
-const { mapRef, basemap, zoom, center } = storeToRefs(mapStore)
+const { mapRef, basemap, zoom, center, currentMap } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
 const { addNewNoteMarker } = noteStore
@@ -49,6 +49,12 @@ function handleClickMap(event) {
 }
 
 const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
+
+watch(currentMap, (newValue) => {
+  if (newValue) {
+    siteStore.getSites(currentMap.value?.id)
+  }
+})
 </script>
 
 <template>
@@ -74,7 +80,7 @@ const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
       <MeasureLayer />
       <NoteLayer v-if="activePanel === RIGHT_PANELS.NOTE" />
 
-      <SiteIdentifyLayer />
+      <SiteLayer />
     </ol-map>
 
     <MapControls :is-panel-active="isPanelActive" :map="mapRef" />

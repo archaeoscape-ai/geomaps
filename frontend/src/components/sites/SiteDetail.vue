@@ -1,7 +1,8 @@
 <script setup>
+import { watch } from 'vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import { storeToRefs } from 'pinia'
-
+import { transform } from 'ol/proj'
 
 const siteStore = useSiteStore()
 const { selectedSite } = storeToRefs(siteStore)
@@ -28,6 +29,17 @@ function getValue(site, key) {
     return o ? o[i] : undefined
   }, site)
 }
+
+watch(
+  selectedSite,
+  (newValue) => {
+    if (newValue) {
+      const siteMarker = transform(newValue?.location?.coordinates, 'EPSG:4326', 'EPSG:3857')
+      siteStore.setSiteMarker(siteMarker)
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
