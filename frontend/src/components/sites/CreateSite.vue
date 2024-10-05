@@ -8,9 +8,15 @@ import LeftPanelWrapper from '@/components/panels/LeftPanelWrapper.vue'
 const siteStore = useSiteStore()
 const { isCreatingSite } = storeToRefs(siteStore)
 
-onMounted(() => (isCreatingSite.value = true))
+onMounted(() => {
+  isCreatingSite.value = true
+  siteStore.setSiteMarker(null)
+})
 
-onBeforeUnmount(() => (isCreatingSite.value = false))
+onBeforeUnmount(() => {
+  isCreatingSite.value = false
+  siteStore.setSiteMarker(null)
+})
 </script>
 
 <template>

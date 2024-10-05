@@ -17,10 +17,6 @@ const { currentMap } = storeToRefs(mapStore)
 const siteStore = useSiteStore()
 const { sites, page, pageSize, searchText } = storeToRefs(siteStore)
 
-onMounted(() => {
-  siteStore.getSites(currentMap.value?.id)
-})
-
 function fetchSites({ currentPage, currentPageSize }) {
   page.value = currentPage - 1
   pageSize.value = currentPageSize
@@ -30,7 +26,7 @@ function fetchSites({ currentPage, currentPageSize }) {
 watchDebounced(
   searchText,
   (newValue) => {
-    siteStore.getSites(1)
+    siteStore.getSites(currentMap.value?.id)
   },
   { debounce: 500, maxWait: 2000 },
 )
@@ -60,17 +56,17 @@ watchDebounced(
       <hr class="my-3" />
     </div>
 
-    <div class="flex flex-grow flex-col gap-4 overflow-auto px-4">
+    <div class="flex flex-grow flex-col gap-4 overflow-auto px-4 pb-4">
       <SiteCard :site="site" v-for="site in sites?.results" :key="site.id" />
     </div>
 
-    <div class="flex justify-center p-3">
+    <!-- <div class="flex justify-center p-3">
       <Pagination
         :totalRecords="sites?.count || 0"
         :page="page"
         :pageSize="pageSize"
         @fetchData="fetchSites"
       />
-    </div>
+    </div> -->
   </LeftPanelWrapper>
 </template>
