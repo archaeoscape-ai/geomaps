@@ -1,8 +1,6 @@
 <script setup>
-import { watch } from 'vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import { storeToRefs } from 'pinia'
-import { transform } from 'ol/proj'
 
 const siteStore = useSiteStore()
 const { selectedSite } = storeToRefs(siteStore)
