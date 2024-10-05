@@ -2,6 +2,7 @@ from django.contrib import admin
 from leaflet.admin import LeafletGeoAdmin
 
 from efeo.models import (
+    FieldSeason,
     Map,
     MapConfig,
     MapNote,
@@ -9,9 +10,12 @@ from efeo.models import (
     SiteResource,
     SiteResourceType,
     SiteType,
+    Trench,
     VectorTileLayer,
     WmsLayer,
     Worksite,
+    WorksiteResource,
+    WorksiteResourceType,
     WorksiteType,
     XYZLayer,
 )
@@ -104,3 +108,31 @@ class XYZLayerAdmin(admin.ModelAdmin):
 class VectorTileLayerAdmin(admin.ModelAdmin):
     list_display = ("alias", "tiles_url", "created_on")
     list_display = ("alias", "tiles_url", "created_on")
+
+
+@admin.register(FieldSeason)
+class FieldSeasonAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
+@admin.register(Trench)
+class TrenchAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
+@admin.register(WorksiteResourceType)
+class WorksiteResourceTypeAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
+@admin.register(WorksiteResource)
+class WorksiteResourceAdmin(admin.ModelAdmin):
+    list_display = (
+        "worksite",
+        "resource_type",
+        "caption",
+        "trench",
+        "fieldseason",
+        "created_by",
+        "created_on",
+    )
