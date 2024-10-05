@@ -34,12 +34,16 @@ function toggleSiteEdit() {
 
 onBeforeUnmount(() => (isEditingSite.value = false))
 
-watch(selectedSite, (newValue) => {
-  if (newValue) {
-    const siteMarker = transform(newValue?.location?.coordinates, 'EPSG:4326', 'EPSG:3857')
-    siteStore.setSiteMarker(siteMarker)
-  }
-})
+watch(
+  selectedSite,
+  (newValue) => {
+    if (newValue) {
+      const siteMarker = transform(newValue?.location?.coordinates, 'EPSG:4326', 'EPSG:3857')
+      siteStore.setSiteMarker(siteMarker)
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>

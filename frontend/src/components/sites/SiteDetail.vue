@@ -29,17 +29,6 @@ function getValue(site, key) {
     return o ? o[i] : undefined
   }, site)
 }
-
-watch(
-  selectedSite,
-  (newValue) => {
-    if (newValue) {
-      const siteMarker = transform(newValue?.location?.coordinates, 'EPSG:4326', 'EPSG:3857')
-      siteStore.setSiteMarker(siteMarker)
-    }
-  },
-  { immediate: true },
-)
 </script>
 
 <template>
