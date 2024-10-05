@@ -32,8 +32,8 @@ function handleCardClick() {
     @click="handleCardClick"
   >
     <CardContent class="p-2">
-      <div class="flex w-full items-center justify-between">
-        <p class="text-sm font-semibold">{{ site.id }}: {{ site.english_name }}</p>
+      <div class="flex w-full items-center justify-between break-words">
+        <p class="w-full text-sm font-semibold">{{ site.id }}: {{ site.english_name }}</p>
         <ChevronRight class="stroke-button-icon" />
       </div>
     </CardContent>

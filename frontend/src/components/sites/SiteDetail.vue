@@ -47,9 +47,9 @@ watch(
     <div
       v-for="(field, index) in siteFields"
       :key="field.key"
-      :class="index % 2 === 0 ? 'bg-gray-100' : 'bg-white'"
+      :class="index % 2 === 0 ? 'bg-gray-200' : 'bg-white'"
     >
-      <div class="grid grid-cols-2 gap-3 px-4 py-2">
+      <div class="grid grid-cols-2 items-center gap-4 break-words px-4 py-2">
         <div class="font-semibold">{{ field.label }}</div>
         <div>
           <template v-if="field.isBoolean">
