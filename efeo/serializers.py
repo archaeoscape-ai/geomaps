@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from efeo.models import (
+    FieldSeason,
     Map,
     MapConfig,
     MapNote,
@@ -8,9 +9,11 @@ from efeo.models import (
     SiteResource,
     SiteResourceType,
     SiteType,
+    Trench,
     VectorTileLayer,
     WmsLayer,
     Worksite,
+    WorksiteResource,
     WorksiteType,
     XYZLayer,
 )
@@ -133,7 +136,7 @@ class WorksiteSerializer(serializers.ModelSerializer):
             "created_on",
             "updated_on",
         )
-        read_only_fields = ("map", "created_by", "created_on", "updated_on")
+        read_only_fields = ("archsite", "created_by", "created_on", "updated_on")
 
 
 class MapNoteSerializer(serializers.ModelSerializer):
@@ -180,6 +183,38 @@ class SiteResourceSerializer(serializers.ModelSerializer):
             "resource_date",
             "resource_file",
             "notes",
+            "created_by",
+            "created_on",
+        )
+        read_only_fields = ("site", "created_by", "created_on")
+
+
+class FieldSeasonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FieldSeason
+        fields = ("id", "name")
+
+
+class TrenchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trench
+        fields = ("id", "name")
+
+
+class WorksiteResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorksiteResource
+        fields = (
+            "id",
+            "site",
+            "resource_type",
+            "caption",
+            "resource_date",
+            "resource_file",
+            "gcs_id",
+            "context",
+            "trench",
+            "fieldseason",
             "created_by",
             "created_on",
         )
