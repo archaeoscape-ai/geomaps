@@ -10,6 +10,8 @@ from efeo.models import (
     SiteType,
     VectorTileLayer,
     WmsLayer,
+    Worksite,
+    WorksiteType,
     XYZLayer,
 )
 
@@ -96,6 +98,37 @@ class SiteSerializer(serializers.ModelSerializer):
             "alternative_khmer_name",
             "description",
             "ik_id_starred",
+            "created_by",
+            "created_on",
+            "updated_on",
+        )
+        read_only_fields = ("map", "created_by", "created_on", "updated_on")
+
+
+class WorksiteTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorksiteType
+        fields = ("id", "name")
+
+
+class WorksiteSerializer(serializers.ModelSerializer):
+
+    worksite_type_name = serializers.ReadOnlyField(source="worksite_type.name")
+
+    class Meta:
+        model = Worksite
+        fields = (
+            "id",
+            "worksite_type",
+            "worksite_type_name",
+            "archsite",
+            "location",
+            "method",
+            "name",
+            "looted",
+            "cultivated",
+            "cleared",
+            "threatened",
             "created_by",
             "created_on",
             "updated_on",

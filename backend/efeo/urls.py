@@ -12,6 +12,11 @@ urlpatterns = [
     ),
     path("site-types/", views.SiteTypeListView.as_view(), name="site-type-list"),
     path(
+        "worksite-types/",
+        views.WorksiteTypeListView.as_view(),
+        name="worksite-type-list",
+    ),
+    path(
         "site-resource-types/",
         views.SiteResourceTypeListView.as_view(),
         name="site-resource-type-list",

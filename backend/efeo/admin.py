@@ -11,6 +11,8 @@ from efeo.models import (
     SiteType,
     VectorTileLayer,
     WmsLayer,
+    Worksite,
+    WorksiteType,
     XYZLayer,
 )
 
@@ -43,6 +45,11 @@ class SiteTypeAdmin(admin.ModelAdmin):
     list_display = ("name",)
 
 
+@admin.register(WorksiteType)
+class WorksiteTypeAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
 @admin.register(SiteResourceType)
 class SiteResourceTypeAdmin(admin.ModelAdmin):
     list_display = ("name",)
@@ -70,6 +77,17 @@ class SiteAdmin(LeafletGeoAdmin):
         "created_by",
     )
     readonly_fields = ("uid", "deleted_at")
+
+
+@admin.register(Worksite)
+class WorksiteAdmin(LeafletGeoAdmin):
+    list_display = (
+        "name",
+        "worksite_type",
+        "archsite",
+        "created_by",
+    )
+    readonly_fields = ("uid",)
 
 
 @admin.register(WmsLayer)

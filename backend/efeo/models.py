@@ -196,3 +196,36 @@ class XYZLayer(AbstractLayer):
 
 class VectorTileLayer(AbstractLayer):
     tiles_url = models.URLField("Tiles URL", max_length=255)
+
+
+class WorksiteType(models.Model):
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
+
+
+class Worksite(models.Model):
+    uid = models.UUIDField(default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=128)
+    worksite_type = models.ForeignKey(
+        WorksiteType, null=True, on_delete=models.SET_NULL
+    )
+    method = models.CharField(max_length=16)
+    archsite = models.ForeignKey(
+        Site, related_name="worksites", null=True, on_delete=models.SET_NULL
+    )
+    location = geomodels.PointField(srid=4326)
+    looted = models.BooleanField(null=True)
+    cultivated = models.BooleanField(null=True)
+    cleared = models.BooleanField(null=True)
+    threatened = models.BooleanField(null=True)
+
+    created_by = models.ForeignKey(
+        "accounts.User", related_name="created_worksites", on_delete=models.PROTECT
+    )
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
