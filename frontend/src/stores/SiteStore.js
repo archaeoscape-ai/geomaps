@@ -51,16 +51,20 @@ export const useSiteStore = defineStore('site', () => {
   async function createSite(mapId, data) {
     const res = await siteService.createSite(mapId, data)
     if (sites.value?.results) {
-      sites.value.results.push(res);
+      sites.value.results.push(res)
     } else {
-      sites.value = { ...sites.value, results: [res] };
+      sites.value = { ...sites.value, results: [res] }
     }
-    
+
     selectedSite.value = res
   }
 
   async function updateSite(siteId, data) {
     const res = await siteService.updateSite(siteId, data)
+    const index = sites.value.results.findIndex((site) => site.id === siteId)
+    if (index !== -1) {
+      sites.value.results[index] = res
+    }
     selectedSite.value = res
   }
 
