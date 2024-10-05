@@ -74,6 +74,10 @@ export const useSiteStore = defineStore('site', () => {
 
   async function deleteSite(siteId) {
     await siteService.deleteSite(siteId)
+    const index = sites.value.results.findIndex((site) => site.id === siteId)
+    if (index !== -1) {
+      sites.value.results.splice(index, 1)
+    }
     selectedSite.value = null
     siteMarker.value = null
   }
