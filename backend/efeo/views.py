@@ -14,6 +14,7 @@ from efeo.models import (
     SiteResource,
     SiteResourceType,
     SiteType,
+    WorksiteType,
 )
 from efeo.permissions import (
     AdminOrCreatorPermission,
@@ -30,6 +31,7 @@ from efeo.serializers import (
     SiteResourceTypeSerializer,
     SiteSerializer,
     SiteTypeSerializer,
+    WorksiteTypeSerializer,
 )
 
 
@@ -95,6 +97,11 @@ class MapConfigView(APIView):
 class SiteTypeListView(generics.ListAPIView):
     serializer_class = SiteTypeSerializer
     queryset = SiteType.objects.all()
+
+
+class WorksiteTypeListView(generics.ListAPIView):
+    serializer_class = WorksiteTypeSerializer
+    queryset = WorksiteType.objects.all()
 
 
 class SiteResourceTypeListView(generics.ListAPIView):
