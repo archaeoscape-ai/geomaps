@@ -19,7 +19,7 @@ defineProps({
 })
 
 const mapStore = useMapStore()
-const { trackingLocation, measuringDistance } = storeToRefs(mapStore)
+const { trackingLocation, measuringDistance, currentMap } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
 const { isAddingNote } = storeToRefs(noteStore)
@@ -28,6 +28,7 @@ const siteStore = useSiteStore()
 const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
 
 const layerConfigStore = useMapLayerConfigStore()
+const { updateLayerConfig } = layerConfigStore
 const { hasLayerConfigChanged, tempLayerConfig, layerConfig } = storeToRefs(layerConfigStore)
 
 const leftPanelStore = useLeftPanelStore()
@@ -40,6 +41,8 @@ function handleMeasureDistance() {
 function saveConfig() {
   console.log('origin', layerConfig.value)
   console.log('update', tempLayerConfig.value)
+  // console.log(currentMap)
+  updateLayerConfig(currentMap.value.id)
 }
 </script>
 

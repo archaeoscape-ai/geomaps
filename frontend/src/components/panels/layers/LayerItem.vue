@@ -9,7 +9,7 @@ import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
 const layerConfigStore = useMapLayerConfigStore()
 
-defineProps({
+const props = defineProps({
   parentId: { type: String, required: true },
   item: { type: Object, required: true },
 })
@@ -19,6 +19,8 @@ const showLegend = ref(false)
 function toggleShowLegend() {
   showLegend.value = !showLegend.value
 }
+
+console.log(props.item)
 </script>
 
 <template>

@@ -23,7 +23,8 @@ const { currentMap } = storeToRefs(mapStore)
 const { getListMaps, setMapById, setDefaultMap } = mapStore
 
 const mapLayerConfigStore = useMapLayerConfigStore()
-const { getMapLayerConfig, getMapDetail, syncLayerConfig } = mapLayerConfigStore
+const { initializeMapConfig } =
+  mapLayerConfigStore
 
 const leftPanelStore = useLeftPanelStore()
 const { activePanel } = storeToRefs(leftPanelStore)
@@ -47,13 +48,10 @@ async function initialize() {
     setMapById(route.params.id)
     if (!currentMap.value) {
       redirectToDefaultMap()
+    } else {
+      initializeMapConfig(currentMap.value.id)
     }
   }
-
-  const p1 = getMapLayerConfig(currentMap.value.id)
-  const p2 = getMapDetail(currentMap.value.id)
-  await Promise.all([ p1, p2 ])
-  syncLayerConfig()
 }
 
 onMounted(() => {
@@ -65,6 +63,10 @@ watch(
   (newId) => {
     if (newId) {
       setMapById(newId)
+      if (!currentMap.value) {
+        redirectToDefaultMap()
+      }
+      initializeMapConfig(currentMap.value.id)
     }
   },
 )

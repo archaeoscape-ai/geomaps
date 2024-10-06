@@ -14,3 +14,8 @@ export async function fetchMapLayerConfig(id) {
   const response = await axios.get(`${resource}/${id}/config/`)
   return response.data
 }
+
+export async function updateCurrentMapLayerConfig(mapId, data) {
+  const response = await axios.post(`${resource}/${mapId}/config/`, { config: data })
+  return response.data
+}

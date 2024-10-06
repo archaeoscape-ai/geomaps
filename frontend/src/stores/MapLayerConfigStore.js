@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { cloneDeep, isEqual, reverse } from 'lodash'
-import { fetchMapById, fetchMapLayerConfig } from '@/api-services/MapService'
+import { fetchMapById, fetchMapLayerConfig, updateCurrentMapLayerConfig } from '@/api-services/MapService'
 import { LAYER_TYPE, LAYER_TYPE_LABEL } from '@/helpers/constants'
 
 export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
@@ -24,9 +24,9 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     return res
   })
 
-  const currentLayersDict = computed(() => {
-    return null
-  })
+  // const currentLayersDict = computed(() => {
+  //   return null
+  // })
 
   const allLayersToggledOn = computed(() => {
     return tempLayerConfig.value.every((layer) => layer.items.every((item) => item.isActive))
@@ -81,6 +81,27 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     isLoading.value = false
   }
 
+  async function initializeMapConfig(id) {
+    const p1 = getMapLayerConfig(id)
+    const p2 = getMapDetail(id)
+    await Promise.all([ p1, p2 ])
+    syncLayerConfig()
+  }
+
+  async function updateLayerConfig(id) {
+    isLoading.value = true
+    const data = await updateCurrentMapLayerConfig(id, tempLayerConfig.value)
+    if (data.config) {
+      layerConfig.value = data.config
+      tempLayerConfig.value = cloneDeep(layerConfig.value)
+    }
+    isLoading.value = false
+  }
+
+  /**
+   * Sync layer config with list of layers returned on the map
+   * in case there are additions or deletions of layers on admin panel
+   */
   function syncLayerConfig() {
     // console.log(layerConfig.value, mapDetail.value, tempLayerConfig.value)
     if (tempLayerConfig.value.length === 0) {
@@ -93,7 +114,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
         const idsToRemove = []
 
         for (let i = 0; i < items.length; i++) {
-          if (!currentLayers.value[type].includes(items[i].id)) {
+          if (!currentLayers.value[type].includes(items[i].layerId)) {
             idsToRemove.push(i)
           }
         }
@@ -110,6 +131,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
         const idsInTempLayerConfig = items.map((layer) => layer.layerId)
 
         for (const id of currentLayers.value[type]) {
+          console.log(id, idsInTempLayerConfig, type)
           if (!idsInTempLayerConfig.includes(id)) {
             const layer = mapDetail.value[type].find((layer) => layer.id === id)
             items.push({
@@ -254,6 +276,8 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
 
     getMapLayerConfig,
     getMapDetail,
+    updateLayerConfig,
+    initializeMapConfig,
     syncLayerConfig,
     setLayerItemsActiveState,
     setAllLayersActiveState,
