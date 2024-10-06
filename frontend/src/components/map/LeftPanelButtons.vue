@@ -10,12 +10,9 @@ import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import ShareDialog from './ShareDialog.vue'
 import { DialogTrigger } from '@/components/ui/dialog'
-import { useRouter } from 'vue-router'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
-import { LEFT_PANELS } from '@/helpers/constants'
 import { useNoteStore } from '@/stores/NoteStore'
 import { useSiteStore } from '@/stores/SiteStore'
-import { disable } from 'ol/rotationconstraint'
 
 defineProps({
   isPanelActive: Boolean,
@@ -31,13 +28,18 @@ const siteStore = useSiteStore()
 const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
 
 const layerConfigStore = useMapLayerConfigStore()
-const { hasLayerConfigChanged } = storeToRefs(layerConfigStore)
+const { hasLayerConfigChanged, tempLayerConfig, layerConfig } = storeToRefs(layerConfigStore)
 
 const leftPanelStore = useLeftPanelStore()
 const { toggleMenu } = leftPanelStore
 
 function handleMeasureDistance() {
   measuringDistance.value = !measuringDistance.value
+}
+
+function saveConfig() {
+  console.log('origin', layerConfig.value)
+  console.log('update', tempLayerConfig.value)
 }
 </script>
 
@@ -127,11 +129,8 @@ function handleMeasureDistance() {
           <TooltipTrigger as-child>
             <Button
               size="icon"
-              :class="
-                hasLayerConfigChanged
-                  ? 'bg-primary-darker hover:bg-primary-darker/90'
-                  : 'bg-primary'
-              "
+              :disabled="!hasLayerConfigChanged"
+              @click="saveConfig"
             >
               <SaveIcon />
             </Button>

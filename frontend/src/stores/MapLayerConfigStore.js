@@ -24,13 +24,19 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     return res
   })
 
+  const currentLayersDict = computed(() => {
+    return null
+  })
+
   const allLayersToggledOn = computed(() => {
     return tempLayerConfig.value.every((layer) => layer.items.every((item) => item.isActive))
   })
 
   const allLayersExpanded = computed(() => {
-    return tempLayerConfig.value.every((layer) =>
-      layer.items.every((item) => !item.isActive || expandedLayer.value.get(item.layerId)),
+    return tempLayerConfig.value.every((group) =>
+      group.items.every(
+        (item) => !item.isActive || expandedLayer.value.get(getKey(group.id, item.layerId)),
+      ),
     )
   })
 
@@ -128,10 +134,10 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
    * @returns {Object|null} - The layer object if found, or null if not.
    */
   function getLayer(parentId, layerId) {
-    const parent = tempLayerConfig.value.find((item) => item.id === parentId)
+    const parent = tempLayerConfig.value.find((group) => group.id === parentId)
     if (!parent) return null
 
-    return parent.items.find((item) => item.layerId === layerId)
+    return parent.items.find((layer) => layer.layerId === layerId)
   }
 
   /**
@@ -140,8 +146,8 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
    * @param {Object} layer - The layer group object that contains items.
    * @param {boolean} value - The value to set for 'isActive' on all items (true or false).
    */
-  function setLayerItemsActiveState(layer, value) {
-    layer.items?.forEach((item) => (item.isActive = value))
+  function setLayerItemsActiveState(group, value) {
+    group.items.forEach((item) => (item.isActive = value))
   }
 
   /**
@@ -150,7 +156,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
    * @param {boolean} value - The value to set for 'isActive' across all layers (true or false).
    */
   function setAllLayersActiveState(value) {
-    tempLayerConfig.value.forEach((layer) => setLayerItemsActiveState(layer, value))
+    tempLayerConfig.value.forEach((group) => setLayerItemsActiveState(group, value))
   }
 
   /**
@@ -159,10 +165,10 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
    * @param {boolean} value - The value to set for expanded state (true or false).
    */
   function setAllLayersExpandedState(value) {
-    tempLayerConfig.value.forEach((layer) => {
-      layer.items.forEach((item) => {
-        if (item.isActive) {
-          expandedLayer.value.set(item.layerId, value)
+    tempLayerConfig.value.forEach((group) => {
+      group.items.forEach((layer) => {
+        if (layer.isActive) {
+          expandedLayer.value.set(getKey(group.id, layer.layerId), value)
         }
       })
     })
@@ -181,30 +187,32 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
 
     layer.isActive = value
     if (!value) {
-      updateLayerExpandedState(layerId, value)
+      updateLayerExpandedState(parentId, layerId, value)
     }
   }
 
   /**
    * Updates the expanded state of a specific active layer.
    *
+   * @param {string} parentId - The ID of the parent layer group (e.g., 'wms-layers').
    * @param {Object} layer - The layer object to update the expanded state.
    * @param {boolean} value - The expanded state to set (true or false).
    */
-  function updateLayerExpandedState(layer, value) {
+  function updateLayerExpandedState(parentId, layer, value) {
     if (!layer.isActive) return
 
-    expandedLayer.value.set(layer.layerId, value)
+    expandedLayer.value.set(getKey(parentId, layer.layerId), value)
   }
 
   /**
    * Checks if a specific layer is expanded based on its layerId.
    *
+   * @param {string} parentId - The ID of the parent layer group (e.g., 'wms-layers').
    * @param {number} layerId - The ID of the layer to check.
    * @returns {boolean} - True if the layer is expanded, false otherwise.
    */
-  function isLayerExpanded(layerId) {
-    return expandedLayer.value.get(layerId) || false
+  function isLayerExpanded(parentId, layerId) {
+    return expandedLayer.value.get(getKey(parentId, layerId)) || false
   }
 
   /**
@@ -229,6 +237,10 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   //   },
   //   { deep: true },
   // )
+
+  function getKey(parentId, layerId) {
+    return `${parentId}-${layerId}`
+  }
 
   return {
     searchText,
