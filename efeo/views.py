@@ -20,6 +20,7 @@ from efeo.models import (
     WorksiteResource,
     WorksiteType,
 )
+from efeo.paginations import CustomLimitOffsetPagination
 from efeo.permissions import (
     AdminOrCreatorPermission,
     AdminOrStandardPermission,
@@ -120,6 +121,7 @@ class SiteResourceTypeListView(generics.ListAPIView):
 class MapSiteListView(generics.ListCreateAPIView):
     serializer_class = SiteSerializer
     permission_classes = [AdminOrStandardPermission]
+    pagination_class = CustomLimitOffsetPagination
 
     filter_backends = (
         CaseInsensitiveOrderingFilter,
