@@ -29,9 +29,6 @@ const { selectedSite, siteTypes, isCreatingSite, siteMarker, isEditingSite } =
 const isSubmitting = ref(false)
 const { toast } = useToast()
 
-onMounted(async () => {
-  await siteStore.getSiteTypes()
-})
 
 const formSchema = toTypedSchema(
   z.object({
@@ -133,6 +130,8 @@ watch(siteMarker, (newValue) => {
     form.setFieldValue('longitude', coords[0])
   }
 })
+
+siteStore.getSiteTypes()
 </script>
 
 <template>

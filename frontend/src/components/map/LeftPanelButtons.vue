@@ -3,26 +3,21 @@ import { MapPin, NavigationIcon, Share2 } from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 import GpsIcon from '@/assets/gps-icon.svg?component'
 import RulerIcon from '@/assets/ruler-icon.svg?component'
-import SaveIcon from '@/assets/save-icon.svg?component'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import ShareDialog from './ShareDialog.vue'
 import { DialogTrigger } from '@/components/ui/dialog'
-import { useRouter } from 'vue-router'
-import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
-import { LEFT_PANELS } from '@/helpers/constants'
 import { useNoteStore } from '@/stores/NoteStore'
 import { useSiteStore } from '@/stores/SiteStore'
-import { disable } from 'ol/rotationconstraint'
 
 defineProps({
   isPanelActive: Boolean,
 })
 
 const mapStore = useMapStore()
-const { trackingLocation, measuringDistance } = storeToRefs(mapStore)
+const { trackingLocation, measuringDistance, currentMap } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
 const { isAddingNote } = storeToRefs(noteStore)
@@ -30,15 +25,13 @@ const { isAddingNote } = storeToRefs(noteStore)
 const siteStore = useSiteStore()
 const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
 
-const layerConfigStore = useMapLayerConfigStore()
-const { hasLayerConfigChanged } = storeToRefs(layerConfigStore)
-
 const leftPanelStore = useLeftPanelStore()
 const { toggleMenu } = leftPanelStore
 
 function handleMeasureDistance() {
   measuringDistance.value = !measuringDistance.value
 }
+
 </script>
 
 <template>
@@ -62,7 +55,7 @@ function handleMeasureDistance() {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <!-- TODO: Get current user location and add a pin -->
+
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger as-child>
@@ -83,7 +76,6 @@ function handleMeasureDistance() {
         </Tooltip>
       </TooltipProvider>
 
-      <!-- TODO: Distance -->
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger as-child>
@@ -104,7 +96,6 @@ function handleMeasureDistance() {
         </Tooltip>
       </TooltipProvider>
 
-      <!-- TODO: Share map -->
       <ShareDialog>
         <TooltipProvider>
           <Tooltip>
@@ -122,25 +113,6 @@ function handleMeasureDistance() {
         </TooltipProvider>
       </ShareDialog>
 
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button
-              size="icon"
-              :class="
-                hasLayerConfigChanged
-                  ? 'bg-primary-darker hover:bg-primary-darker/90'
-                  : 'bg-primary'
-              "
-            >
-              <SaveIcon />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right">
-            <p>Save</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
     </div>
   </div>
 </template>

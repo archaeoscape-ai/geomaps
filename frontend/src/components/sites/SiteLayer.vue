@@ -68,7 +68,7 @@ const selectInteactionFilter = (feature) => {
 </script>
 
 <template>
-  <ol-vector-layer v-if="showIdentifyLayer">
+  <ol-vector-layer v-if="showIdentifyLayer" zIndex="1000">
     <ol-source-vector ref="identifySiteSourceRef">
       <!-- list all sites -->
       <SiteFeature v-for="site in sites?.results" :site="site" :key="site.id" />

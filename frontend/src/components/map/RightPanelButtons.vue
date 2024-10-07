@@ -2,18 +2,36 @@
 import { LayersIcon } from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 import NoteIcon from '@/assets/note-icon.svg?component'
+import SaveIcon from '@/assets/save-icon.svg?component'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
 import { RIGHT_PANELS } from '@/helpers/constants'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { DropdownMenu } from '../ui/dropdown-menu'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 import MainMenu from './MainMenu.vue'
+import { useMapStore } from '@/stores/MapStore'
+import { storeToRefs } from 'pinia'
+import { useToast } from '../ui/toast'
 
 defineProps({
   isPanelActive: Boolean,
 })
 
+const { toast } = useToast()
+
+const mapStore = useMapStore()
+const { currentMap } = storeToRefs(mapStore)
+
 const rightPanelStore = useRightPanelStore()
 const { openPanel } = rightPanelStore
+
+const layerConfigStore = useMapLayerConfigStore()
+const { updateLayerConfig } = layerConfigStore
+const { hasLayerConfigChanged } = storeToRefs(layerConfigStore)
+
+async function saveConfig() {
+  await updateLayerConfig(currentMap.value.id)
+  toast({ description: 'Layer config saved' })
+}
 </script>
 
 <template>
@@ -49,6 +67,19 @@ const { openPanel } = rightPanelStore
           </TooltipTrigger>
           <TooltipContent side="left">
             <p>Notes</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button size="icon" :disabled="!hasLayerConfigChanged" @click="saveConfig">
+              <SaveIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="left">
+            <p>Save</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
