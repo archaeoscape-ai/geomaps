@@ -24,10 +24,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     return res
   })
 
-  // const currentLayersDict = computed(() => {
-  //   return null
-  // })
-
   const allLayersToggledOn = computed(() => {
     return tempLayerConfig.value.every((layer) => layer.items.every((item) => item.isActive))
   })
@@ -81,6 +77,10 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     isLoading.value = false
   }
 
+  /**
+   * Initialize map config and sync if the map config is stale
+   * @param {number} id map id
+   */
   async function initializeMapConfig(id) {
     const p1 = getMapLayerConfig(id)
     const p2 = getMapDetail(id)
@@ -88,6 +88,10 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     syncLayerConfig()
   }
 
+  /**
+   * Update map config 
+   * @param {number} id map id
+   */
   async function updateLayerConfig(id) {
     isLoading.value = true
     const data = await updateCurrentMapLayerConfig(id, tempLayerConfig.value)
@@ -131,7 +135,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
         const idsInTempLayerConfig = items.map((layer) => layer.layerId)
 
         for (const id of currentLayers.value[type]) {
-          console.log(id, idsInTempLayerConfig, type)
           if (!idsInTempLayerConfig.includes(id)) {
             const layer = mapDetail.value[type].find((layer) => layer.id === id)
             items.push({
@@ -144,8 +147,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
         }
       }
     }
-
-    console.log(layerConfig.value, tempLayerConfig.value)
   }
 
   /**
@@ -250,15 +251,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
 
     layer.opacity = value
   }
-
-  // watch(
-  //   tempLayerConfig,
-  //   (newValue) => {
-  //     console.log(newValue)
-  //     // update the layer index on the map based on the new position
-  //   },
-  //   { deep: true },
-  // )
 
   function getKey(parentId, layerId) {
     return `${parentId}-${layerId}`
