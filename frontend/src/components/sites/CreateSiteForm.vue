@@ -8,12 +8,16 @@ import { storeToRefs } from 'pinia'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useMapStore } from '@/stores/MapStore'
 import { transform } from 'ol/proj'
-import FormInputField from '../ui/input/FormInputField.vue'
-import FormTextareaField from '../ui/textarea/FormTextareaField.vue'
-import FormCheckboxField from '../ui/checkbox/FormCheckboxField.vue'
-import FormSelectField from '../ui/select/FormSelectField.vue'
-import { useToast } from '../ui/toast'
-import Separator from '../ui/separator/Separator.vue'
+import FormInputField from '@/components/ui/input/FormInputField.vue'
+import FormTextareaField from '@/components/ui/textarea/FormTextareaField.vue'
+import FormCheckboxField from '@/components/ui/checkbox/FormCheckboxField.vue'
+import FormSelectField from '@/components/ui/select/FormSelectField.vue'
+import { useToast } from '@/components/ui/toast'
+import Separator from '@/components/ui/separator/Separator.vue'
+import { useLeftPanelStore } from '@/stores/LeftPanelStore'
+import { LEFT_PANELS } from '@/helpers/constants'
+
+const leftPanelStore = useLeftPanelStore()
 
 const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
@@ -73,11 +77,13 @@ const onSubmit = form.handleSubmit(async (values) => {
     }
     if (selectedSite.value && isEditingSite.value) {
       await siteStore.updateSite(selectedSite.value.id, data)
+      isEditingSite.value = false
       toast({ description: 'Site updated!' })
     } else {
       await siteStore.createSite(currentMap.value.id, data)
       toast({ description: 'Site created!' })
     }
+    leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
   } catch (error) {
     if (error.status === 400) {
       for (const [fieldName, errorMessage] of Object.entries(error.response.data)) {
@@ -86,7 +92,6 @@ const onSubmit = form.handleSubmit(async (values) => {
       return
     }
     toast({ description: 'Could not save site!', variant: 'destructive' })
-    console.log(error)
   } finally {
     isSubmitting.value = false
   }
@@ -139,8 +144,8 @@ siteStore.getSiteTypes()
       <FormInputField name="english_name" label="English Name" />
       <FormInputField name="french_name" label="French Name" />
       <FormInputField name="khmer_name" label="Khmer Name" />
-      <FormInputField name="alternative_name" label="Alternative Name" />
-      <FormInputField name="alternative_khmer_name" label="Alternative Khmer Name" />
+      <FormInputField name="alternative_name" label="Alternative Name(s)" />
+      <FormInputField name="alternative_khmer_name" label="Alternative Khmer Name(s)" />
 
       <Separator />
 

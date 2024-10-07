@@ -7,7 +7,7 @@ import NoteLayer from '@/components/notes/NoteLayer.vue'
 import { useNoteStore } from '@/stores/NoteStore'
 import { BASEMAP_URLS, LAYER_TYPE, RIGHT_PANELS } from '@/helpers/constants'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
-import SiteIdentifyLayer from '@/components/sites/SiteIdentifyLayer.vue'
+import SiteLayer from '@/components/sites/SiteLayer.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import MeasureLayer from './MeasureLayer.vue'
 import GeolocationLayer from './GeolocationLayer.vue'
@@ -18,7 +18,7 @@ defineProps({
 })
 
 const mapStore = useMapStore()
-const { mapRef, basemap, zoom, center } = storeToRefs(mapStore)
+const { mapRef, basemap, zoom, center, currentMap } = storeToRefs(mapStore)
 
 const mapLayerConfigStore = useMapLayerConfigStore()
 const { tempLayerConfigDict } = storeToRefs(mapLayerConfigStore)
@@ -53,6 +53,11 @@ function handleClickMap(event) {
 const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
 
 // watch(tempLayerConfigDict, () => console.log(tempLayerConfigDict.value[LAYER_TYPE.XYZ]))
+watch(currentMap, (newValue) => {
+  if (newValue) {
+    siteStore.getSites(currentMap.value?.id)
+  }
+})
 </script>
 
 <template>
@@ -79,7 +84,9 @@ const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
       <MeasureLayer />
       <NoteLayer v-if="activePanel === RIGHT_PANELS.NOTE" />
 
-      <SiteIdentifyLayer />
+      <MapControls :is-panel-active="isPanelActive" :map="mapRef" />
+
+      <SiteLayer />
 
       <template v-for="layer in tempLayerConfigDict[LAYER_TYPE.XYZ]?.items" :key="layer.layerId">
         <ol-tile-layer v-if="layer.isActive">
@@ -87,8 +94,6 @@ const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
         </ol-tile-layer>
       </template>
     </ol-map>
-
-    <MapControls :is-panel-active="isPanelActive" :map="mapRef" />
   </div>
 </template>
 

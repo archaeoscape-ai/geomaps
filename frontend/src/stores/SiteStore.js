@@ -14,7 +14,7 @@ export const useSiteStore = defineStore('site', () => {
 
   const sites = ref(null)
   const page = ref(0)
-  const pageSize = ref(20)
+  const pageSize = ref(-1)
   const searchText = ref('')
   const selectedSite = ref(null)
   const siteMarker = ref(null)
@@ -50,11 +50,21 @@ export const useSiteStore = defineStore('site', () => {
 
   async function createSite(mapId, data) {
     const res = await siteService.createSite(mapId, data)
+    if (sites.value?.results) {
+      sites.value.results.push(res)
+    } else {
+      sites.value = { ...sites.value, results: [res] }
+    }
+
     selectedSite.value = res
   }
 
   async function updateSite(siteId, data) {
     const res = await siteService.updateSite(siteId, data)
+    const index = sites.value.results.findIndex((site) => site.id === siteId)
+    if (index !== -1) {
+      sites.value.results[index] = res
+    }
     selectedSite.value = res
   }
 
@@ -64,6 +74,10 @@ export const useSiteStore = defineStore('site', () => {
 
   async function deleteSite(siteId) {
     await siteService.deleteSite(siteId)
+    const index = sites.value.results.findIndex((site) => site.id === siteId)
+    if (index !== -1) {
+      sites.value.results.splice(index, 1)
+    }
     selectedSite.value = null
     siteMarker.value = null
   }
