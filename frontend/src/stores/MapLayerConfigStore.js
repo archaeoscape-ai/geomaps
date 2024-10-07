@@ -1,7 +1,11 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { cloneDeep, isEqual, reverse } from 'lodash'
-import { fetchMapById, fetchMapLayerConfig, updateCurrentMapLayerConfig } from '@/api-services/MapService'
+import {
+  fetchMapById,
+  fetchMapLayerConfig,
+  updateCurrentMapLayerConfig,
+} from '@/api-services/MapService'
 import { LAYER_TYPE, LAYER_TYPE_LABEL } from '@/helpers/constants'
 
 export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
@@ -22,6 +26,30 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     }
 
     return res
+  })
+
+  const mapDetailDict = computed(() => {
+    if (!mapDetail.value) return []
+    const res = {}
+
+    for (const layerType of Object.values(LAYER_TYPE)) {
+      res[layerType] = mapDetail.value[layerType].reduce((prev, curr) => {
+        return { ...prev, [curr.id]: { ...curr }}
+      }, {})
+    }
+
+    return res
+  })
+
+  const tempLayerConfigDict = computed(() => {
+    if (!mapDetail.value) return {}
+
+    return tempLayerConfig.value.reduce((prev, curr) => {
+      const items = curr.items.map((layer) => {
+        return { ...layer, layerDetail: mapDetailDict.value[curr.id][layer.layerId] }
+      })
+      return { ...prev, [curr.id]: { ...curr, items } }
+    }, {})
   })
 
   const allLayersToggledOn = computed(() => {
@@ -56,7 +84,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
         ],
       })
     }
-    console.log(tempLayerConfig.value)
   }
 
   async function getMapLayerConfig(id) {
@@ -84,12 +111,12 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   async function initializeMapConfig(id) {
     const p1 = getMapLayerConfig(id)
     const p2 = getMapDetail(id)
-    await Promise.all([ p1, p2 ])
+    await Promise.all([p1, p2])
     syncLayerConfig()
   }
 
   /**
-   * Update map config 
+   * Update map config
    * @param {number} id map id
    */
   async function updateLayerConfig(id) {
@@ -260,6 +287,8 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     searchText,
     layerConfig,
     tempLayerConfig,
+    tempLayerConfigDict,
+    currentLayers,
     expandedLayer,
     allLayersToggledOn,
     allLayersExpanded,

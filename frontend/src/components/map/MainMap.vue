@@ -1,16 +1,17 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import MapControls from './MapControls.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import NoteLayer from '@/components/notes/NoteLayer.vue'
 import { useNoteStore } from '@/stores/NoteStore'
-import { BASEMAP_URLS, RIGHT_PANELS } from '@/helpers/constants'
+import { BASEMAP_URLS, LAYER_TYPE, RIGHT_PANELS } from '@/helpers/constants'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
 import SiteIdentifyLayer from '@/components/sites/SiteIdentifyLayer.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import MeasureLayer from './MeasureLayer.vue'
 import GeolocationLayer from './GeolocationLayer.vue'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
 defineProps({
   isPanelActive: Boolean,
@@ -18,6 +19,9 @@ defineProps({
 
 const mapStore = useMapStore()
 const { mapRef, basemap, zoom, center } = storeToRefs(mapStore)
+
+const mapLayerConfigStore = useMapLayerConfigStore()
+const { tempLayerConfigDict } = storeToRefs(mapLayerConfigStore)
 
 const noteStore = useNoteStore()
 const { addNewNoteMarker } = noteStore
@@ -47,6 +51,8 @@ function handleClickMap(event) {
 }
 
 const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
+
+// watch(tempLayerConfigDict, () => console.log(tempLayerConfigDict.value[LAYER_TYPE.XYZ]))
 </script>
 
 <template>
@@ -64,6 +70,7 @@ const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
         :zoom="zoom"
         :projection="projection"
       />
+
       <ol-tile-layer>
         <ol-source-xyz :url="basemapUrl" />
       </ol-tile-layer>
@@ -73,6 +80,12 @@ const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
       <NoteLayer v-if="activePanel === RIGHT_PANELS.NOTE" />
 
       <SiteIdentifyLayer />
+
+      <template v-for="layer in tempLayerConfigDict[LAYER_TYPE.XYZ]?.items" :key="layer.layerId">
+        <ol-tile-layer v-if="layer.isActive">
+          <ol-source-xyz :url="layer.layerDetail.tiles_url" />
+        </ol-tile-layer>
+      </template>
     </ol-map>
 
     <MapControls :is-panel-active="isPanelActive" :map="mapRef" />
