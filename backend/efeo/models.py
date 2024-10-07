@@ -98,7 +98,7 @@ class Map(SoftDeletableModel):
 
 
 class MapConfig(models.Model):
-    user = models.OneToOneField("accounts.User", null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey("accounts.User", null=True, on_delete=models.CASCADE)
     map = models.ForeignKey(
         "efeo.Map", related_name="map_confgis", on_delete=models.CASCADE
     )
