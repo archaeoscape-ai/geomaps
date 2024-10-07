@@ -1,12 +1,18 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import * as siteService from '@/api-services/SiteService'
+import { Collection } from 'ol'
+import { transform } from 'ol/proj'
 
 export const useSiteStore = defineStore('site', () => {
   /**
    * @type {import('vue').Ref<{ source: import('ol/source/Vector').default } | null>}
    */
   const identifySiteSourceRef = ref(null)
+  const newSiteFeatureRef = ref(null)
+  const siteSelectInteractionRef = ref(null)
+  const selectedSites = ref(new Collection())
+  const selectedSite = computed(() => selectedSites.value?.item(0)?.getProperties())
 
   const isLoading = ref(false)
   const isCreatingSite = ref(false)
@@ -16,7 +22,6 @@ export const useSiteStore = defineStore('site', () => {
   const page = ref(0)
   const pageSize = ref(-1)
   const searchText = ref('')
-  const selectedSite = ref(null)
   const siteMarker = ref(null)
 
   const siteTypes = ref(null)
@@ -56,7 +61,8 @@ export const useSiteStore = defineStore('site', () => {
       sites.value = { ...sites.value, results: [res] }
     }
 
-    selectedSite.value = res
+    newSiteFeatureRef.value.feature.setProperties(res)
+    selectedSites.value.push(newSiteFeatureRef.value.feature)
   }
 
   async function updateSite(siteId, data) {
@@ -65,7 +71,6 @@ export const useSiteStore = defineStore('site', () => {
     if (index !== -1) {
       sites.value.results[index] = res
     }
-    selectedSite.value = res
   }
 
   function setSiteMarker(coordinates) {
@@ -78,8 +83,18 @@ export const useSiteStore = defineStore('site', () => {
     if (index !== -1) {
       sites.value.results.splice(index, 1)
     }
-    selectedSite.value = null
+
+    selectedSites.value.clear()
     siteMarker.value = null
+  }
+
+  function resetSitePosition() {
+    const oldCoordinates = transform(
+      selectedSite.value?.location?.coordinates,
+      'EPSG:4326',
+      'EPSG:3857',
+    )
+    selectedSite.value?.geometry?.setCoordinates(oldCoordinates)
   }
 
   return {
@@ -91,8 +106,11 @@ export const useSiteStore = defineStore('site', () => {
     siteTypes,
     isCreatingSite,
     identifySiteSourceRef,
+    siteSelectInteractionRef,
     siteMarker,
     isEditingSite,
+    selectedSites,
+    newSiteFeatureRef,
 
     getSites,
     getSiteTypes,
@@ -100,5 +118,6 @@ export const useSiteStore = defineStore('site', () => {
     createSite,
     setSiteMarker,
     deleteSite,
+    resetSitePosition,
   }
 })

@@ -27,7 +27,7 @@ const { isAddingNote } = storeToRefs(noteStore)
 
 const siteStore = useSiteStore()
 const { setSiteMarker } = siteStore
-const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
+const { isCreatingSite, isEditingSite, selectedSite } = storeToRefs(siteStore)
 
 const rightPanelStore = useRightPanelStore()
 const { activePanel } = storeToRefs(rightPanelStore)
@@ -43,6 +43,10 @@ function handleClickMap(event) {
   }
 
   if (isCreatingSite.value || isEditingSite.value) {
+    // update the coordinate of selected site while editing
+    if (selectedSite.value && isEditingSite.value) {
+      selectedSite.value.geometry?.setCoordinates(event.coordinate)
+    }
     setSiteMarker(event.coordinate)
     return
   }

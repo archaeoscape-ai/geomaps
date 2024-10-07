@@ -14,14 +14,16 @@ const props = defineProps({
 const leftPanelStore = useLeftPanelStore()
 
 const siteStore = useSiteStore()
-const { selectedSite } = storeToRefs(siteStore)
+const { selectedSite, siteSelectInteractionRef, identifySiteSourceRef, selectedSites } =
+  storeToRefs(siteStore)
 
 function handleCardClick() {
-  selectedSite.value = props.site
+  selectedSites.value.clear()
+  const selectedFeature = identifySiteSourceRef.value.source.getFeatureById(props.site.id)
 
-  const siteMarker = transform(props.site.location.coordinates, 'EPSG:4326', 'EPSG:3857')
+  // selectedSite.value = selectedFeature.getProperties()
+  selectedSites.value.push(selectedFeature)
 
-  siteStore.setSiteMarker(siteMarker)
   leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
 }
 </script>

@@ -5,6 +5,7 @@ import { LEFT_PANELS } from '@/helpers/constants'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { transform } from 'ol/proj'
+import SiteFeature from '@/components/sites/SiteFeature.vue'
 
 const strokeColor = ref('rgba(255, 255, 255, 0.2)')
 const fillColor = ref('#3ca23c')
@@ -14,8 +15,17 @@ const leftPanelStore = useLeftPanelStore()
 const { activePanel } = storeToRefs(leftPanelStore)
 
 const siteStore = useSiteStore()
-const { selectedSite, identifySiteSourceRef, siteMarker, isCreatingSite, sites } =
-  storeToRefs(siteStore)
+const {
+  selectedSite,
+  identifySiteSourceRef,
+  siteMarker,
+  isCreatingSite,
+  sites,
+  isEditingSite,
+  siteSelectInteractionRef,
+  selectedSites,
+  newSiteFeatureRef,
+} = storeToRefs(siteStore)
 
 const showIdentifyLayer = computed(() => {
   // return (
@@ -28,8 +38,32 @@ const showIdentifyLayer = computed(() => {
   return true
 })
 
-const tanfromSiteCoordinate = (coordinates) => {
+const transfromSiteCoordinate = (coordinates) => {
   return transform(coordinates, 'EPSG:4326', 'EPSG:3857')
+}
+
+function onFeatureSelected(event) {
+  const deselectedFeatures = event.deselected
+
+  if (deselectedFeatures.length > 0) {
+    if (isEditingSite.value) {
+      selectedSites.value.push(deselectedFeatures[0])
+      return
+    }
+  }
+
+  const features = event.selected
+  if (features.length === 0) {
+    return
+  }
+
+  selectedSites.value.clear()
+  selectedSites.value.push(features[0])
+  leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
+}
+
+const selectInteactionFilter = (feature) => {
+  return !isCreatingSite.value && !isEditingSite.value && feature.getProperties().type === 'site'
 }
 </script>
 
@@ -37,26 +71,32 @@ const tanfromSiteCoordinate = (coordinates) => {
   <ol-vector-layer v-if="showIdentifyLayer">
     <ol-source-vector ref="identifySiteSourceRef">
       <!-- list all sites -->
-      <ol-feature v-for="site in sites?.results" :key="site.id">
-        <ol-geom-point :coordinates="tanfromSiteCoordinate(site?.location?.coordinates)" />
-        <ol-style>
-          <ol-style-circle :radius="radius">
+      <SiteFeature v-for="site in sites?.results" :site="site" :key="site.id" />
+
+      <!-- for create -->
+      <ol-feature v-if="siteMarker && isCreatingSite" ref="newSiteFeatureRef">
+        <ol-geom-point :coordinates="siteMarker" />
+        <ol-style zIndex="1">
+          <ol-style-circle :radius="16">
             <ol-style-fill :color="fillColor"></ol-style-fill>
-            <ol-style-stroke :color="strokeColor" :width="10"></ol-style-stroke>
+            <ol-style-stroke :color="strokeColor" :width="16"></ol-style-stroke>
           </ol-style-circle>
         </ol-style>
       </ol-feature>
 
-      <!-- for edit and create -->
-      <ol-feature :properties="selectedSite">
-        <ol-geom-point :coordinates="siteMarker" v-if="siteMarker" />
+      <ol-interaction-select
+        @select="onFeatureSelected"
+        :filter="selectInteactionFilter"
+        ref="siteSelectInteractionRef"
+        :features="selectedSites"
+      >
         <ol-style zIndex="1">
-          <ol-style-circle :radius="radius">
-            <ol-style-fill color="red"></ol-style-fill>
-            <ol-style-stroke :color="strokeColor" :width="10"></ol-style-stroke>
+          <ol-style-circle :radius="16">
+            <ol-style-fill :color="fillColor"></ol-style-fill>
+            <ol-style-stroke :color="strokeColor" :width="16"></ol-style-stroke>
           </ol-style-circle>
         </ol-style>
-      </ol-feature>
+      </ol-interaction-select>
     </ol-source-vector>
   </ol-vector-layer>
 </template>

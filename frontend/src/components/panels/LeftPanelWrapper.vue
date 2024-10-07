@@ -9,13 +9,12 @@ const leftPanelStore = useLeftPanelStore()
 const { activePanel } = storeToRefs(leftPanelStore)
 
 const siteStore = useSiteStore()
-const { selectedSite } = storeToRefs(siteStore)
-
+const { selectedSites } = storeToRefs(siteStore)
 
 function handlePanelClose() {
+  siteStore.resetSitePosition()
   activePanel.value = null
-  selectedSite.value = null
-  siteStore.setSiteMarker(null)
+  selectedSites.value.clear()
 }
 
 defineProps({
@@ -34,7 +33,6 @@ defineProps({
           variant="secondary"
           class="rounded-full bg-white"
           @click="handlePanelClose"
-
         >
           <X class="stroke-button-icon" />
         </Button>
