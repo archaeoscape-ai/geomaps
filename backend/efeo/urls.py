@@ -34,7 +34,7 @@ urlpatterns = [
     path(
         "sites/<int:pk>/resources/",
         views.SiteResourceListView.as_view(),
-        name="site-resource-detail",
+        name="site-resource-list",
     ),
     path(
         "site-resources/<int:pk>/",
@@ -55,5 +55,25 @@ urlpatterns = [
         "maps/<int:map_pk>/notes/<int:pk>/",
         views.MapNoteDetail.as_view(),
         name="map-note-detail",
+    ),
+    path(
+        "fieldseasons/",
+        views.FieldSeasonListView.as_view(),
+        name="fieldseason-list",
+    ),
+    path(
+        "trenches/",
+        views.TrenchListView.as_view(),
+        name="trench-list",
+    ),
+    path(
+        "sites/<int:pk>/worksites/",
+        views.WorksiteListView.as_view(),
+        name="map-worksites",
+    ),
+    path(
+        "worksites/<int:pk>/resources/",
+        views.WorksiteResourceListView.as_view(),
+        name="worksite-resource-list",
     ),
 ]

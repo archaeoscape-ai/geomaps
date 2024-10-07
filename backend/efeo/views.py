@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from efeo.filters import CaseInsensitiveOrderingFilter
 from efeo.models import (
+    FieldSeason,
     Map,
     MapConfig,
     MapNote,
@@ -14,6 +15,9 @@ from efeo.models import (
     SiteResource,
     SiteResourceType,
     SiteType,
+    Trench,
+    Worksite,
+    WorksiteResource,
     WorksiteType,
 )
 from efeo.permissions import (
@@ -22,6 +26,7 @@ from efeo.permissions import (
     MapNotePermission,
 )
 from efeo.serializers import (
+    FieldSeasonSerializer,
     MapConfigSerializer,
     MapDetailSerializer,
     MapNoteGeomSerializer,
@@ -31,6 +36,9 @@ from efeo.serializers import (
     SiteResourceTypeSerializer,
     SiteSerializer,
     SiteTypeSerializer,
+    TrenchSerializer,
+    WorksiteResourceSerializer,
+    WorksiteSerializer,
     WorksiteTypeSerializer,
 )
 
@@ -199,3 +207,49 @@ class MapNoteDetail(generics.RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         map = get_object_or_404(Map, pk=self.kwargs["map_pk"])
         serializer.save(map=map)
+
+
+class FieldSeasonListView(generics.ListAPIView):
+    serializer_class = FieldSeasonSerializer
+    queryset = FieldSeason.objects.all()
+
+
+class TrenchListView(generics.ListAPIView):
+    serializer_class = TrenchSerializer
+    queryset = Trench.objects.all()
+
+
+class WorksiteListView(generics.ListCreateAPIView):
+    serializer_class = WorksiteSerializer
+    permission_classes = [AdminOrStandardPermission]
+
+    filter_backends = (
+        CaseInsensitiveOrderingFilter,
+        filters.SearchFilter,
+        DjangoFilterBackend,
+    )
+    filterset_fields = ("created_by", "cultivated", "cleared", "threatened")
+    search_fields = ("name",)
+    ordering_fields = ("name",)
+    ordering = ("name",)
+
+    def get_queryset(self):
+        site = get_object_or_404(Site, pk=self.kwargs["pk"])
+        return Worksite.objects.filter(archsite=site)
+
+    def perform_create(self, serializer):
+        site = get_object_or_404(Site, pk=self.kwargs["pk"])
+        serializer.save(archsite=site, created_by=self.request.user)
+
+
+class WorksiteResourceListView(generics.ListCreateAPIView):
+    permission_classes = [AdminOrStandardPermission]
+    serializer_class = WorksiteResourceSerializer
+
+    def get_queryset(self):
+        worksite = get_object_or_404(Worksite, pk=self.kwargs["pk"])
+        return WorksiteResource.objects.filter(worksite=worksite)
+
+    def perform_create(self, serializer):
+        worksite = get_object_or_404(Worksite, pk=self.kwargs["pk"])
+        serializer.save(worksite=worksite, created_by=self.request.user)
