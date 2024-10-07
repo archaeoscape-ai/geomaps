@@ -89,12 +89,14 @@ export const useSiteStore = defineStore('site', () => {
   }
 
   function resetSitePosition() {
-    const oldCoordinates = transform(
-      selectedSite.value?.location?.coordinates,
-      'EPSG:4326',
-      'EPSG:3857',
-    )
-    selectedSite.value?.geometry?.setCoordinates(oldCoordinates)
+    if (selectedSite.value && selectedSite.value.location) {
+      const oldCoordinates = transform(
+        selectedSite.value?.location.coordinates,
+        'EPSG:4326',
+        'EPSG:3857',
+      )
+      selectedSite.value?.geometry?.setCoordinates(oldCoordinates)
+    }
   }
 
   return {
