@@ -106,6 +106,7 @@ class MapConfigView(APIView):
 class SiteTypeListView(generics.ListAPIView):
     serializer_class = SiteTypeSerializer
     queryset = SiteType.objects.all()
+    pagination_class = CustomLimitOffsetPagination
 
 
 class WorksiteTypeListView(generics.ListAPIView):
@@ -116,6 +117,7 @@ class WorksiteTypeListView(generics.ListAPIView):
 class SiteResourceTypeListView(generics.ListAPIView):
     serializer_class = SiteResourceTypeSerializer
     queryset = SiteResourceType.objects.all()
+    pagination_class = CustomLimitOffsetPagination
 
 
 class MapSiteListView(generics.ListCreateAPIView):
