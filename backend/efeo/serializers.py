@@ -206,7 +206,7 @@ class WorksiteResourceSerializer(serializers.ModelSerializer):
         model = WorksiteResource
         fields = (
             "id",
-            "site",
+            "worksite",
             "resource_type",
             "caption",
             "resource_date",
@@ -218,4 +218,4 @@ class WorksiteResourceSerializer(serializers.ModelSerializer):
             "created_by",
             "created_on",
         )
-        read_only_fields = ("site", "created_by", "created_on")
+        read_only_fields = ("worksite", "created_by", "created_on")
