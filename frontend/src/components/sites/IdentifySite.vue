@@ -19,7 +19,7 @@ const noteStore = useNoteStore()
 const { isAddingNote } = storeToRefs(noteStore)
 
 const siteStore = useSiteStore()
-const { selectedSite, isEditingSite, selectedSites } = storeToRefs(siteStore)
+const { selectedSite, isEditingSite } = storeToRefs(siteStore)
 
 const heading = computed(() => {
   return isEditingSite.value ? 'Update Site' : 'Site Details'

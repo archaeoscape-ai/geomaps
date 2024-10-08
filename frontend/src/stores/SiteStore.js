@@ -1,8 +1,9 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import * as siteService from '@/api-services/SiteService'
-import { Collection } from 'ol'
 import { transform } from 'ol/proj'
+import { useLeftPanelStore } from './LeftPanelStore'
+import { LEFT_PANELS } from '@/helpers/constants'
 
 export const useSiteStore = defineStore('site', () => {
   /**
@@ -10,9 +11,9 @@ export const useSiteStore = defineStore('site', () => {
    */
   const identifySiteSourceRef = ref(null)
   const newSiteFeatureRef = ref(null)
-  const siteSelectInteractionRef = ref(null)
-  const selectedSites = ref(new Collection())
-  const selectedSite = computed(() => selectedSites.value?.item(0)?.getProperties())
+  const selectSiteInteractionRef = ref(null)
+  const selectedSiteFeature = ref(null)
+  const selectedSite = computed(() => selectedSiteFeature.value?.getProperties())
 
   const isLoading = ref(false)
   const isCreatingSite = ref(false)
@@ -25,6 +26,8 @@ export const useSiteStore = defineStore('site', () => {
   const siteMarker = ref(null)
 
   const siteTypes = ref(null)
+
+  const leftPanelStore = useLeftPanelStore()
 
   async function getSiteTypes() {
     const params = {
@@ -61,8 +64,14 @@ export const useSiteStore = defineStore('site', () => {
       sites.value = { ...sites.value, results: [res] }
     }
 
-    newSiteFeatureRef.value.feature.setProperties(res)
-    selectedSites.value.push(newSiteFeatureRef.value.feature)
+    newSiteFeatureRef.value.feature.setProperties({ ...res, type: 'site' })
+    newSiteFeatureRef.value.feature.setId(res.id)
+    newSiteFeatureRef.value.feature = null
+
+    const selectedFeature = identifySiteSourceRef.value.source.getFeatureById(res.id)
+    selectSiteInteractionRef.value.select.getFeatures().clear()
+    selectSiteInteractionRef.value?.select?.getFeatures().push(selectedFeature)
+    selectedSiteFeature.value = selectedFeature
   }
 
   async function updateSite(siteId, data) {
@@ -84,8 +93,8 @@ export const useSiteStore = defineStore('site', () => {
       sites.value.results.splice(index, 1)
     }
 
-    selectedSites.value.clear()
-    siteMarker.value = null
+    selectedSiteFeature.value = null
+    leftPanelStore.setTab(LEFT_PANELS.LIST)
   }
 
   function resetSitePosition() {
@@ -104,14 +113,14 @@ export const useSiteStore = defineStore('site', () => {
     page,
     pageSize,
     searchText,
+    selectedSiteFeature,
     selectedSite,
     siteTypes,
     isCreatingSite,
     identifySiteSourceRef,
-    siteSelectInteractionRef,
+    selectSiteInteractionRef,
     siteMarker,
     isEditingSite,
-    selectedSites,
     newSiteFeatureRef,
 
     getSites,

@@ -16,14 +16,13 @@ const { activePanel } = storeToRefs(leftPanelStore)
 
 const siteStore = useSiteStore()
 const {
-  selectedSite,
+  selectedSiteFeature,
   identifySiteSourceRef,
   siteMarker,
   isCreatingSite,
   sites,
   isEditingSite,
-  siteSelectInteractionRef,
-  selectedSites,
+  selectSiteInteractionRef,
   newSiteFeatureRef,
 } = storeToRefs(siteStore)
 
@@ -38,18 +37,11 @@ const showIdentifyLayer = computed(() => {
   return true
 })
 
-const transfromSiteCoordinate = (coordinates) => {
-  return transform(coordinates, 'EPSG:4326', 'EPSG:3857')
-}
-
 function onFeatureSelected(event) {
   const deselectedFeatures = event.deselected
 
   if (deselectedFeatures.length > 0) {
-    if (isEditingSite.value) {
-      selectedSites.value.push(deselectedFeatures[0])
-      return
-    }
+    selectedSiteFeature.value = null
   }
 
   const features = event.selected
@@ -57,13 +49,16 @@ function onFeatureSelected(event) {
     return
   }
 
-  selectedSites.value.clear()
-  selectedSites.value.push(features[0])
+  selectedSiteFeature.value = features[0]
   leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
 }
 
 const selectInteactionFilter = (feature) => {
   return !isCreatingSite.value && !isEditingSite.value && feature.getProperties().type === 'site'
+}
+
+function removeCondition(event) {
+  return isEditingSite.value
 }
 </script>
 
@@ -87,8 +82,8 @@ const selectInteactionFilter = (feature) => {
       <ol-interaction-select
         @select="onFeatureSelected"
         :filter="selectInteactionFilter"
-        ref="siteSelectInteractionRef"
-        :features="selectedSites"
+        ref="selectSiteInteractionRef"
+        :removeCondition="removeCondition"
       >
         <ol-style zIndex="1">
           <ol-style-circle :radius="16">

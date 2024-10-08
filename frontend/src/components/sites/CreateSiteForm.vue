@@ -29,7 +29,6 @@ const { selectedSite, siteTypes, isCreatingSite, siteMarker, isEditingSite } =
 const isSubmitting = ref(false)
 const { toast } = useToast()
 
-
 const formSchema = toTypedSchema(
   z.object({
     english_name: z.string().min(1, { message: 'This field has to be filled' }),
@@ -81,6 +80,8 @@ const onSubmit = form.handleSubmit(async (values) => {
       toast({ description: 'Site updated!' })
     } else {
       await siteStore.createSite(currentMap.value.id, data)
+      isCreatingSite.value = false
+      siteMarker.value = null
       toast({ description: 'Site created!' })
     }
     leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)

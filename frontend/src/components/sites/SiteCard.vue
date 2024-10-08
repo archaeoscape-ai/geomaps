@@ -14,15 +14,19 @@ const props = defineProps({
 const leftPanelStore = useLeftPanelStore()
 
 const siteStore = useSiteStore()
-const { selectedSite, siteSelectInteractionRef, identifySiteSourceRef, selectedSites } =
-  storeToRefs(siteStore)
+const {
+  selectedSiteFeature,
+  selectedSite,
+  siteSelectInteractionRef,
+  identifySiteSourceRef,
+  selectSiteInteractionRef,
+} = storeToRefs(siteStore)
 
 function handleCardClick() {
-  selectedSites.value.clear()
   const selectedFeature = identifySiteSourceRef.value.source.getFeatureById(props.site.id)
-
-  // selectedSite.value = selectedFeature.getProperties()
-  selectedSites.value.push(selectedFeature)
+  selectSiteInteractionRef.value.select.getFeatures().clear()
+  selectSiteInteractionRef.value?.select?.getFeatures().push(selectedFeature)
+  selectedSiteFeature.value = selectedFeature
 
   leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
 }
