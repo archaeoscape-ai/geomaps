@@ -3,6 +3,7 @@ from leaflet.admin import LeafletGeoAdmin
 
 from efeo.models import (
     FieldSeason,
+    Individuals,
     Map,
     MapConfig,
     MapNote,
@@ -56,6 +57,11 @@ class WorksiteTypeAdmin(admin.ModelAdmin):
 
 @admin.register(SiteResourceType)
 class SiteResourceTypeAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
+@admin.register(Individuals)
+class IndividualsAdmin(admin.ModelAdmin):
     list_display = ("name",)
 
 
