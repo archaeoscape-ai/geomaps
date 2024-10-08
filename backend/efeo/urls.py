@@ -22,6 +22,11 @@ urlpatterns = [
         name="site-resource-type-list",
     ),
     path(
+        "individuals/",
+        views.IndividualsListView.as_view(),
+        name="individuals-list",
+    ),
+    path(
         "maps/<int:pk>/sites/",
         views.MapSiteListView.as_view(),
         name="map-sites",

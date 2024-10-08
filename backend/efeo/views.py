@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from efeo.filters import CaseInsensitiveOrderingFilter
 from efeo.models import (
     FieldSeason,
+    Individuals,
     Map,
     MapConfig,
     MapNote,
@@ -28,6 +29,7 @@ from efeo.permissions import (
 )
 from efeo.serializers import (
     FieldSeasonSerializer,
+    IndividualsSerializer,
     MapConfigSerializer,
     MapDetailSerializer,
     MapNoteGeomSerializer,
@@ -117,6 +119,12 @@ class WorksiteTypeListView(generics.ListAPIView):
 class SiteResourceTypeListView(generics.ListAPIView):
     serializer_class = SiteResourceTypeSerializer
     queryset = SiteResourceType.objects.all()
+    pagination_class = CustomLimitOffsetPagination
+
+
+class IndividualsListView(generics.ListAPIView):
+    serializer_class = IndividualsSerializer
+    queryset = Individuals.objects.all()
     pagination_class = CustomLimitOffsetPagination
 
 
