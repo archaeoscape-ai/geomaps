@@ -46,6 +46,17 @@ class SiteResourceType(models.Model):
         verbose_name_plural = "Arch Site Resource Types"
 
 
+class Individuals(models.Model):
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Individual"
+        verbose_name_plural = "Individuals"
+
+
 def get_site_resource_dir(instance, filename):
     return os.path.join(str(instance.site.uid), "resources", filename)
 
@@ -56,7 +67,7 @@ class SiteResource(models.Model):
     )
     resource_type = models.ForeignKey("efeo.SiteResourceType", on_delete=models.PROTECT)
     caption = models.CharField(max_length=128, blank=True)
-    author = models.CharField(max_length=255, blank=True)
+    author = models.ForeignKey("efeo.Individuals", null=True, on_delete=models.SET_NULL)
     resource_date = models.DateField(blank=True, null=True)
     resource_file = models.FileField(
         max_length=255, storage=FS, upload_to=get_site_resource_dir

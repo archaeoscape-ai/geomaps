@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from efeo.models import (
     FieldSeason,
+    Individuals,
     Map,
     MapConfig,
     MapNote,
@@ -79,6 +80,12 @@ class MapConfigSerializer(serializers.ModelSerializer):
 class SiteTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteType
+        fields = ("id", "name")
+
+
+class IndividualsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Individuals
         fields = ("id", "name")
 
 
