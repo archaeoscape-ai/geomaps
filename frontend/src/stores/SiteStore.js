@@ -1,9 +1,10 @@
 import { computed, ref } from 'vue'
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import * as siteService from '@/api-services/SiteService'
 import { transform } from 'ol/proj'
 import { useLeftPanelStore } from './LeftPanelStore'
 import { LEFT_PANELS } from '@/helpers/constants'
+import { useMapStore } from './MapStore'
 
 export const useSiteStore = defineStore('site', () => {
   /**
@@ -26,6 +27,9 @@ export const useSiteStore = defineStore('site', () => {
   const siteMarker = ref(null)
 
   const siteTypes = ref(null)
+
+  const mapStore = useMapStore()
+  const { mapRef } = storeToRefs(mapStore)
 
   const leftPanelStore = useLeftPanelStore()
 
@@ -108,6 +112,18 @@ export const useSiteStore = defineStore('site', () => {
     }
   }
 
+  function centerSelectedSite() {
+    if (!selectedSiteFeature.value) return
+
+    const geometry = selectedSiteFeature.value.getGeometry()
+    const center = geometry.getExtent()
+
+    mapRef.value.map.getView().animate({
+      center: center,
+      duration: 1000,
+    })
+  }
+
   return {
     sites,
     page,
@@ -130,5 +146,6 @@ export const useSiteStore = defineStore('site', () => {
     setSiteMarker,
     deleteSite,
     resetSitePosition,
+    centerSelectedSite,
   }
 })

@@ -29,6 +29,10 @@ const { selectedSite, siteTypes, isCreatingSite, siteMarker, isEditingSite } =
 const isSubmitting = ref(false)
 const { toast } = useToast()
 
+onMounted(() => {
+  siteStore.getSiteTypes()
+})
+
 const formSchema = toTypedSchema(
   z.object({
     english_name: z.string().min(1, { message: 'This field has to be filled' }),
@@ -131,8 +135,6 @@ watch(siteMarker, (newValue) => {
     form.setFieldValue('longitude', coords[0])
   }
 })
-
-siteStore.getSiteTypes()
 </script>
 
 <template>

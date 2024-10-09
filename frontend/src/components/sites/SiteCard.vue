@@ -1,10 +1,10 @@
 <script setup>
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { Card, CardContent } from '@/components/ui/card'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { useSiteStore } from '@/stores/SiteStore'
 import { ChevronRight } from 'lucide-vue-next'
-import { transform } from 'ol/proj'
 import { LEFT_PANELS } from '@/helpers/constants'
 
 const props = defineProps({
@@ -14,33 +14,31 @@ const props = defineProps({
 const leftPanelStore = useLeftPanelStore()
 
 const siteStore = useSiteStore()
-const {
-  selectedSiteFeature,
-  selectedSite,
-  siteSelectInteractionRef,
-  identifySiteSourceRef,
-  selectSiteInteractionRef,
-} = storeToRefs(siteStore)
+const { selectedSiteFeature, selectedSite, identifySiteSourceRef, selectSiteInteractionRef } =
+  storeToRefs(siteStore)
 
 function handleCardClick() {
   const selectedFeature = identifySiteSourceRef.value.source.getFeatureById(props.site.id)
   selectSiteInteractionRef.value.select.getFeatures().clear()
   selectSiteInteractionRef.value?.select?.getFeatures().push(selectedFeature)
   selectedSiteFeature.value = selectedFeature
+  siteStore.centerSelectedSite()
 
   leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
 }
+
+const activeSite = computed(() => selectedSite.value?.id === props.site.id)
 </script>
 
 <template>
   <Card
-    :class="['cursor-pointer', selectedSite?.id === props.site.id ? 'border border-gray-400' : '']"
+    :class="['cursor-pointer', activeSite ? 'bg-primary text-white' : '']"
     @click="handleCardClick"
   >
     <CardContent class="p-2">
       <div class="flex w-full items-center justify-between break-words">
         <p class="w-full text-sm font-semibold">{{ site.id }}: {{ site.english_name }}</p>
-        <ChevronRight class="stroke-button-icon" />
+        <ChevronRight :class="[activeSite ? 'text-white' : 'stroke-button-icon']" />
       </div>
     </CardContent>
   </Card>
