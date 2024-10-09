@@ -41,15 +41,15 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     return res
   })
 
-  const tempLayerConfigDict = computed(() => {
+  const tempLayerConfigWithLayerDetail = computed(() => {
     if (!mapDetail.value) return {}
 
-    return tempLayerConfig.value.reduce((prev, curr) => {
-      const items = curr.items.map((layer) => {
-        return { ...layer, layerDetail: mapDetailDict.value[curr.id][layer.layerId] }
+    return tempLayerConfig.value.map((group) => {
+      const items = group.items.map((layer) => {
+        return { ...layer, layerDetail: mapDetailDict.value[group.id][layer.layerId] }
       })
-      return { ...prev, [curr.id]: { ...curr, items } }
-    }, {})
+      return { ...group, items }
+    })
   })
 
   const allLayersToggledOn = computed(() => {
@@ -287,7 +287,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     searchText,
     layerConfig,
     tempLayerConfig,
-    tempLayerConfigDict,
+    tempLayerConfigWithLayerDetail,
     currentLayers,
     expandedLayer,
     allLayersToggledOn,

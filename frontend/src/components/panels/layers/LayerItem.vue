@@ -29,14 +29,14 @@ console.log(props.item)
       <div class="flex items-center gap-2">
         <GripVertical class="drag-handle cursor-pointer stroke-button-icon" />
         <Switch
-          :id="`${item.layerId}`"
+          :id="`${parentId}-${item.layerId}`"
           :checked="item.isActive"
           @update:checked="
             (value) =>
               layerConfigStore.updateLayerVisibility(parentId, item.layerId, value)
           "
         />
-        <Label class="cursor-pointer font-semibold" :for="`${item.layerId}`">
+        <Label class="cursor-pointer font-semibold" :for="`${parentId}-${item.layerId}`">
           {{ item.alias }}
         </Label>
       </div>

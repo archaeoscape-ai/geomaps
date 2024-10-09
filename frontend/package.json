@@ -27,7 +27,7 @@
     "vue": "^3.4.37",
     "vue-files-preview": "^1.0.32",
     "vue-router": "^4.4.5",
-    "vue3-openlayers": "^8.1.0",
+    "vue3-openlayers": "^9.0.0",
     "vuedraggable": "^4.1.0",
     "zod": "^3.23.8"
   },
