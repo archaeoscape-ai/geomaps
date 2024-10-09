@@ -50,7 +50,7 @@ const tanfromSiteCoordinate = (coordinates) => {
       <!-- for edit and create -->
       <ol-feature :properties="selectedSite">
         <ol-geom-point :coordinates="siteMarker" v-if="siteMarker" />
-        <ol-style zIndex="1">
+        <ol-style>
           <ol-style-circle :radius="radius">
             <ol-style-fill color="red"></ol-style-fill>
             <ol-style-stroke :color="strokeColor" :width="10"></ol-style-stroke>

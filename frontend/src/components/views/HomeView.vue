@@ -12,7 +12,7 @@ import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import BaseMapButtons from '@/components/map/BaseMapButtons.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { useRoute, useRouter } from 'vue-router'
-import Toaster from '../ui/toast/Toaster.vue'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
 const router = useRouter()
 const route = useRoute()
@@ -20,6 +20,9 @@ const route = useRoute()
 const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
 const { getListMaps, setMapById, setDefaultMap } = mapStore
+
+const mapLayerConfigStore = useMapLayerConfigStore()
+const { initializeMapConfig } = mapLayerConfigStore
 
 const leftPanelStore = useLeftPanelStore()
 const { activePanel } = storeToRefs(leftPanelStore)
@@ -43,22 +46,26 @@ async function initialize() {
     setMapById(route.params.id)
     if (!currentMap.value) {
       redirectToDefaultMap()
+    } else {
+      initializeMapConfig(currentMap.value.id)
     }
   }
 }
-
-onMounted(() => {
-  initialize()
-})
 
 watch(
   () => route.params.id,
   (newId) => {
     if (newId) {
       setMapById(newId)
+      if (!currentMap.value) {
+        redirectToDefaultMap()
+      }
+      initializeMapConfig(currentMap.value.id)
     }
   },
 )
+
+initialize()
 </script>
 
 <template>
@@ -69,7 +76,6 @@ watch(
     <RightPanelButtons :isPanelActive="isRightPanelActive" />
     <RightPanelContainer :isPanelActive="isRightPanelActive" />
     <BaseMapButtons :isPanelActive="isRightPanelActive" />
-    <Toaster />
   </div>
 </template>
 

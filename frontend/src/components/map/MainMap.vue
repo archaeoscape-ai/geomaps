@@ -1,18 +1,17 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import MapControls from './MapControls.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import NoteLayer from '@/components/notes/NoteLayer.vue'
 import { useNoteStore } from '@/stores/NoteStore'
-import { BASEMAP_URLS, RIGHT_PANELS } from '@/helpers/constants'
+import { BASEMAP_URLS, LAYER_TYPE, RIGHT_PANELS } from '@/helpers/constants'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
-import { XYZ } from 'ol/source'
-import TileLayer from 'ol/layer/Tile'
 import SiteLayer from '@/components/sites/SiteLayer.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import MeasureLayer from './MeasureLayer.vue'
 import GeolocationLayer from './GeolocationLayer.vue'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
 defineProps({
   isPanelActive: Boolean,
@@ -20,6 +19,9 @@ defineProps({
 
 const mapStore = useMapStore()
 const { mapRef, basemap, zoom, center, currentMap } = storeToRefs(mapStore)
+
+const mapLayerConfigStore = useMapLayerConfigStore()
+const { tempLayerConfigWithLayerDetail } = storeToRefs(mapLayerConfigStore)
 
 const noteStore = useNoteStore()
 const { addNewNoteMarker } = noteStore
@@ -34,6 +36,8 @@ const { activePanel } = storeToRefs(rightPanelStore)
 
 const projection = ref('EPSG:3857')
 const rotation = ref(0)
+const format = inject('ol-format')
+const mvtFormat = new format.MVT()
 
 function handleClickMap(event) {
   if (isAddingNote.value) {
@@ -50,6 +54,7 @@ function handleClickMap(event) {
 
 const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
 
+watch(tempLayerConfigWithLayerDetail, () => console.log(tempLayerConfigWithLayerDetail.value))
 watch(currentMap, (newValue) => {
   if (newValue) {
     siteStore.getSites(currentMap.value?.id)
@@ -72,6 +77,7 @@ watch(currentMap, (newValue) => {
         :zoom="zoom"
         :projection="projection"
       />
+      
       <ol-tile-layer>
         <ol-source-xyz :url="basemapUrl" />
       </ol-tile-layer>
@@ -81,14 +87,38 @@ watch(currentMap, (newValue) => {
       <NoteLayer v-if="activePanel === RIGHT_PANELS.NOTE" />
 
       <SiteLayer />
-    </ol-map>
 
+      <template v-for="group in tempLayerConfigWithLayerDetail" :key="group.id">
+        <template v-for="layer in group.items" :key="`${group.id}-${layer.id}`">
+          <ol-vector-tile-layer
+            v-if="group.id === LAYER_TYPE.VECTOR"
+            :visible="layer.isActive"
+            :opacity="layer.opacity / 100"
+          >
+            <ol-source-vector-tile :url="layer.layerDetail.tiles_url" :format="mvtFormat">
+            </ol-source-vector-tile>
+          </ol-vector-tile-layer>
+
+          <ol-tile-layer v-else :visible="layer.isActive" :opacity="layer.opacity / 100">
+            <ol-source-xyz v-if="group.id === LAYER_TYPE.XYZ" :url="layer.layerDetail.tiles_url" />
+            <ol-source-tile-wms
+              v-else-if="group.id === LAYER_TYPE.WMS"
+              :url="layer.layerDetail.wms_url"
+            />
+          </ol-tile-layer>
+        </template>
+
+        <!-- <template v-else-if="group.id === LAYER_TYPE.WMS">
+          <template v-for="layer in group.items" :key="layer.id">
+            <ol-tile-layer v-if="layer.isActive">
+              <ol-source-xyz :url="layer.layerDetail.tiles_url" />
+            </ol-tile-layer>
+          </template>
+        </template> -->
+      </template>
+    </ol-map>
     <MapControls :is-panel-active="isPanelActive" :map="mapRef" />
   </div>
 </template>
 
-<style>
-.ol-attribution {
-  display: none;
-}
-</style>
+<style></style>

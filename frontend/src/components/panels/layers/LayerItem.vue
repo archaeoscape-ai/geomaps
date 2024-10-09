@@ -19,6 +19,8 @@ const showLegend = ref(false)
 function toggleShowLegend() {
   showLegend.value = !showLegend.value
 }
+
+console.log(props.item)
 </script>
 
 <template>
@@ -27,33 +29,33 @@ function toggleShowLegend() {
       <div class="flex items-center gap-2">
         <GripVertical class="drag-handle cursor-pointer stroke-button-icon" />
         <Switch
-          :id="`${props.item.layerId}`"
-          :checked="props.item.isActive"
+          :id="`${parentId}-${item.layerId}`"
+          :checked="item.isActive"
           @update:checked="
             (value) =>
-              layerConfigStore.updateLayerVisibility(props.parentId, props.item.layerId, value)
+              layerConfigStore.updateLayerVisibility(parentId, item.layerId, value)
           "
         />
-        <Label class="cursor-pointer font-semibold" :for="`${props.item.layerId}`">
-          {{ props.item.alias }}
+        <Label class="cursor-pointer font-semibold" :for="`${parentId}-${item.layerId}`">
+          {{ item.alias }}
         </Label>
       </div>
 
       <ChevronDown
         class="cursor-pointer stroke-button-icon"
-        @click="layerConfigStore.updateLayerExpandedState(props.item, true)"
-        v-if="!layerConfigStore.isLayerExpanded(props.item.layerId)"
+        @click="layerConfigStore.updateLayerExpandedState(parentId, item, true)"
+        v-if="!layerConfigStore.isLayerExpanded(parentId, item.layerId)"
       />
       <ChevronUp
         class="cursor-pointer stroke-button-icon"
-        @click="layerConfigStore.updateLayerExpandedState(props.item, false)"
+        @click="layerConfigStore.updateLayerExpandedState(parentId, item, false)"
         v-else
       />
     </CardHeader>
 
     <CardContent
       class="mb-2 flex flex-col p-2"
-      v-if="props.item.isActive && layerConfigStore.isLayerExpanded(props.item.layerId)"
+      v-if="item.isActive && layerConfigStore.isLayerExpanded(parentId, item.layerId)"
     >
       <div class="flex w-full flex-col gap-4 px-1">
         <div class="flex items-center gap-4">
@@ -66,18 +68,18 @@ function toggleShowLegend() {
         </div>
         <div>
           <Slider
-            :default-value="[props.item.opacity]"
+            :default-value="[item.opacity]"
             :max="100"
             :step="1"
-            :disabled="!props.item.isActive"
+            :disabled="!item.isActive"
             @update:modelValue="
               (value) =>
-                layerConfigStore.updateLayerOpacity(props.parentId, props.item.layerId, value[0])
+                layerConfigStore.updateLayerOpacity(parentId, item.layerId, value[0])
             "
           />
         </div>
       </div>
-      <div class="mt-2" v-if="props.item.isActive && showLegend">
+      <div class="mt-2" v-if="item.isActive && showLegend">
         <span class="divider"></span>
         <h1>show legend</h1>
       </div>

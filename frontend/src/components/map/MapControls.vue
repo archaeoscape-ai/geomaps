@@ -19,6 +19,7 @@ function handleZoom(isZoomIn) {
 
 <template>
   <div
+    zIndex="1002"
     class="absolute bottom-4 left-4 transition-all"
     :class="{
       'translate-x-0': !isPanelActive,
