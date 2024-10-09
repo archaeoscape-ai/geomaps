@@ -2,18 +2,25 @@
 import { ref } from 'vue'
 import ConfirmationAlertDialog from '../ui/alert-dialog/ConfirmationAlertDialog.vue'
 import { useSiteStore } from '@/stores/SiteStore'
+import { useToast } from '@/components/ui/toast'
 
 const props = defineProps({
   siteId: { type: Number, required: false },
 })
 
 const open = ref(false)
-
+const { toast } = useToast()
 const siteStore = useSiteStore()
 
 async function confirm() {
-  await siteStore.deleteSite(props.siteId)
-  open.value = false
+  try {
+    await siteStore.deleteSite(props.siteId)
+    toast({ description: 'Site deleted!' })
+  } catch (error) {
+    toast({ description: 'Could not delete site!', variant: 'destructive' })
+  } finally {
+    open.value = false
+  }
 }
 
 function cancelDeletion() {

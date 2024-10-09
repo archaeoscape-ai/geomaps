@@ -9,13 +9,12 @@ const leftPanelStore = useLeftPanelStore()
 const { activePanel } = storeToRefs(leftPanelStore)
 
 const siteStore = useSiteStore()
-const { selectedSite } = storeToRefs(siteStore)
-
+const { selectSiteInteractionRef } = storeToRefs(siteStore)
 
 function handlePanelClose() {
+  siteStore.resetSitePosition()
   activePanel.value = null
-  selectedSite.value = null
-  siteStore.setSiteMarker(null)
+  selectSiteInteractionRef.value.select.getFeatures().clear()
 }
 
 defineProps({
@@ -24,7 +23,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="p-4">
+  <div class="mb-4 p-4 shadow">
     <div class="flex items-center justify-between">
       <h2 class="font-bold">{{ header }}</h2>
       <div class="flex gap-4">
@@ -34,7 +33,6 @@ defineProps({
           variant="secondary"
           class="rounded-full bg-white"
           @click="handlePanelClose"
-
         >
           <X class="stroke-button-icon" />
         </Button>

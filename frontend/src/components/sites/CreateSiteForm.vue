@@ -29,6 +29,9 @@ const { selectedSite, siteTypes, isCreatingSite, siteMarker, isEditingSite } =
 const isSubmitting = ref(false)
 const { toast } = useToast()
 
+onMounted(() => {
+  siteStore.getSiteTypes()
+})
 
 const formSchema = toTypedSchema(
   z.object({
@@ -81,6 +84,8 @@ const onSubmit = form.handleSubmit(async (values) => {
       toast({ description: 'Site updated!' })
     } else {
       await siteStore.createSite(currentMap.value.id, data)
+      isCreatingSite.value = false
+      siteMarker.value = null
       toast({ description: 'Site created!' })
     }
     leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
@@ -130,8 +135,6 @@ watch(siteMarker, (newValue) => {
     form.setFieldValue('longitude', coords[0])
   }
 })
-
-siteStore.getSiteTypes()
 </script>
 
 <template>
