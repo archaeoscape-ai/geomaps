@@ -65,6 +65,7 @@ watch(
   async (newSite) => {
     if (newSite) {
       isAddingResource.value = false
+      updatingResource.value = null
       await siteResourceStore.getSiteResources(newSite.id)
     }
   },

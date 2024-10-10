@@ -51,6 +51,9 @@ const initialFormValues = computed(() => ({
   notes: updatingResource.value?.notes || '',
 }))
 
+const resourceDate = computed(() =>
+  form.values?.resource_date ? parseDate(form.values.resource_date) : '',
+)
 const form = useForm({
   validationSchema: formSchema,
   initialValues: initialFormValues.value,
@@ -112,7 +115,7 @@ const onSubmit = form.handleSubmit(async (values) => {
       <DatePicker
         name="resource_date"
         label="Resource Date"
-        :model-value="parseDate(form.values.resource_date)"
+        :model-value="resourceDate"
         @update:model-value="(v) => form.setFieldValue('resource_date', v.toString())"
       />
       <FormTextareaField name="notes" label="Notes" />
