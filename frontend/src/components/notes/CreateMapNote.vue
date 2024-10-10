@@ -5,11 +5,11 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import { useNoteStore } from '@/stores/NoteStore'
 import { storeToRefs } from 'pinia'
 import { useMapStore } from '@/stores/MapStore'
+import FormInputField from '../ui/input/FormInputField.vue'
+import FormTextareaField from '../ui/textarea/FormTextareaField.vue'
 
 const noteStore = useNoteStore()
 const { addNote, updateNote } = noteStore
@@ -56,24 +56,8 @@ watch(selectedNoteDetail, () => {
   <div class="flex flex-col gap-4">
     <h3 class="text-base font-bold">{{ isCreatingNote ? 'Create Note' : 'Update Note' }}</h3>
     <form @submit="onSubmit" class="flex w-80 flex-col gap-4">
-      <FormField v-slot="{ componentField }" name="title">
-        <FormItem>
-          <FormLabel>Note Title</FormLabel>
-          <FormControl>
-            <Input type="text" v-bind="componentField" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      <FormField v-slot="{ componentField }" name="body">
-        <FormItem>
-          <FormLabel>Note Body</FormLabel>
-          <FormControl>
-            <Input type="text" v-bind="componentField" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
+      <FormInputField name="title" label="Note Title" />
+      <FormTextareaField name="body" label="Note Body" />
       <Button type="submit" class="mt-4 w-full">Save</Button>
     </form>
   </div>
