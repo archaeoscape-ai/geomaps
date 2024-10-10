@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import {
   addNewNote,
@@ -8,8 +8,15 @@ import {
   fetchNotes,
   updateCurrentNote,
 } from '@/api-services/NoteService'
+import { useToast } from '@/components/ui/toast'
+import { useMapStore } from './MapStore'
 
 export const useNoteStore = defineStore('note', () => {
+  const { toast } = useToast()
+
+  const mapStore = useMapStore()
+  const { mapRef } = storeToRefs(mapStore)
+
   const notes = ref(null)
   const notesGeom = ref([])
   const selectedNote = ref(null)
@@ -83,7 +90,7 @@ export const useNoteStore = defineStore('note', () => {
     await getNotes(mapId)
     isLoading.value = false
     resetNoteOverlay()
-    // toast.success('Note successfully added')
+    toast({ description: 'Note successfully added!' })
   }
 
   async function updateNote(mapId, noteId, data) {
@@ -92,7 +99,7 @@ export const useNoteStore = defineStore('note', () => {
     await getNotes(mapId)
     isLoading.value = false
     resetNoteOverlay()
-    // toast.success('Note successfully updated')
+    toast({ description: 'Note successfully updated!' })
   }
 
   async function deleteNote(mapId, noteId) {
@@ -102,7 +109,7 @@ export const useNoteStore = defineStore('note', () => {
     await getNotes(mapId)
     isLoading.value = false
     resetNoteOverlay()
-    // toast.success('Note successfully deleted')
+    toast({ description: 'Note successfully deleted!' })
   }
 
   async function getNoteById(mapId, noteId) {
@@ -149,9 +156,7 @@ export const useNoteStore = defineStore('note', () => {
             payload: { note },
           })
 
-          // nextTick(() => {
-          //   map.value.map.getView().setCenter(note.geom.coordinates)
-          // })
+          mapRef.value.map.getView().animate({ center: [ note.geom.coordinates[0] + 80000, note.geom.coordinates[1] ], duration: 1000 })
         }
       }
     } else {

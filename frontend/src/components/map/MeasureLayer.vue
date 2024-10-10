@@ -160,7 +160,7 @@ watch(measuringDistance, (value) => {
     </div>
   </ol-overlay>
 
-  <ol-vector-layer v-if="measuringDistance">
+  <ol-vector-layer v-if="measuringDistance" zIndex="1000">
     <ol-source-vector>
       <ol-interaction-draw :type="drawType" @drawend="drawend" @drawstart="drawstart" />
     </ol-source-vector>
@@ -174,7 +174,7 @@ watch(measuringDistance, (value) => {
     </ol-style>
   </ol-vector-layer>
 
-  <ol-vector-layer>
+  <ol-vector-layer zIndex="1000">
     <ol-source-vector ref="measureRef"> </ol-source-vector>
     <ol-style>
       <ol-style-stroke color="black" :width="2" />

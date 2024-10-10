@@ -92,8 +92,8 @@ watch(currentMap, (newValue) => {
       <GeolocationLayer />
       <MeasureLayer />
       <NoteLayer v-if="activePanel === RIGHT_PANELS.NOTE" />
-
       <SiteLayer />
+      <MapControls :is-panel-active="isPanelActive" :map="mapRef" />
 
       <template v-for="group in tempLayerConfigWithLayerDetail" :key="group.id">
         <template v-for="layer in group.items" :key="`${group.id}-${layer.id}`">
@@ -101,12 +101,18 @@ watch(currentMap, (newValue) => {
             v-if="group.id === LAYER_TYPE.VECTOR"
             :visible="layer.isActive"
             :opacity="layer.opacity / 100"
+            :zIndex="layer.zIndex"
           >
             <ol-source-vector-tile :url="layer.layerDetail.tiles_url" :format="mvtFormat">
             </ol-source-vector-tile>
           </ol-vector-tile-layer>
 
-          <ol-tile-layer v-else :visible="layer.isActive" :opacity="layer.opacity / 100">
+          <ol-tile-layer
+            v-else
+            :visible="layer.isActive"
+            :opacity="layer.opacity / 100"
+            :zIndex="layer.zIndex"
+          >
             <ol-source-xyz v-if="group.id === LAYER_TYPE.XYZ" :url="layer.layerDetail.tiles_url" />
             <ol-source-tile-wms
               v-else-if="group.id === LAYER_TYPE.WMS"
@@ -114,17 +120,8 @@ watch(currentMap, (newValue) => {
             />
           </ol-tile-layer>
         </template>
-
-        <!-- <template v-else-if="group.id === LAYER_TYPE.WMS">
-          <template v-for="layer in group.items" :key="layer.id">
-            <ol-tile-layer v-if="layer.isActive">
-              <ol-source-xyz :url="layer.layerDetail.tiles_url" />
-            </ol-tile-layer>
-          </template>
-        </template> -->
       </template>
     </ol-map>
-    <MapControls :is-panel-active="isPanelActive" :map="mapRef" />
   </div>
 </template>
 

@@ -1,5 +1,4 @@
 <script setup>
-import { computed } from 'vue'
 import Button from '@/components/ui/button/Button.vue'
 import Switch from '@/components/ui/switch/Switch.vue'
 import Label from '@/components/ui/label/Label.vue'
@@ -11,17 +10,20 @@ import { storeToRefs } from 'pinia'
 import draggable from 'vuedraggable'
 import { X } from 'lucide-vue-next'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
+import Card from '../ui/card/Card.vue'
+import CardContent from '../ui/card/CardContent.vue'
+import Separator from '../ui/separator/Separator.vue'
+import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 
 const layerConfigStore = useMapLayerConfigStore()
-const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText } =
+const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText, showSiteLayer } =
   storeToRefs(layerConfigStore)
+
+const leftPanelStore = useLeftPanelStore()
+const { activePanel: activeLeftPanel } = storeToRefs(leftPanelStore)
 
 const rightPanelStore = useRightPanelStore()
 const { activePanel } = storeToRefs(rightPanelStore)
-
-const list = computed({
-  get: () => tempLayerConfig.value,
-})
 
 function searchLayer(evt) {
   searchText.value = evt.target.value
@@ -74,17 +76,41 @@ function searchLayer(evt) {
         {{ allLayersExpanded ? 'Collapse All' : 'Expand All' }}
       </button>
     </div>
-    <draggable
-      :list="list"
-      class="flex flex-grow flex-col overflow-auto pb-4"
-      ghostClass="opacity-50"
-      item-key="id"
-      handle=".drag-handle"
-      :animation="250"
-    >
-      <template #item="{ element }">
-        <Layers :layer="element" class="mt-4" />
-      </template>
-    </draggable>
+
+    <div class="mx-4">
+      <Separator />
+    </div>
+
+    <div class="flex flex-grow flex-col overflow-auto pb-4">
+      <Card class="mx-4 mb-4">
+        <CardContent class="p-2">
+          <div class="flex items-center gap-2">
+            <Switch
+              v-model:checked="showSiteLayer"
+              id="site-layer-switch"
+              :disabled="!!activeLeftPanel"
+            />
+            <Label class="cursor-pointer font-semibold" for="site-layer-switch">Site Layer</Label>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div class="mx-4">
+        <Separator />
+      </div>
+
+      <draggable
+        :list="tempLayerConfig"
+        class="flex flex-grow flex-col"
+        ghostClass="opacity-50"
+        item-key="id"
+        handle=".drag-handle"
+        :animation="250"
+      >
+        <template #item="{ element }">
+          <Layers :layer="element" class="mt-4" />
+        </template>
+      </draggable>
+    </div>
   </div>
 </template>

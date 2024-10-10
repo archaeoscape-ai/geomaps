@@ -1,9 +1,12 @@
 import { LEFT_PANELS } from '@/helpers/constants'
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
+import { useMapLayerConfigStore } from './MapLayerConfigStore'
 
 export const useLeftPanelStore = defineStore('left-panel', () => {
   const activePanel = ref(null)
+  const mapLayerConfigStore = useMapLayerConfigStore()
+  const { showSiteLayer } = storeToRefs(mapLayerConfigStore)
 
   const tabs = computed(() => [
     {
@@ -22,6 +25,7 @@ export const useLeftPanelStore = defineStore('left-panel', () => {
 
   function toggleMenu() {
     if (activePanel.value === null) {
+      showSiteLayer.value = true
       activePanel.value = tabs.value[0]
     } else {
       activePanel.value = null
