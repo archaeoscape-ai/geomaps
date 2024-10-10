@@ -32,6 +32,7 @@ function onFeatureSelected(event) {
 
   if (deselectedFeatures.length > 0) {
     selectedSiteFeature.value = null
+    setTab(LEFT_PANELS.LIST)
   }
 
   const features = event.selected
