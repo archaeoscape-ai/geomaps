@@ -17,7 +17,7 @@ defineProps({
 })
 
 const mapStore = useMapStore()
-const { trackingLocation, measuringDistance, currentMap } = storeToRefs(mapStore)
+const { trackingLocation, measuringDistance } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
 const { isAddingNote } = storeToRefs(noteStore)

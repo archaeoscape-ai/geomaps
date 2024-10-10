@@ -1,18 +1,17 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { LEFT_PANELS } from '@/helpers/constants'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
-import { transform } from 'ol/proj'
 import SiteFeature from '@/components/sites/SiteFeature.vue'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
 const strokeColor = ref('rgba(255, 255, 255, 0.2)')
 const fillColor = ref('#3ca23c')
-const radius = ref(10)
 
 const leftPanelStore = useLeftPanelStore()
-const { activePanel } = storeToRefs(leftPanelStore)
+const { setTab } = leftPanelStore
 
 const siteStore = useSiteStore()
 const {
@@ -26,16 +25,8 @@ const {
   newSiteFeatureRef,
 } = storeToRefs(siteStore)
 
-const showIdentifyLayer = computed(() => {
-  // return (
-  //   activePanel.value !== null &&
-  //   (isCreatingSite.value ||
-  //     (selectedSite.value !== null &&
-  //       (activePanel.value.id === LEFT_PANELS.IDENTIFY ||
-  //         activePanel.value.id === LEFT_PANELS.CREATE)))
-  // )
-  return true
-})
+const layerConfigStore = useMapLayerConfigStore()
+const { showSiteLayer } = storeToRefs(layerConfigStore)
 
 function onFeatureSelected(event) {
   const deselectedFeatures = event.deselected
@@ -50,20 +41,20 @@ function onFeatureSelected(event) {
   }
 
   selectedSiteFeature.value = features[0]
-  leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
+  setTab(LEFT_PANELS.IDENTIFY)
 }
 
 const selectInteactionFilter = (feature) => {
   return !isCreatingSite.value && !isEditingSite.value && feature.getProperties().type === 'site'
 }
 
-function removeCondition(event) {
+function removeCondition() {
   return isEditingSite.value
 }
 </script>
 
 <template>
-  <ol-vector-layer v-if="showIdentifyLayer">
+  <ol-vector-layer zIndex="1000" v-if="showSiteLayer">
     <ol-source-vector ref="identifySiteSourceRef">
       <!-- list all sites -->
       <SiteFeature v-for="site in sites?.results" :site="site" :key="site.id" />
