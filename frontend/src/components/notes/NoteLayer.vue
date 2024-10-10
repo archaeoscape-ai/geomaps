@@ -10,8 +10,14 @@ const fillColor = ref('#FFFFFF')
 const radius = ref(10)
 
 const noteStore = useNoteStore()
-const { displayedNotes, selectedNote, selectNoteInteractionRef, noteSourceRef, noteOverlayRef, isAddingNote } =
-  storeToRefs(noteStore)
+const {
+  displayedNotes,
+  selectedNote,
+  selectNoteInteractionRef,
+  noteSourceRef,
+  noteOverlayRef,
+  isAddingNote,
+} = storeToRefs(noteStore)
 const { resetNoteOverlay } = noteStore
 
 const siteStore = useSiteStore()
@@ -48,7 +54,7 @@ const selectInteactionFilter = (feature) => {
 }
 
 onUnmounted(() => {
-  isAddingNote.value = false 
+  isAddingNote.value = false
 })
 </script>
 

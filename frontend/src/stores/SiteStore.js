@@ -10,7 +10,7 @@ export const useSiteStore = defineStore('site', () => {
   /**
    * @type {import('vue').Ref<{ source: import('ol/source/Vector').default } | null>}
    */
-  const identifySiteSourceRef = ref(null)
+  // const siteLayerSourceRef = ref(null)
   const newSiteFeatureRef = ref(null)
   const selectSiteInteractionRef = ref(null)
   const selectedSiteFeature = ref(null)
@@ -32,6 +32,17 @@ export const useSiteStore = defineStore('site', () => {
   const { mapRef } = storeToRefs(mapStore)
 
   const leftPanelStore = useLeftPanelStore()
+
+  const showIdentifyLayer = ref(true)
+
+  const siteLayerSourceRef = computed(() => {
+    const siteVectorLayer = mapRef.value.map
+      .getLayers()
+      .getArray()
+      .find((item) => item.get('name') === 'siteVectorLayer')
+
+    return siteVectorLayer.getSource()
+  })
 
   async function getSiteTypes() {
     const params = {
@@ -68,14 +79,7 @@ export const useSiteStore = defineStore('site', () => {
       sites.value = { ...sites.value, results: [res] }
     }
 
-    newSiteFeatureRef.value.feature.setProperties({ ...res, type: 'site' })
-    newSiteFeatureRef.value.feature.setId(res.id)
-    newSiteFeatureRef.value.feature = null
-
-    const selectedFeature = identifySiteSourceRef.value.source.getFeatureById(res.id)
-    selectSiteInteractionRef.value.select.getFeatures().clear()
-    selectSiteInteractionRef.value?.select?.getFeatures().push(selectedFeature)
-    selectedSiteFeature.value = selectedFeature
+    return res
   }
 
   async function updateSite(siteId, data) {
@@ -133,11 +137,12 @@ export const useSiteStore = defineStore('site', () => {
     selectedSite,
     siteTypes,
     isCreatingSite,
-    identifySiteSourceRef,
+    siteLayerSourceRef,
     selectSiteInteractionRef,
     siteMarker,
     isEditingSite,
     newSiteFeatureRef,
+    showIdentifyLayer,
 
     getSites,
     getSiteTypes,

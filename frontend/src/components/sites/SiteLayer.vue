@@ -1,41 +1,26 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { LEFT_PANELS } from '@/helpers/constants'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
-import { transform } from 'ol/proj'
 import SiteFeature from '@/components/sites/SiteFeature.vue'
 
 const strokeColor = ref('rgba(255, 255, 255, 0.2)')
 const fillColor = ref('#3ca23c')
-const radius = ref(10)
 
 const leftPanelStore = useLeftPanelStore()
-const { activePanel } = storeToRefs(leftPanelStore)
 
 const siteStore = useSiteStore()
 const {
-  selectedSiteFeature,
-  identifySiteSourceRef,
-  siteMarker,
-  isCreatingSite,
   sites,
+  siteMarker,
   isEditingSite,
-  selectSiteInteractionRef,
+  isCreatingSite,
+  selectedSiteFeature,
   newSiteFeatureRef,
+  selectSiteInteractionRef,
 } = storeToRefs(siteStore)
-
-const showIdentifyLayer = computed(() => {
-  // return (
-  //   activePanel.value !== null &&
-  //   (isCreatingSite.value ||
-  //     (selectedSite.value !== null &&
-  //       (activePanel.value.id === LEFT_PANELS.IDENTIFY ||
-  //         activePanel.value.id === LEFT_PANELS.CREATE)))
-  // )
-  return true
-})
 
 function onFeatureSelected(event) {
   const deselectedFeatures = event.deselected
@@ -63,8 +48,8 @@ function removeCondition(event) {
 </script>
 
 <template>
-  <ol-vector-layer v-if="showIdentifyLayer">
-    <ol-source-vector ref="identifySiteSourceRef">
+  <ol-vector-layer name="siteVectorLayer">
+    <ol-source-vector>
       <!-- list all sites -->
       <SiteFeature v-for="site in sites?.results" :site="site" :key="site.id" />
 

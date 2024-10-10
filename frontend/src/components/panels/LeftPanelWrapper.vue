@@ -23,7 +23,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="mb-4 p-4 shadow">
+  <div class="p-4">
     <div class="flex items-center justify-between">
       <h2 class="font-bold">{{ header }}</h2>
       <div class="flex gap-4">

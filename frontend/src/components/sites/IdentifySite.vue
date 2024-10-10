@@ -5,14 +5,14 @@ import { useSiteStore } from '@/stores/SiteStore'
 import { useMapStore } from '@/stores/MapStore'
 import { useNoteStore } from '@/stores/NoteStore'
 import { useSiteResourceStore } from '@/stores/SiteResourceStore'
-import Button from '@/components/ui/button/Button.vue'
 import CreateSiteForm from '@/components/sites/CreateSiteForm.vue'
 import CreateSiteResourceForm from '@/components/sites/resources/CreateSiteResourceForm.vue'
 import SiteDetail from '@/components/sites/SiteDetail.vue'
 import SiteResources from '@/components/sites/resources/SiteResources.vue'
 import LeftPanelWrapper from '@/components/panels/LeftPanelWrapper.vue'
 import DeleteSiteDialog from './DeleteSiteDialog.vue'
-import { Ban, Pencil, Trash, Files, ArrowLeft } from 'lucide-vue-next'
+import { Ban, Pencil, Trash, FilePlus, ArrowLeft } from 'lucide-vue-next'
+import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
 
 const mapStore = useMapStore()
 const { measuringDistance } = storeToRefs(mapStore)
@@ -27,11 +27,13 @@ const siteResourceStore = useSiteResourceStore()
 const { isAddingResource, siteResources, updatingResource } = storeToRefs(siteResourceStore)
 
 const heading = computed(() => {
-  return isAddingResource.value
-    ? 'Add resource'
-    : isEditingSite.value
-      ? 'Update Site'
-      : 'Site Details'
+  return updatingResource.value
+    ? 'Update Resource'
+    : isAddingResource.value
+      ? 'Add Resource'
+      : isEditingSite.value
+        ? 'Update Site'
+        : 'Site Details'
 })
 
 function toggleSiteEdit() {
@@ -55,6 +57,7 @@ function cancelAddResource() {
 onBeforeUnmount(() => {
   isEditingSite.value = false
   isAddingResource.value = false
+  updatingResource.value = null
 })
 
 watch(
@@ -74,28 +77,46 @@ watch(
     <template v-slot:header-actions v-if="selectedSite">
       <template v-if="!isAddingResource && !updatingResource">
         <DeleteSiteDialog :site-id="selectedSite?.id">
-          <Button size="icon" variant="secondary" class="hover:bg-white">
+          <IconTooltipButton tooltipText="Delete" tooltipSide="bottom">
             <Trash class="stroke-primary" size="20" />
-          </Button>
+          </IconTooltipButton>
         </DeleteSiteDialog>
-        <Button @click="addResources" size="icon" variant="secondary" class="hover:bg-white">
-          <Files size="20" />
-        </Button>
-        <Button
-          @click="toggleSiteEdit"
-          size="icon"
-          variant="secondary"
-          class="hover:bg-white"
-          :disabled="measuringDistance || isAddingNote"
+
+        <IconTooltipButton
+          tooltipText="Add resources"
+          tooltipSide="bottom"
+          @onBtnClick="addResources"
         >
-          <Ban size="20" v-if="isEditingSite" />
-          <Pencil size="20" v-else />
-        </Button>
+          <FilePlus size="20" />
+        </IconTooltipButton>
+
+        <IconTooltipButton
+          tooltipText="Edit"
+          tooltipSide="bottom"
+          @onBtnClick="toggleSiteEdit"
+          :disabled="measuringDistance || isAddingNote"
+          v-if="!isEditingSite"
+        >
+          <Pencil size="20" />
+        </IconTooltipButton>
+        <IconTooltipButton
+          tooltipText="Cancel"
+          tooltipSide="bottom"
+          @onBtnClick="toggleSiteEdit"
+          :disabled="measuringDistance || isAddingNote"
+          v-if="isEditingSite"
+        >
+          <Ban size="20" />
+        </IconTooltipButton>
       </template>
       <template v-else>
-        <Button @click="cancelAddResource" size="icon" variant="secondary" class="hover:bg-white">
+        <IconTooltipButton
+          tooltipText="Go back"
+          tooltipSide="bottom"
+          @onBtnClick="cancelAddResource"
+        >
           <ArrowLeft size="20" />
-        </Button>
+        </IconTooltipButton>
       </template>
     </template>
 

@@ -49,7 +49,6 @@ export const useSiteResourceStore = defineStore('siteResource', () => {
 
   async function createSiteResource(siteId, data) {
     const res = await siteResourceService.createSiteResource(siteId, data)
-    console.log(res)
     if (siteResources.value?.results) {
       siteResources.value.results.push(res)
     } else {

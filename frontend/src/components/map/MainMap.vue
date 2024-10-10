@@ -84,7 +84,7 @@ watch(currentMap, (newValue) => {
         :zoom="zoom"
         :projection="projection"
       />
-      
+
       <ol-tile-layer>
         <ol-source-xyz :url="basemapUrl" />
       </ol-tile-layer>
