@@ -53,7 +53,7 @@ function removeCondition() {
 </script>
 
 <template>
-  <ol-vector-layer zIndex="1000" v-if="showSiteLayer">
+  <ol-vector-layer zIndex="1000" v-if="showSiteLayer" name="siteVectorLayer">
     <ol-source-vector>
       <!-- list all sites -->
       <SiteFeature v-for="site in sites?.results" :site="site" :key="site.id" />
