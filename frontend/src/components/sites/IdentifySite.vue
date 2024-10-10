@@ -11,7 +11,7 @@ import SiteDetail from '@/components/sites/SiteDetail.vue'
 import SiteResources from '@/components/sites/resources/SiteResources.vue'
 import LeftPanelWrapper from '@/components/panels/LeftPanelWrapper.vue'
 import DeleteSiteDialog from './DeleteSiteDialog.vue'
-import { Pencil, Trash, FilePlus, ArrowLeft } from 'lucide-vue-next'
+import { Trash, ArrowLeft } from 'lucide-vue-next'
 import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
 
 const mapStore = useMapStore()
@@ -24,7 +24,7 @@ const siteStore = useSiteStore()
 const { selectedSite, isEditingSite } = storeToRefs(siteStore)
 
 const siteResourceStore = useSiteResourceStore()
-const { isAddingResource, siteResources, updatingResource } = storeToRefs(siteResourceStore)
+const { isAddingResource, updatingResource } = storeToRefs(siteResourceStore)
 
 const heading = computed(() => {
   return updatingResource.value
