@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +25,7 @@ const emit = defineEmits(['confirm', 'cancel', 'tiggerDialog'])
 
 <template>
   <AlertDialog :open="open">
-    <AlertDialogTrigger as-child @click="emit('tiggerDialog')">
+    <AlertDialogTrigger @click="emit('tiggerDialog')">
       <slot></slot>
     </AlertDialogTrigger>
     <AlertDialogContent>
@@ -35,7 +35,7 @@ const emit = defineEmits(['confirm', 'cancel', 'tiggerDialog'])
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel @click="emit('cancel')">Cancel</AlertDialogCancel>
-        <AlertDialogAction @click="emit('confirm')" as-child>
+        <AlertDialogAction @click="emit('confirm')">
           <Button :disabled="isLoading">
             <Loader2 v-show="isLoading" class="mr-2 h-4 w-4 animate-spin" />
             Delete

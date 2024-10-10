@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { Calendar as CalendarIcon } from 'lucide-vue-next'
 import { toDate } from 'radix-vue/date'
 import { Calendar } from '@/components/ui/calendar'

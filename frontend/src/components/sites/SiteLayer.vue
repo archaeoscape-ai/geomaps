@@ -15,14 +15,13 @@ const { setTab } = leftPanelStore
 
 const siteStore = useSiteStore()
 const {
-  selectedSiteFeature,
-  identifySiteSourceRef,
-  siteMarker,
-  isCreatingSite,
   sites,
+  siteMarker,
   isEditingSite,
-  selectSiteInteractionRef,
+  isCreatingSite,
+  selectedSiteFeature,
   newSiteFeatureRef,
+  selectSiteInteractionRef,
 } = storeToRefs(siteStore)
 
 const layerConfigStore = useMapLayerConfigStore()
@@ -55,7 +54,7 @@ function removeCondition() {
 
 <template>
   <ol-vector-layer zIndex="1000" v-if="showSiteLayer">
-    <ol-source-vector ref="identifySiteSourceRef">
+    <ol-source-vector>
       <!-- list all sites -->
       <SiteFeature v-for="site in sites?.results" :site="site" :key="site.id" />
 

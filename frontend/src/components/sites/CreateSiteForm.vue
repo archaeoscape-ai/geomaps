@@ -18,13 +18,20 @@ import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { LEFT_PANELS } from '@/helpers/constants'
 
 const leftPanelStore = useLeftPanelStore()
-
 const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
-
 const siteStore = useSiteStore()
-const { selectedSite, siteTypes, isCreatingSite, siteMarker, isEditingSite } =
-  storeToRefs(siteStore)
+const {
+  selectedSite,
+  siteTypes,
+  isCreatingSite,
+  siteMarker,
+  isEditingSite,
+  newSiteFeatureRef,
+  siteLayerSourceRef,
+  selectedSiteFeature,
+  selectSiteInteractionRef,
+} = storeToRefs(siteStore)
 
 const isSubmitting = ref(false)
 const { toast } = useToast()
@@ -38,8 +45,8 @@ const formSchema = toTypedSchema(
     english_name: z.string().min(1, { message: 'This field has to be filled' }),
     french_name: z.string().optional(),
     khmer_name: z.string().optional(),
-    latitude: z.number().or(z.string()).pipe(z.coerce.number().gte(-90).lt(90)),
-    longitude: z.number().or(z.string()).pipe(z.coerce.number().gte(-180).lt(180)),
+    latitude: z.coerce.number().gte(-90).lte(90, { message: 'Invalid Latitude' }),
+    longitude: z.coerce.number().gte(-180).lte(180, { message: 'Invalid Longitude' }),
     alternative_name: z.string().optional(),
     alternative_khmer_name: z.string().optional(),
     description: z.string().optional(),
@@ -68,7 +75,30 @@ const form = useForm({
   initialValues: initialFormValues.value,
 })
 
+const resetSiteCreationState = () => {
+  isEditingSite.value = false
+  isCreatingSite.value = false
+  siteMarker.value = null
+  leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
+}
+
+const updateNewFeatureProperties = (properties) => {
+  if (newSiteFeatureRef.value?.feature) {
+    newSiteFeatureRef.value.feature.setProperties(properties)
+    newSiteFeatureRef.value.feature.setId(properties.id)
+  }
+}
+
+const setNewSiteAsSelected = (res) => {
+  selectedSiteFeature.value = siteLayerSourceRef.value.getFeatureById(res.id)
+  const selectedFeatures = selectSiteInteractionRef.value.select.getFeatures()
+  selectedFeatures.clear()
+  selectedFeatures.push(selectedSiteFeature.value)
+}
+
 const onSubmit = form.handleSubmit(async (values) => {
+  if (isSubmitting.value) return
+
   try {
     isSubmitting.value = true
     const data = {
@@ -78,33 +108,33 @@ const onSubmit = form.handleSubmit(async (values) => {
         coordinates: [values.longitude, values.latitude],
       },
     }
-    if (selectedSite.value && isEditingSite.value) {
+
+    if (isEditingSite.value && selectedSite.value) {
       await siteStore.updateSite(selectedSite.value.id, data)
-      isEditingSite.value = false
       toast({ description: 'Site updated!' })
     } else {
-      await siteStore.createSite(currentMap.value.id, data)
-      isCreatingSite.value = false
-      siteMarker.value = null
+      const res = await siteStore.createSite(currentMap.value.id, data)
+      updateNewFeatureProperties({ ...res, type: 'site' })
+      setNewSiteAsSelected(res)
+      newSiteFeatureRef.value.feature = null
       toast({ description: 'Site created!' })
     }
-    leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
+
+    resetSiteCreationState()
   } catch (error) {
     if (error.status === 400) {
-      for (const [fieldName, errorMessage] of Object.entries(error.response.data)) {
-        form.setFieldError(fieldName, errorMessage)
-      }
-      return
+      Object.entries(error.response.data).forEach(([field, message]) => {
+        form.setFieldError(field, message)
+      })
+    } else {
+      toast({ description: 'Could not save site!', variant: 'destructive' })
     }
-    toast({ description: 'Could not save site!', variant: 'destructive' })
   } finally {
     isSubmitting.value = false
   }
 })
 
-function setFieldValue() {
-  form.resetForm({ values: initialFormValues.value })
-}
+const setFieldValue = () => form.resetForm({ values: initialFormValues.value })
 
 watch(isCreatingSite, (newValue) => {
   if (newValue) {
@@ -118,8 +148,8 @@ watch(isCreatingSite, (newValue) => {
         description: '',
         ik_id_starred: false,
         site_type: '',
-        longitude: '',
         latitude: '',
+        longitude: '',
       },
     })
   } else {
@@ -129,10 +159,9 @@ watch(isCreatingSite, (newValue) => {
 
 watch(siteMarker, (newValue) => {
   if (newValue) {
-    const coords = transform(newValue, 'EPSG:3857', 'EPSG:4326')
-
-    form.setFieldValue('latitude', coords[1])
-    form.setFieldValue('longitude', coords[0])
+    const [longitude, latitude] = transform(newValue, 'EPSG:3857', 'EPSG:4326')
+    form.setFieldValue('latitude', latitude)
+    form.setFieldValue('longitude', longitude)
   }
 })
 </script>
@@ -141,7 +170,6 @@ watch(siteMarker, (newValue) => {
   <div class="flex flex-col gap-4">
     <form @submit="onSubmit" class="flex flex-col gap-4">
       <FormSelectField name="site_type" label="Site Type" :options="siteTypes?.results" />
-
       <Separator />
 
       <FormInputField name="english_name" label="English Name" />
@@ -149,19 +177,16 @@ watch(siteMarker, (newValue) => {
       <FormInputField name="khmer_name" label="Khmer Name" />
       <FormInputField name="alternative_name" label="Alternative Name(s)" />
       <FormInputField name="alternative_khmer_name" label="Alternative Khmer Name(s)" />
-
       <Separator />
 
       <FormInputField name="latitude" label="Latitude" />
       <FormInputField name="longitude" label="Longitude" />
       <FormTextareaField name="description" label="Description" />
-
       <Separator />
 
       <FormCheckboxField name="ik_id_starred" label="IK ID Starred" />
       <FormInputField name="inventaire_khmere_id" label="Inventaire Khmere (IK) ID" />
       <FormInputField name="monuments_hostoriques_id" label="Monuments Historiques (MH) ID" />
-
       <Button type="submit" class="my-4 w-full" :disabled="isSubmitting">Save</Button>
     </form>
   </div>

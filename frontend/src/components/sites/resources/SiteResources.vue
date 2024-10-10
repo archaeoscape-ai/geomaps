@@ -9,6 +9,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Pencil } from 'lucide-vue-next'
+import Separator from '@/components/ui/separator/Separator.vue'
 
 const siteResourceStore = useSiteResourceStore()
 const { siteResources, updatingResource } = storeToRefs(siteResourceStore)
@@ -19,18 +20,18 @@ function onEditResourceClick(resource) {
 </script>
 
 <template>
-  <div class="mt-4">
+  <div class="mt-4 pb-4">
     <h2 class="px-4 font-semibold">Linked Resources</h2>
-    <Accordion type="multiple" collapsible orientation="horizontal">
+    <Accordion type="multiple" collapsible orientation="horizontal" class="px-4 text-xs">
       <AccordionItem
         :value="resource.id.toString()"
         v-for="resource in siteResources.results"
         :key="resource.id"
-        class="mt-2 px-4 text-sm"
+        class="mt-2 rounded bg-white px-4 text-sm shadow-sm"
         orientation="horizontal"
       >
         <AccordionTrigger class="hover:no-underline">{{ resource.caption }}</AccordionTrigger>
-        <AccordionContent>
+        <AccordionContent class="text-xs">
           <div class="grid grid-cols-2 items-center gap-2 break-words py-1">
             <div class="font-semibold">
               Resource ID [<button
@@ -42,12 +43,13 @@ function onEditResourceClick(resource) {
             </div>
             <div>{{ resource.id }}</div>
           </div>
+          <Separator />
           <ResourceField label="Caption" :value="resource.caption" />
           <ResourceField label="Resource Type" :value="resource.resource_type" />
           <ResourceField label="Author" :value="resource.author" />
           <ResourceField label="Date" :value="resource.resource_date" />
           <ResourceField label="Added By" :value="resource.created_by" />
-          <ResourceField label="Notes" :value="resource.notes" />
+          <ResourceField label="Notes" :value="resource.notes" :showDivider="false" />
         </AccordionContent>
       </AccordionItem>
     </Accordion>

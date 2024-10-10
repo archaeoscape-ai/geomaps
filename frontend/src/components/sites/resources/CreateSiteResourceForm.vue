@@ -7,15 +7,18 @@ import { useToast } from '@/components/ui/toast'
 import { useSiteStore } from '@/stores/SiteStore'
 import { toTypedSchema } from '@vee-validate/zod'
 import { computed, onMounted, ref } from 'vue'
-import Separator from '@/components/ui/separator/Separator.vue'
 import { useSiteResourceStore } from '@/stores/SiteResourceStore'
 import FormInputField from '@/components/ui/input/FormInputField.vue'
 import FormTextareaField from '@/components/ui/textarea/FormTextareaField.vue'
 import FormSelectField from '@/components/ui/select/FormSelectField.vue'
 import DatePicker from '@/components/ui/date-picker/DatePicker.vue'
+import { LEFT_PANELS } from '@/helpers/constants'
+import { useLeftPanelStore } from '@/stores/LeftPanelStore'
+import { parseDate } from '@internationalized/date'
 
+const leftPanelStore = useLeftPanelStore()
 const siteStore = useSiteStore()
-const { selectedSite, isCreatingSite } = storeToRefs(siteStore)
+const { selectedSite } = storeToRefs(siteStore)
 
 const siteResourceStore = useSiteResourceStore()
 const { siteResourceTypes, isAddingResource, individuals, updatingResource } =
@@ -70,14 +73,17 @@ const onSubmit = form.handleSubmit(async (values) => {
       await siteResourceStore.createSiteResource(selectedSite.value.id, formData)
     }
     toast({ description: 'Site resource saved!' })
+    updatingResource.value = null
+    isAddingResource.value = false
+    leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
   } catch (error) {
     if (error.status === 400) {
       for (const [fieldName, errorMessage] of Object.entries(error.response.data)) {
         form.setFieldError(fieldName, errorMessage)
       }
-      return
+    } else {
+      toast({ description: 'Could not save site resource!', variant: 'destructive' })
     }
-    toast({ description: 'Could not save site resource!', variant: 'destructive' })
   } finally {
     isSubmitting.value = false
   }
@@ -106,6 +112,7 @@ const onSubmit = form.handleSubmit(async (values) => {
       <DatePicker
         name="resource_date"
         label="Resource Date"
+        :model-value="parseDate(form.values.resource_date)"
         @update:model-value="(v) => form.setFieldValue('resource_date', v.toString())"
       />
       <FormTextareaField name="notes" label="Notes" />

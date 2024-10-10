@@ -11,8 +11,12 @@ const props = defineProps({
 const open = ref(false)
 const { toast } = useToast()
 const siteStore = useSiteStore()
+const isLoading = ref(false)
 
 async function confirm() {
+  if (isLoading.value) return
+
+  isLoading.value = true
   try {
     await siteStore.deleteSite(props.siteId)
     toast({ description: 'Site deleted!' })
@@ -20,6 +24,7 @@ async function confirm() {
     toast({ description: 'Could not delete site!', variant: 'destructive' })
   } finally {
     open.value = false
+    isLoading.value = false
   }
 }
 
@@ -40,7 +45,7 @@ function tiggerDialog() {
     @cancel="cancelDeletion"
     @confirm="confirm"
     @tiggerDialog="tiggerDialog"
-    :isLoading="false"
+    :isLoading="isLoading"
   >
     <slot />
   </ConfirmationAlertDialog>
