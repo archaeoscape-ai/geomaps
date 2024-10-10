@@ -88,7 +88,7 @@ function searchLayer(evt) {
             <Switch
               v-model:checked="showSiteLayer"
               id="site-layer-switch"
-              :disabled="activeLeftPanel"
+              :disabled="!!activeLeftPanel"
             />
             <Label class="cursor-pointer font-semibold" for="site-layer-switch">Site Layer</Label>
           </div>
