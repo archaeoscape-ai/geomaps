@@ -23,6 +23,7 @@ const props = defineProps({
     type: String,
     default: 'secondary',
   },
+  btnClass: String,
 })
 
 const emit = defineEmits(['onBtnClick'])
@@ -37,6 +38,7 @@ const emit = defineEmits(['onBtnClick'])
           :disabled="disabled"
           @click="emit('onBtnClick')"
           :variant="buttonVariant"
+          :class="btnClass"
         >
           <slot />
         </Button>

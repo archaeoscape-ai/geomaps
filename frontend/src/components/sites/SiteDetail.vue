@@ -1,9 +1,22 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import { useSiteStore } from '@/stores/SiteStore'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
+import { Pencil } from 'lucide-vue-next'
+import { useMapStore } from '@/stores/MapStore'
+import { useNoteStore } from '@/stores/NoteStore'
+
+const mapStore = useMapStore()
+const { measuringDistance } = storeToRefs(mapStore)
+
+const noteStore = useNoteStore()
+const { isAddingNote } = storeToRefs(noteStore)
 
 const siteStore = useSiteStore()
 const { selectedSite } = storeToRefs(siteStore)
+
+const emit = defineEmits(['toggleSiteEdit'])
 
 const siteFields = [
   { label: 'Site Type', key: 'site_type_name' },
@@ -30,20 +43,34 @@ function getValue(site, key) {
 </script>
 
 <template>
-  <div class="mx-4 rounded bg-white py-4 text-xs shadow-sm">
-    <div v-for="(field, index) in siteFields" :key="field.key" class="px-4">
-      <div class="grid grid-cols-2 items-center gap-2 break-words py-2">
-        <div class="font-semibold">{{ field.label }}</div>
-        <div>
-          <template v-if="field.isBoolean">
-            {{ getValue(selectedSite, field.key) ? 'Yes' : 'No' }}
-          </template>
-          <template v-else>
-            {{ getValue(selectedSite, field.key) }}
-          </template>
+  <Card class="mx-4 text-xs">
+    <CardHeader class="flex flex-row items-center justify-between p-4">
+      <CardTitle class="text-sm font-bold">Summary</CardTitle>
+      <IconTooltipButton
+        tooltipText="Edit"
+        tooltipSide="bottom"
+        @onBtnClick="emit('toggleSiteEdit')"
+        :disabled="measuringDistance || isAddingNote"
+        btnClass="bg-white"
+      >
+        <Pencil size="20" />
+      </IconTooltipButton>
+    </CardHeader>
+    <CardContent class="flex flex-col px-4">
+      <div v-for="(field, index) in siteFields" :key="field.key">
+        <div class="grid grid-cols-2 items-center gap-2 break-words py-2">
+          <div class="font-semibold">{{ field.label }}</div>
+          <div>
+            <template v-if="field.isBoolean">
+              {{ getValue(selectedSite, field.key) ? 'Yes' : 'No' }}
+            </template>
+            <template v-else>
+              {{ getValue(selectedSite, field.key) }}
+            </template>
+          </div>
         </div>
+        <hr v-if="index !== siteFields.length - 1" />
       </div>
-      <hr v-if="index !== siteFields.length - 1" />
-    </div>
-  </div>
+    </CardContent>
+  </Card>
 </template>
