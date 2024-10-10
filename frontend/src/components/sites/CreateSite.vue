@@ -5,7 +5,7 @@ import CreateSiteForm from '@/components/sites/CreateSiteForm.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import LeftPanelWrapper from '@/components/panels/LeftPanelWrapper.vue'
 import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
-import { Ban } from 'lucide-vue-next'
+import { ArrowLeft } from 'lucide-vue-next'
 import { LEFT_PANELS } from '@/helpers/constants'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 
@@ -34,7 +34,7 @@ const cancelSiteCreation = () => {
   <LeftPanelWrapper header="Create Site">
     <template v-slot:header-actions v-if="isCreatingSite">
       <IconTooltipButton tooltipText="Cancel" tooltipSide="bottom" @onBtnClick="cancelSiteCreation">
-        <Ban size="20" />
+        <ArrowLeft size="20" />
       </IconTooltipButton>
     </template>
 

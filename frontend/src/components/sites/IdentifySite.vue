@@ -11,7 +11,7 @@ import SiteDetail from '@/components/sites/SiteDetail.vue'
 import SiteResources from '@/components/sites/resources/SiteResources.vue'
 import LeftPanelWrapper from '@/components/panels/LeftPanelWrapper.vue'
 import DeleteSiteDialog from './DeleteSiteDialog.vue'
-import { Ban, Pencil, Trash, FilePlus, ArrowLeft } from 'lucide-vue-next'
+import { Pencil, Trash, FilePlus, ArrowLeft } from 'lucide-vue-next'
 import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
 
 const mapStore = useMapStore()
@@ -44,11 +44,6 @@ function toggleSiteEdit() {
   }
 }
 
-function addResources() {
-  isEditingSite.value = false
-  isAddingResource.value = true
-}
-
 function cancelAddResource() {
   isAddingResource.value = false
   updatingResource.value = null
@@ -77,29 +72,12 @@ watch(
   <LeftPanelWrapper :header="heading">
     <template v-slot:header-actions v-if="selectedSite">
       <template v-if="!isAddingResource && !updatingResource">
-        <DeleteSiteDialog :site-id="selectedSite?.id">
+        <DeleteSiteDialog :site-id="selectedSite?.id" v-if="!isEditingSite">
           <IconTooltipButton tooltipText="Delete" tooltipSide="bottom">
             <Trash class="stroke-primary" size="20" />
           </IconTooltipButton>
         </DeleteSiteDialog>
 
-        <IconTooltipButton
-          tooltipText="Add resources"
-          tooltipSide="bottom"
-          @onBtnClick="addResources"
-        >
-          <FilePlus size="20" />
-        </IconTooltipButton>
-
-        <IconTooltipButton
-          tooltipText="Edit"
-          tooltipSide="bottom"
-          @onBtnClick="toggleSiteEdit"
-          :disabled="measuringDistance || isAddingNote"
-          v-if="!isEditingSite"
-        >
-          <Pencil size="20" />
-        </IconTooltipButton>
         <IconTooltipButton
           tooltipText="Cancel"
           tooltipSide="bottom"
@@ -107,7 +85,7 @@ watch(
           :disabled="measuringDistance || isAddingNote"
           v-if="isEditingSite"
         >
-          <Ban size="20" />
+          <ArrowLeft size="20" />
         </IconTooltipButton>
       </template>
       <template v-else>
@@ -127,8 +105,8 @@ watch(
       <CreateSiteResourceForm v-else-if="isAddingResource || updatingResource" class="px-4" />
 
       <template v-else>
-        <SiteDetail />
-        <SiteResources v-if="siteResources?.results.length > 0" />
+        <SiteDetail @toggleSiteEdit="toggleSiteEdit" />
+        <SiteResources />
       </template>
     </div>
 
