@@ -1,5 +1,4 @@
 <script setup>
-import { computed } from 'vue'
 import Button from '@/components/ui/button/Button.vue'
 import Switch from '@/components/ui/switch/Switch.vue'
 import Label from '@/components/ui/label/Label.vue'
@@ -18,10 +17,6 @@ const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText } =
 
 const rightPanelStore = useRightPanelStore()
 const { activePanel } = storeToRefs(rightPanelStore)
-
-const list = computed({
-  get: () => tempLayerConfig.value,
-})
 
 function searchLayer(evt) {
   searchText.value = evt.target.value
@@ -75,7 +70,7 @@ function searchLayer(evt) {
       </button>
     </div>
     <draggable
-      :list="list"
+      :list="tempLayerConfig"
       class="flex flex-grow flex-col overflow-auto pb-4"
       ghostClass="opacity-50"
       item-key="id"
