@@ -9,6 +9,10 @@ import LayerItem from './LayerItem.vue'
 import draggable from 'vuedraggable'
 import { storeToRefs } from 'pinia'
 
+const props = defineProps({
+  layer: { type: Object, required: true },
+})
+
 const parentExpanded = ref(false)
 const layerConfigStore = useMapLayerConfigStore()
 const { allLayersExpanded, searchText } = storeToRefs(layerConfigStore)
@@ -19,17 +23,8 @@ function handleParentExpansion() {
   parentExpanded.value = !parentExpanded.value
 }
 
-const props = defineProps({
-  layer: { type: Object, required: true },
-})
-
-const list = computed({
-  get: () => props.layer.items,
-  set: (value) => console.log(value),
-})
-
 watch(allLayersExpanded, (newValue) => {
-  if (newValue) {
+  if (newValue && props.layer.items.some((layer) => layer.isActive)) {
     parentExpanded.value = newValue
   }
 })
@@ -42,15 +37,11 @@ watch(allLayersExpanded, (newValue) => {
         <div class="flex items-center gap-2">
           <GripVertical class="drag-handle cursor-pointer stroke-button-icon" />
           <Switch
-            :id="props.layer.id"
+            :id="layer.id"
             :checked="isParentActive"
-            @update:checked="
-              (value) => layerConfigStore.setLayerItemsActiveState(props.layer, value)
-            "
+            @update:checked="(value) => layerConfigStore.setLayerItemsActiveState(layer, value)"
           />
-          <Label class="cursor-pointer font-semibold" :for="props.layer.id">{{
-            props.layer.title
-          }}</Label>
+          <Label class="cursor-pointer font-semibold" :for="layer.id">{{ layer.title }}</Label>
         </div>
 
         <ChevronDown
@@ -68,7 +59,7 @@ watch(allLayersExpanded, (newValue) => {
 
     <div class="ml-6" v-if="parentExpanded">
       <draggable
-        :list="list"
+        :list="layer.items"
         class="flex flex-col"
         ghostClass="opacity-50"
         item-key="id"
@@ -78,7 +69,7 @@ watch(allLayersExpanded, (newValue) => {
         <template #item="{ element }">
           <LayerItem
             :item="element"
-            :parentId="props.layer.id"
+            :parentId="layer.id"
             v-if="element.alias.toLowerCase().includes(searchText.toLowerCase())"
           />
         </template>

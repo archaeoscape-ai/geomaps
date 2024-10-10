@@ -12,9 +12,10 @@ import { X } from 'lucide-vue-next'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
 import Card from '../ui/card/Card.vue'
 import CardContent from '../ui/card/CardContent.vue'
+import Separator from '../ui/separator/Separator.vue'
 
 const layerConfigStore = useMapLayerConfigStore()
-const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText } =
+const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText, showSiteLayer } =
   storeToRefs(layerConfigStore)
 
 const rightPanelStore = useRightPanelStore()
@@ -71,24 +72,37 @@ function searchLayer(evt) {
         {{ allLayersExpanded ? 'Collapse All' : 'Expand All' }}
       </button>
     </div>
-    <div class="px-4">
-      <Card>
-        <CardContent class="p-2">
 
+    <div class="mx-4">
+      <Separator />
+    </div>
+
+    <div class="flex flex-grow flex-col overflow-auto pb-4">
+      <Card class="mx-4 mb-4">
+        <CardContent class="p-2">
+          <div class="flex items-center gap-2">
+            <Switch v-model:checked="showSiteLayer" id="site-layer-switch" />
+            <Label class="cursor-pointer font-semibold" for="site-layer-switch">Site Layer</Label>
+          </div>
         </CardContent>
       </Card>
+
+      <div class="mx-4">
+        <Separator />
+      </div>
+
+      <draggable
+        :list="tempLayerConfig"
+        class="flex flex-grow flex-col"
+        ghostClass="opacity-50"
+        item-key="id"
+        handle=".drag-handle"
+        :animation="250"
+      >
+        <template #item="{ element }">
+          <Layers :layer="element" class="mt-4" />
+        </template>
+      </draggable>
     </div>
-    <draggable
-      :list="tempLayerConfig"
-      class="flex flex-grow flex-col overflow-auto"
-      ghostClass="opacity-50"
-      item-key="id"
-      handle=".drag-handle"
-      :animation="250"
-    >
-      <template #item="{ element }">
-        <Layers :layer="element" class="mt-4" />
-      </template>
-    </draggable>
   </div>
 </template>

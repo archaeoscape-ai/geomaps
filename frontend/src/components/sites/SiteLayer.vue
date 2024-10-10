@@ -5,6 +5,7 @@ import { LEFT_PANELS } from '@/helpers/constants'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import SiteFeature from '@/components/sites/SiteFeature.vue'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
 const strokeColor = ref('rgba(255, 255, 255, 0.2)')
 const fillColor = ref('#3ca23c')
@@ -23,6 +24,9 @@ const {
   selectSiteInteractionRef,
   newSiteFeatureRef,
 } = storeToRefs(siteStore)
+
+const layerConfigStore = useMapLayerConfigStore()
+const { showSiteLayer } = storeToRefs(layerConfigStore)
 
 function onFeatureSelected(event) {
   const deselectedFeatures = event.deselected
@@ -50,7 +54,7 @@ function removeCondition() {
 </script>
 
 <template>
-  <ol-vector-layer zIndex="1000">
+  <ol-vector-layer zIndex="1000" v-if="showSiteLayer">
     <ol-source-vector ref="identifySiteSourceRef">
       <!-- list all sites -->
       <SiteFeature v-for="site in sites?.results" :site="site" :key="site.id" />

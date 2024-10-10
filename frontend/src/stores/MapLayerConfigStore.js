@@ -16,6 +16,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   const layerConfig = ref([])
   const tempLayerConfig = ref([])
   const isLoading = ref(false)
+  const showSiteLayer = ref(true)
 
   const currentLayers = computed(() => {
     if (!mapDetail.value) return []
@@ -208,6 +209,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
    * @param {boolean} value - The value to set for 'isActive' across all layers (true or false).
    */
   function setAllLayersActiveState(value) {
+    showSiteLayer.value = value
     tempLayerConfig.value.forEach((group) => setLayerItemsActiveState(group, value))
   }
 
@@ -286,6 +288,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   }
 
   return {
+    showSiteLayer,
     searchText,
     layerConfig,
     tempLayerConfig,
