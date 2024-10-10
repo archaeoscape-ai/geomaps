@@ -10,6 +10,8 @@ import { storeToRefs } from 'pinia'
 import draggable from 'vuedraggable'
 import { X } from 'lucide-vue-next'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
+import Card from '../ui/card/Card.vue'
+import CardContent from '../ui/card/CardContent.vue'
 
 const layerConfigStore = useMapLayerConfigStore()
 const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText } =
@@ -69,9 +71,16 @@ function searchLayer(evt) {
         {{ allLayersExpanded ? 'Collapse All' : 'Expand All' }}
       </button>
     </div>
+    <div class="px-4">
+      <Card>
+        <CardContent class="p-2">
+
+        </CardContent>
+      </Card>
+    </div>
     <draggable
       :list="tempLayerConfig"
-      class="flex flex-grow flex-col overflow-auto pb-4"
+      class="flex flex-grow flex-col overflow-auto"
       ghostClass="opacity-50"
       item-key="id"
       handle=".drag-handle"

@@ -43,10 +43,12 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
 
   const tempLayerConfigWithLayerDetail = computed(() => {
     if (!mapDetail.value) return {}
+    let zIndex = tempLayerConfig.value.reduce((prev, curr) => prev + curr.items.length, 1)
 
     return tempLayerConfig.value.map((group) => {
       const items = group.items.map((layer) => {
-        return { ...layer, layerDetail: mapDetailDict.value[group.id][layer.layerId] }
+        zIndex--
+        return { ...layer, zIndex: zIndex, layerDetail: mapDetailDict.value[group.id][layer.layerId] }
       })
       return { ...group, items }
     })

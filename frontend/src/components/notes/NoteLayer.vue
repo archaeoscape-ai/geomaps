@@ -53,7 +53,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <ol-vector-layer>
+  <ol-vector-layer zIndex="1000">
     <ol-source-vector ref="noteSourceRef">
       <ol-feature
         v-for="data in displayedNotes"

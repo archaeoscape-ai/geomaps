@@ -44,7 +44,7 @@ const selectInteactionFilter = (feature) => {
   return !isCreatingSite.value && !isEditingSite.value && feature.getProperties().type === 'site'
 }
 
-function removeCondition(event) {
+function removeCondition() {
   return isEditingSite.value
 }
 </script>
