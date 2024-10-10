@@ -13,10 +13,14 @@ import { useRightPanelStore } from '@/stores/RightPanelStore'
 import Card from '../ui/card/Card.vue'
 import CardContent from '../ui/card/CardContent.vue'
 import Separator from '../ui/separator/Separator.vue'
+import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 
 const layerConfigStore = useMapLayerConfigStore()
 const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText, showSiteLayer } =
   storeToRefs(layerConfigStore)
+
+const leftPanelStore = useLeftPanelStore()
+const { activePanel: activeLeftPanel } = storeToRefs(leftPanelStore)
 
 const rightPanelStore = useRightPanelStore()
 const { activePanel } = storeToRefs(rightPanelStore)
@@ -81,7 +85,11 @@ function searchLayer(evt) {
       <Card class="mx-4 mb-4">
         <CardContent class="p-2">
           <div class="flex items-center gap-2">
-            <Switch v-model:checked="showSiteLayer" id="site-layer-switch" />
+            <Switch
+              v-model:checked="showSiteLayer"
+              id="site-layer-switch"
+              :disabled="activeLeftPanel"
+            />
             <Label class="cursor-pointer font-semibold" for="site-layer-switch">Site Layer</Label>
           </div>
         </CardContent>
