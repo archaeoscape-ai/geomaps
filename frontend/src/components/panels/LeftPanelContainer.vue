@@ -30,7 +30,7 @@ function shouldDisable(id) {
 
 <template>
   <div
-    class="absolute z-10 h-full w-96 flex-col bg-[#F2F5F8] shadow-[0px_2px_8px_0px_#0000001F] transition-all"
+    class="absolute z-10 h-full w-full sm:w-96 flex-col bg-[#F2F5F8] shadow-[0px_2px_8px_0px_#0000001F] transition-all"
     :class="{
       'translate-x-0': activePanel !== null,
       '-translate-x-full': activePanel === null,

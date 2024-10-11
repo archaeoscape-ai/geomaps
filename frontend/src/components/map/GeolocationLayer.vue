@@ -4,7 +4,6 @@ import { fromLonLat } from 'ol/proj'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref, watch } from 'vue'
 import Button from '@/components/ui/button/Button.vue'
-import { Trash } from 'lucide-vue-next'
 
 const position = ref([])
 const positionFeature = ref(null)
@@ -16,7 +15,7 @@ const projection = ref('EPSG:4326')
 const vectorLayer = ref()
 const geolocationRef = ref()
 const selectInteractionRef = ref()
-const overlayRef = ref()
+const locationOverlayRef = ref()
 
 const mapStore = useMapStore()
 const { trackingLocation, mapRef } = storeToRefs(mapStore)
@@ -34,9 +33,9 @@ onMounted(() => {
 watch(trackingLocation, () => {
   geolocationRef.value.geoLoc.setTracking(trackingLocation.value)
   geolocationRef.value.geoLoc.changed()
-  if (!trackingLocation.value) {
-    overlayRef.value.setPosition(null)
-  } else if (position.value) {
+  if (!trackingLocation.value || !position.value || !position.value.length) {
+    locationOverlayRef.value.setPosition(null)
+  } else {
     mapRef.value.map.getView().setCenter(fromLonLat(position.value))
     mapRef.value.map.getView().setZoom(7)
   }
@@ -46,7 +45,7 @@ function featureSelected(event) {
   const deselectedFeatures = event.deselected
 
   if (deselectedFeatures.length > 0) {
-    overlayRef.value.setPosition(null)
+    locationOverlayRef.value.setPosition(null)
   }
 
   const features = event.selected
@@ -55,7 +54,7 @@ function featureSelected(event) {
     return
   }
 
-  overlayRef.value.setPosition(fromLonLat(position.value))
+  locationOverlayRef.value.setPosition(fromLonLat(position.value))
 }
 
 const selectInteactionFilter = (feature) => {
@@ -101,7 +100,7 @@ const selectInteactionFilter = (feature) => {
         </ol-style>
       </ol-interaction-select>
 
-      <ol-overlay :autoPan="true" ref="overlayRef" :stopEvent="true" :offset="[20, -18]">
+      <ol-overlay :autoPan="true" ref="locationOverlayRef" :stopEvent="true" :offset="[20, -18]">
         <div class="rounded bg-white shadow-[0px_0px_6px_4px_#0000001F]">
           <div class="flex flex-col gap-1 p-4 pb-1 text-sm">
             <p>

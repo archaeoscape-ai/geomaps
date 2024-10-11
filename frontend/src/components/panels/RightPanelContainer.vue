@@ -16,7 +16,7 @@ const componentMapping = {
 
 <template>
   <div
-    class="absolute right-0 z-10 flex h-full w-96 flex-col bg-[#F2F5F8] shadow-[0px_2px_8px_0px_#0000001F] transition-all"
+    class="absolute right-0 z-10 flex h-full w-full sm:w-96 flex-col bg-[#F2F5F8] shadow-[0px_2px_8px_0px_#0000001F] transition-all"
     :class="{
       'translate-x-0': activePanel !== null,
       'translate-x-full': activePanel === null,
