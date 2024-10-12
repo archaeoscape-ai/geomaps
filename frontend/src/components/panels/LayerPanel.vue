@@ -104,7 +104,7 @@ function searchLayer(evt) {
           <div class="flex items-center gap-2">
             <Switch
               v-model:checked="showNoteLayer"
-              id="site-layer-switch"
+              id="note-layer-switch"
             />
             <Label class="cursor-pointer font-semibold" for="site-layer-switch">Note Layer</Label>
           </div>
