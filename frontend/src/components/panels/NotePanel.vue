@@ -14,7 +14,7 @@ const mapStore = useMapStore()
 const { currentMap, measuringDistance } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
-const { notes, isAddingNote, page, pageSize } = storeToRefs(noteStore)
+const { notes, isDisplayingNoteCursor, page, pageSize } = storeToRefs(noteStore)
 const { resetNoteOverlay, getNotes, getNotesGeom } = noteStore
 
 const siteStore = useSiteStore()
@@ -24,10 +24,10 @@ const rightPanelStore = useRightPanelStore()
 const { activePanel } = storeToRefs(rightPanelStore)
 
 function handleCreateNote() {
-  if (isAddingNote.value) {
+  if (isDisplayingNoteCursor.value) {
     resetNoteOverlay()
   } else {
-    isAddingNote.value = true
+    isDisplayingNoteCursor.value = true
   }
 }
 
@@ -60,15 +60,15 @@ function handleFetchNotes({ currentPage, currentPageSize }) {
       <Button
         class="flex w-full items-center gap-1"
         @click="handleCreateNote"
-        :variant="isAddingNote ? 'outline' : 'default'"
+        :variant="isDisplayingNoteCursor ? 'outline' : 'default'"
         :disabled="isCreatingSite || isEditingSite || measuringDistance"
       >
-        <p>{{ isAddingNote ? 'Click on the map to create note' : 'Create Note' }}</p>
-        <X size="16" v-if="isAddingNote" />
+        <p>{{ isDisplayingNoteCursor ? 'Click on the map to create note' : 'Create Note' }}</p>
+        <X size="16" v-if="isDisplayingNoteCursor" />
         <Plus size="16" v-else />
       </Button>
     </div>
-    <div class="flex flex-grow flex-col gap-4 overflow-auto p-4">
+    <div class="flex flex-grow flex-col gap-4 overflow-auto p-4 pt-0 mt-4">
       <NoteCard :note="note" v-for="note in notes?.results" :key="note.id" />
     </div>
     <div class="flex justify-center p-3">

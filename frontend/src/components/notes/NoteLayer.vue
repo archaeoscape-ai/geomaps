@@ -1,13 +1,18 @@
 <script setup>
 import { useNoteStore } from '@/stores/NoteStore'
 import { storeToRefs } from 'pinia'
-import { onUnmounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import MapNoteOverlay from './MapNoteOverlay.vue'
 import { useSiteStore } from '@/stores/SiteStore'
+import { useRightPanelStore } from '@/stores/RightPanelStore'
+import { RIGHT_PANELS } from '@/helpers/constants'
 
 const strokeColor = ref('rgba(255, 255, 255, 0.4)')
 const fillColor = ref('#FFFFFF')
 const radius = ref(10)
+
+const rightPanelStore = useRightPanelStore()
+const { activePanel } = storeToRefs(rightPanelStore)
 
 const noteStore = useNoteStore()
 const {
@@ -16,7 +21,10 @@ const {
   selectNoteInteractionRef,
   noteSourceRef,
   noteOverlayRef,
-  isAddingNote,
+  isCreatingNote,
+  isEditingNote,
+  showNoteLayer,
+  isDisplayingNoteCursor,
 } = storeToRefs(noteStore)
 const { resetNoteOverlay } = noteStore
 
@@ -26,6 +34,7 @@ const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
 function featureSelected(event) {
   const deselectedFeatures = event.deselected
 
+  console.log('here')
   if (deselectedFeatures.length > 0) {
     resetNoteOverlay()
   }
@@ -53,13 +62,23 @@ const selectInteactionFilter = (feature) => {
   return !isCreatingSite.value && !isEditingSite.value && feature.getProperties().type === 'note'
 }
 
-onUnmounted(() => {
-  isAddingNote.value = false
-})
+// onUnmounted(() => {
+//   isDisplayingNoteCursor.value = false
+// })
 </script>
 
 <template>
-  <ol-vector-layer zIndex="1000">
+  <ol-vector-layer
+    zIndex="1000"
+    v-if="
+      activePanel === RIGHT_PANELS.NOTE ||
+      isCreatingNote ||
+      isEditingNote ||
+      isDisplayingNoteCursor ||
+      selectedNote ||
+      showNoteLayer
+    "
+  >
     <ol-source-vector ref="noteSourceRef">
       <ol-feature
         v-for="data in displayedNotes"

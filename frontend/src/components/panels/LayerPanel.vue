@@ -14,10 +14,14 @@ import Card from '../ui/card/Card.vue'
 import CardContent from '../ui/card/CardContent.vue'
 import Separator from '../ui/separator/Separator.vue'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
+import { useNoteStore } from '@/stores/NoteStore'
 
 const layerConfigStore = useMapLayerConfigStore()
 const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText, showSiteLayer } =
   storeToRefs(layerConfigStore)
+
+const noteStore = useNoteStore()
+const { showNoteLayer } = storeToRefs(noteStore)
 
 const leftPanelStore = useLeftPanelStore()
 const { activePanel: activeLeftPanel } = storeToRefs(leftPanelStore)
@@ -91,6 +95,18 @@ function searchLayer(evt) {
               :disabled="!!activeLeftPanel"
             />
             <Label class="cursor-pointer font-semibold" for="site-layer-switch">Site Layer</Label>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card class="mx-4 mb-4">
+        <CardContent class="p-2">
+          <div class="flex items-center gap-2">
+            <Switch
+              v-model:checked="showNoteLayer"
+              id="site-layer-switch"
+            />
+            <Label class="cursor-pointer font-semibold" for="site-layer-switch">Note Layer</Label>
           </div>
         </CardContent>
       </Card>

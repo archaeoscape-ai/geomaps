@@ -27,7 +27,7 @@ function handleEditNote() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-2" v-if="selectedNoteDetail">
+  <div class="flex flex-col gap-2 max-w-[300px]" v-if="selectedNoteDetail">
     <h3 class="line-clamp-1 text-sm font-semibold">{{ selectedNoteDetail?.title }}</h3>
     <p class="line-clamp-3 text-sm">{{ selectedNoteDetail?.body }}</p>
     <div class="flex items-center justify-between">

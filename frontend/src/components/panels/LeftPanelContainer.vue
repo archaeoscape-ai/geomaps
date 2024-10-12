@@ -15,7 +15,7 @@ const mapStore = useMapStore()
 const { measuringDistance } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
-const { isAddingNote } = storeToRefs(noteStore)
+const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 
 const componentMapping = {
   [LEFT_PANELS.CREATE]: CreateSite,
@@ -24,7 +24,7 @@ const componentMapping = {
 }
 
 function shouldDisable(id) {
-  return id === LEFT_PANELS.CREATE && (isAddingNote.value || measuringDistance.value)
+  return id === LEFT_PANELS.CREATE && (isDisplayingNoteCursor.value || measuringDistance.value)
 }
 </script>
 
