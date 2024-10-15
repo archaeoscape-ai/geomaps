@@ -73,6 +73,9 @@ function addResources() {
           <Separator />
           <ResourceField label="Caption" :value="resource.caption" />
           <ResourceField label="Resource Type" :value="resource.resource_type" />
+          <ResourceField label="Resource File">
+            <a :href="resource.resource_file" target="_blank" class="text-blue-500 underline font-semibold">File</a>
+          </ResourceField>
           <ResourceField label="Author" :value="resource.author" />
           <ResourceField label="Date" :value="resource.resource_date" />
           <ResourceField label="Added By" :value="resource.created_by" />
