@@ -7,7 +7,7 @@ import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import SiteFeature from '@/components/sites/SiteFeature.vue'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
-const strokeColor = ref('black')
+const strokeColor = ref('#fafafa')
 const fillColor = ref('#16a34a')
 const fillColorSelected = ref('#166534')
 
@@ -87,7 +87,7 @@ function removeCondition() {
         :removeCondition="removeCondition"
       >
         <ol-style zIndex="1">
-          <ol-style-circle :radius="8">
+          <ol-style-circle :radius="12">
             <ol-style-stroke
               :strokeWidth="1"
               :color="strokeColor"

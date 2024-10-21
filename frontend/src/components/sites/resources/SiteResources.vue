@@ -30,7 +30,7 @@ function addResources() {
 </script>
 
 <template>
-  <div class="rounded-lg m-4 bg-white p-4 pb-4">
+  <div class="rounded-lg mx-4 bg-white p-4 pb-4">
     <div class="flex items-center justify-between">
       <h3 class="text-sm font-semibold">Linked Resources</h3>
       <IconTooltipButton

@@ -41,7 +41,7 @@ function shouldDisable(id) {
         <button
           v-for="tab in tabs"
           :key="tab.id"
-          class="flex h-8 flex-grow items-center justify-center text-center text-sm font-bold text-primary-foreground"
+          class="flex h-8 flex-grow items-center justify-center text-center text-sm font-bold text-primary-foreground basis-0"
           @click="leftPanelStore.setTab(tab.id)"
           :class="{
             'bg-primary-darker': activePanel?.id === tab.id,

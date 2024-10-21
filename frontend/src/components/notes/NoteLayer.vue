@@ -89,7 +89,7 @@ const selectInteactionFilter = (feature) => {
         <ol-style>
           <ol-style-circle :radius="radius">
             <ol-style-fill :color="fillColor"></ol-style-fill>
-            <ol-style-stroke :color="strokeColor" :width="10"></ol-style-stroke>
+            <ol-style-stroke :color="strokeColor" :width="8"></ol-style-stroke>
           </ol-style-circle>
         </ol-style>
       </ol-feature>
@@ -102,9 +102,9 @@ const selectInteactionFilter = (feature) => {
     :filter="selectInteactionFilter"
   >
     <ol-style>
-      <ol-style-circle :radius="16">
+      <ol-style-circle :radius="12">
         <ol-style-fill :color="fillColor"></ol-style-fill>
-        <ol-style-stroke :color="strokeColor" :width="16"></ol-style-stroke>
+        <ol-style-stroke :color="strokeColor" :width="12"></ol-style-stroke>
       </ol-style-circle>
     </ol-style>
   </ol-interaction-select>
