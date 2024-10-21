@@ -20,7 +20,7 @@ const mapStore = useMapStore()
 const { trackingLocation, measuringDistance } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
-const { isAddingNote } = storeToRefs(noteStore)
+const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 
 const siteStore = useSiteStore()
 const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
@@ -85,7 +85,7 @@ function handleMeasureDistance() {
               :class="{
                 'bg-primary-darker': measuringDistance,
               }"
-              :disabled="isAddingNote || isCreatingSite || isEditingSite"
+              :disabled="isDisplayingNoteCursor || isCreatingSite || isEditingSite"
             >
               <RulerIcon />
             </Button>

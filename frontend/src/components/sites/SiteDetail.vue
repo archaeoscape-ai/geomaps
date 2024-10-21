@@ -11,7 +11,7 @@ const mapStore = useMapStore()
 const { measuringDistance } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
-const { isAddingNote } = storeToRefs(noteStore)
+const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 
 const siteStore = useSiteStore()
 const { selectedSite } = storeToRefs(siteStore)
@@ -50,7 +50,7 @@ function getValue(site, key) {
         tooltipText="Edit"
         tooltipSide="bottom"
         @onBtnClick="emit('toggleSiteEdit')"
-        :disabled="measuringDistance || isAddingNote"
+        :disabled="measuringDistance || isDisplayingNoteCursor"
         btnClass="bg-white"
       >
         <Pencil size="20" />

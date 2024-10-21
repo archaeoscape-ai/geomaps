@@ -1,4 +1,4 @@
-import { fetchAllMaps, fetchMapById } from '@/api-services/MapService'
+import { fetchAllMaps } from '@/api-services/MapService'
 import { BASEMAPS } from '@/helpers/constants'
 import { fromLonLat } from 'ol/proj'
 import { defineStore } from 'pinia'

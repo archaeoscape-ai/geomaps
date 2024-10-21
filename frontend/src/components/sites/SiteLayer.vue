@@ -7,8 +7,9 @@ import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import SiteFeature from '@/components/sites/SiteFeature.vue'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
-const strokeColor = ref('rgba(255, 255, 255, 0.2)')
-const fillColor = ref('#3ca23c')
+const strokeColor = ref('#fafafa')
+const fillColor = ref('#16a34a')
+const fillColorSelected = ref('#166534')
 
 const leftPanelStore = useLeftPanelStore()
 const { setTab } = leftPanelStore
@@ -59,15 +60,22 @@ function removeCondition() {
   <ol-vector-layer zIndex="1000" v-if="showSiteLayer" name="siteVectorLayer">
     <ol-source-vector>
       <!-- list all sites -->
-      <SiteFeature v-for="site in sites?.results" :site="site" :key="site.id" />
+      <SiteFeature
+        v-for="site in sites?.results"
+        :site="site"
+        :key="site.id"
+        :fillColor="fillColor"
+        :strokeColor="strokeColor"
+        :radius="8"
+      />
 
       <!-- for create -->
       <ol-feature v-if="siteMarker && isCreatingSite" ref="newSiteFeatureRef">
         <ol-geom-point :coordinates="siteMarker" />
         <ol-style zIndex="1">
-          <ol-style-circle :radius="16">
+          <ol-style-circle :radius="8">
+            <ol-style-stroke :strokeWidth="1" color="strokeColor"></ol-style-stroke>
             <ol-style-fill :color="fillColor"></ol-style-fill>
-            <ol-style-stroke :color="strokeColor" :width="16"></ol-style-stroke>
           </ol-style-circle>
         </ol-style>
       </ol-feature>
@@ -79,9 +87,12 @@ function removeCondition() {
         :removeCondition="removeCondition"
       >
         <ol-style zIndex="1">
-          <ol-style-circle :radius="16">
-            <ol-style-fill :color="fillColor"></ol-style-fill>
-            <ol-style-stroke :color="strokeColor" :width="16"></ol-style-stroke>
+          <ol-style-circle :radius="12">
+            <ol-style-stroke
+              :strokeWidth="1"
+              :color="strokeColor"
+            ></ol-style-stroke>
+            <ol-style-fill :color="fillColorSelected"></ol-style-fill>
           </ol-style-circle>
         </ol-style>
       </ol-interaction-select>

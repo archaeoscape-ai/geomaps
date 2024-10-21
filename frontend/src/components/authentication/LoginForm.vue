@@ -58,6 +58,6 @@ const onSubmit = form.handleSubmit(async (values) => {
     <FormInputField name="email" label="Email Address" type="email" />
     <FormInputField name="password" label="Password" type="password" />
 
-    <Button type="submit" class="mt-4 w-full" :disabled="isLoggingIn"> Login </Button>
+    <Button type="submit" class="mt-4 w-full" :disabled="isLoggingIn">Login</Button>
   </form>
 </template>

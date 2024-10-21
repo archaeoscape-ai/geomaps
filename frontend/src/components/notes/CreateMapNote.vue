@@ -20,8 +20,14 @@ const { currentMap } = storeToRefs(mapStore)
 
 const formSchema = toTypedSchema(
   z.object({
-    title: z.string().min(1, { message: 'This field has to be filled.' }),
-    body: z.string().min(1, { message: 'This field has to be filled.' }),
+    title: z
+      .string()
+      .min(1, { message: 'This field has to be filled.' })
+      .max(128, { message: 'Must be 128 or fewer characters' }),
+    body: z
+      .string()
+      .min(1, { message: 'This field has to be filled.' })
+      .max(255, { message: 'Must be 255 or fewer characters' }),
   }),
 )
 
@@ -39,10 +45,14 @@ const onSubmit = form.handleSubmit(async (values) => {
     geom: selectedNote.value.geom,
   }
 
-  if (isCreatingNote.value) {
-    await addNote(currentMap.value.id, data)
-  } else {
-    await updateNote(currentMap.value.id, selectedNote.value.id, data)
+  try {
+    if (isCreatingNote.value) {
+      await addNote(currentMap.value.id, data)
+    } else {
+      await updateNote(currentMap.value.id, selectedNote.value.id, data)
+    }
+  } catch (error) {
+    form.setErrors(error.response.data)
   }
 })
 

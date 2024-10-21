@@ -15,7 +15,8 @@ const props = defineProps({
   <div>
     <div class="grid grid-cols-2 items-center gap-2 break-words py-2">
       <div class="font-semibold">{{ label }}</div>
-      <div>{{ value }}</div>
+      <div v-if="value">{{ value }}</div>
+      <slot></slot>
     </div>
 
     <Separator v-if="showDivider" />

@@ -5,8 +5,7 @@ import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import NoteLayer from '@/components/notes/NoteLayer.vue'
 import { useNoteStore } from '@/stores/NoteStore'
-import { BASEMAP_URLS, LAYER_TYPE, RIGHT_PANELS } from '@/helpers/constants'
-import { useRightPanelStore } from '@/stores/RightPanelStore'
+import { BASEMAP_URLS, LAYER_TYPE } from '@/helpers/constants'
 import SiteLayer from '@/components/sites/SiteLayer.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import MeasureLayer from './MeasureLayer.vue'
@@ -25,14 +24,12 @@ const { tempLayerConfigWithLayerDetail } = storeToRefs(mapLayerConfigStore)
 
 const noteStore = useNoteStore()
 const { addNewNoteMarker } = noteStore
-const { isAddingNote } = storeToRefs(noteStore)
+const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 
 const siteStore = useSiteStore()
 const { setSiteMarker } = siteStore
 const { isCreatingSite, isEditingSite, selectedSiteFeature } = storeToRefs(siteStore)
 
-const rightPanelStore = useRightPanelStore()
-const { activePanel } = storeToRefs(rightPanelStore)
 
 const projection = ref('EPSG:3857')
 const rotation = ref(0)
@@ -40,9 +37,9 @@ const format = inject('ol-format')
 const mvtFormat = new format.MVT()
 
 function handleClickMap(event) {
-  if (isAddingNote.value) {
+  if (isDisplayingNoteCursor.value) {
     addNewNoteMarker(event.coordinate)
-    isAddingNote.value = false
+    isDisplayingNoteCursor.value = false
     return
   }
 
@@ -73,7 +70,7 @@ watch(currentMap, (newValue) => {
   <div
     class="absolute inset-0"
     :class="{
-      'hover:cursor-crosshair': isAddingNote || isCreatingSite || isEditingSite,
+      'hover:cursor-crosshair': isDisplayingNoteCursor || isCreatingSite || isEditingSite,
     }"
   >
     <ol-map class="h-full" :controls="[]" ref="mapRef" @click="handleClickMap">
@@ -91,7 +88,7 @@ watch(currentMap, (newValue) => {
 
       <GeolocationLayer />
       <MeasureLayer />
-      <NoteLayer v-if="activePanel === RIGHT_PANELS.NOTE" />
+      <NoteLayer />
       <SiteLayer />
       <MapControls :is-panel-active="isPanelActive" :map="mapRef" />
 

@@ -56,7 +56,7 @@ watchDebounced(
       <hr class="my-3" />
     </div>
 
-    <div class="flex flex-grow flex-col gap-4 overflow-auto px-4 pb-4">
+    <div class="flex flex-grow flex-col gap-4 overflow-auto pl-4 pr-2.5 pb-4">
       <SiteCard :site="site" v-for="site in sites?.results" :key="site.id" />
     </div>
 

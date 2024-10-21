@@ -18,7 +18,7 @@ const mapStore = useMapStore()
 const { measuringDistance } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
-const { isAddingNote } = storeToRefs(noteStore)
+const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 
 const siteStore = useSiteStore()
 const { selectedSite, isEditingSite } = storeToRefs(siteStore)
@@ -82,7 +82,7 @@ watch(
           tooltipText="Cancel"
           tooltipSide="bottom"
           @onBtnClick="toggleSiteEdit"
-          :disabled="measuringDistance || isAddingNote"
+          :disabled="measuringDistance || isDisplayingNoteCursor"
           v-if="isEditingSite"
         >
           <ArrowLeft size="20" />

@@ -30,7 +30,7 @@ function addResources() {
 </script>
 
 <template>
-  <div class="rounded-lg m-4 bg-white p-4 pb-4">
+  <div class="rounded-lg mx-4 bg-white p-4 pb-4">
     <div class="flex items-center justify-between">
       <h3 class="text-sm font-semibold">Linked Resources</h3>
       <IconTooltipButton
@@ -73,6 +73,9 @@ function addResources() {
           <Separator />
           <ResourceField label="Caption" :value="resource.caption" />
           <ResourceField label="Resource Type" :value="resource.resource_type" />
+          <ResourceField label="Resource File">
+            <a :href="resource.resource_file" target="_blank" class="text-blue-500 underline font-semibold">File</a>
+          </ResourceField>
           <ResourceField label="Author" :value="resource.author" />
           <ResourceField label="Date" :value="resource.resource_date" />
           <ResourceField label="Added By" :value="resource.created_by" />

@@ -44,7 +44,7 @@ export const useNoteStore = defineStore('note', () => {
    * Check if user is in process of adding a new note by
    * clicking the Add New Note button
    */
-  const isAddingNote = ref(false)
+  const isDisplayingNoteCursor = ref(false)
 
   /**
    * Check if user is editing the note using Edit modal
@@ -57,6 +57,8 @@ export const useNoteStore = defineStore('note', () => {
   const isCreatingNote = computed(() => {
     return selectedNote.value?.id === 'new-note'
   })
+
+  const showNoteLayer = ref(false)
 
   /**
    * Note markers displaying on the map
@@ -127,12 +129,13 @@ export const useNoteStore = defineStore('note', () => {
         coordinates,
       },
     }
+    console.log(selectedNote.value)
   }
 
   function resetNoteOverlay() {
     selectedNote.value = null
     selectedNoteDetail.value = null
-    isAddingNote.value = false
+    isDisplayingNoteCursor.value = false
     isEditingNote.value = false
   }
 
@@ -177,7 +180,7 @@ export const useNoteStore = defineStore('note', () => {
     selectNoteInteractionRef.value = null
     noteSourceRef.value = null
     noteOverlayRef.value = null
-    isAddingNote.value = false
+    isDisplayingNoteCursor.value = false
     isEditingNote.value = false
   }
 
@@ -186,13 +189,14 @@ export const useNoteStore = defineStore('note', () => {
     notes,
     selectedNote,
     selectedNoteDetail,
-    isAddingNote,
+    isDisplayingNoteCursor,
     isEditingNote,
     isCreatingNote,
     displayedNotes,
     isLoading,
     page,
     pageSize,
+    showNoteLayer,
 
     // layer refs
     selectNoteInteractionRef,

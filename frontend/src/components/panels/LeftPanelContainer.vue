@@ -15,7 +15,7 @@ const mapStore = useMapStore()
 const { measuringDistance } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
-const { isAddingNote } = storeToRefs(noteStore)
+const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 
 const componentMapping = {
   [LEFT_PANELS.CREATE]: CreateSite,
@@ -24,7 +24,7 @@ const componentMapping = {
 }
 
 function shouldDisable(id) {
-  return id === LEFT_PANELS.CREATE && (isAddingNote.value || measuringDistance.value)
+  return id === LEFT_PANELS.CREATE && (isDisplayingNoteCursor.value || measuringDistance.value)
 }
 </script>
 
@@ -41,7 +41,7 @@ function shouldDisable(id) {
         <button
           v-for="tab in tabs"
           :key="tab.id"
-          class="flex h-8 flex-grow items-center justify-center text-center text-sm font-bold text-primary-foreground"
+          class="flex h-8 flex-grow items-center justify-center text-center text-sm font-bold text-primary-foreground basis-0"
           @click="leftPanelStore.setTab(tab.id)"
           :class="{
             'bg-primary-darker': activePanel?.id === tab.id,
