@@ -141,6 +141,9 @@ class MapSiteListView(generics.ListCreateAPIView):
     filterset_fields = (
         "created_by",
         "ik_id_starred",
+        "english_name",
+        "french_name",
+        "khmer_name",
     )
     search_fields = ("english_name", "french_name", "khmer_name")
     ordering_fields = ("english_name",)
