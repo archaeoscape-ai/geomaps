@@ -2,7 +2,7 @@
 import { storeToRefs } from 'pinia'
 import { watchDebounced } from '@vueuse/core'
 import Button from '@/components/ui/button/Button.vue'
-import { Filter, Search, SlidersHorizontal } from 'lucide-vue-next'
+import { Search, SlidersHorizontal } from 'lucide-vue-next'
 import Input from '@/components/ui/input/Input.vue'
 import SiteCard from '@/components/sites/SiteCard.vue'
 import { useSiteStore } from '@/stores/SiteStore'
@@ -11,21 +11,43 @@ import { useMapStore } from '@/stores/MapStore'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
 import FormInputField from '@/components/ui/input/FormInputField.vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { useForm } from 'vee-validate'
+import { computed, watch } from 'vue'
+
+const mapStore = useMapStore()
+const { currentMap } = storeToRefs(mapStore)
+
+const siteStore = useSiteStore()
+const { getSites } = siteStore
+const { sites, page, pageSize, searchText, siteFilters } = storeToRefs(siteStore)
+
+const hasFilters = computed(() => {
+  const res =  Object.values(siteFilters.value).some(field => field)
+  return res
+})
+
+function fetchSites({ currentPage, currentPageSize }) {
+  page.value = currentPage - 1
+  pageSize.value = currentPageSize
+  siteStore.getSites(currentMap.value?.id)
+}
+
+watchDebounced(
+  searchText,
+  () => {
+    getSites(currentMap.value?.id)
+  },
+  { debounce: 500, maxWait: 2000 },
+)
 
 const formSchema = toTypedSchema(
   z.object({
-    english_name: z.string().min(1, { message: 'This field has to be filled' }),
+    english_name: z.string().optional(),
     french_name: z.string().optional(),
     khmer_name: z.string().optional(),
     // latitude: z.coerce.number().gte(-90).lte(90, { message: 'Invalid Latitude' }),
@@ -40,33 +62,24 @@ const formSchema = toTypedSchema(
   }),
 )
 
-const form = useForm({
+const { resetForm, isSubmitting, handleSubmit } = useForm({
   validationSchema: formSchema,
 })
 
-const mapStore = useMapStore()
-const { currentMap } = storeToRefs(mapStore)
+const applyFilters = handleSubmit(async (values) => {
+  getSites(currentMap.value?.id)
+})
 
-const siteStore = useSiteStore()
-const { sites, page, pageSize, searchText } = storeToRefs(siteStore)
-
-function fetchSites({ currentPage, currentPageSize }) {
-  page.value = currentPage - 1
-  pageSize.value = currentPageSize
-  siteStore.getSites(currentMap.value?.id)
+async function clearFilters() {
+  resetForm({
+    values: {
+      english_name: '',
+      french_name: '',
+      khmer_name: '',
+    },
+  })
+  applyFilters()
 }
-
-watchDebounced(
-  searchText,
-  (newValue) => {
-    siteStore.getSites(currentMap.value?.id)
-  },
-  { debounce: 500, maxWait: 2000 },
-)
-
-const applyFilters = form.handleSubmit(async (values) => {
-  console.log(values)
-}) 
 </script>
 
 <template>
@@ -75,17 +88,40 @@ const applyFilters = form.handleSubmit(async (values) => {
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <Button size="icon" variant="secondary" class="rounded-full">
-            <SlidersHorizontal class="stroke-button-icon" />
+            <SlidersHorizontal color="#AB1C28" v-show="hasFilters"/>
+            <SlidersHorizontal class="stroke-button-icon" v-show="!hasFilters"/>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent class="w-96 text-sm pb-4">
-          <form class="flex flex-col gap-4" @submit="applyFilters">
-            <div class="max-h-96 overflow-auto p-4 h-full flex flex-col gap-4">
-              <FormInputField name="english_name" label="English Name" />
-              <FormInputField name="french_name" label="French Name" />
-              <FormInputField name="khmer_name" label="Khmer Name" />
+        <DropdownMenuContent class="w-96 pb-4 text-sm">
+          <form class="flex flex-col" @submit="applyFilters">
+            <div class="flex h-full max-h-96 flex-col gap-4 overflow-auto p-4">
+              <FormInputField
+                name="english_name"
+                label="English Name"
+                v-model="siteFilters.english_name"
+              />
+              <FormInputField
+                name="french_name"
+                label="French Name"
+                v-model="siteFilters.french_name"
+              />
+              <FormInputField
+                name="khmer_name"
+                label="Khmer Name"
+                v-model="siteFilters.khmer_name"
+              />
             </div>
-            <Button type="submit" class="self-end mr-4">Filter</Button>
+            <div class="flex items-center self-end">
+              <Button
+                class="mr-4"
+                variant="secondary"
+                @click.prevent="clearFilters"
+                :disable="isSubmitting"
+              >
+                Clear Filter
+              </Button>
+              <Button type="submit" class="mr-4 self-end" :disable="isSubmitting"> Search </Button>
+            </div>
           </form>
         </DropdownMenuContent>
       </DropdownMenu>
