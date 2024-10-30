@@ -17,7 +17,9 @@ import FormInputField from '@/components/ui/input/FormInputField.vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { useForm } from 'vee-validate'
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+
+const filterPanelOpen = ref(false)
 
 const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
@@ -27,7 +29,7 @@ const { getSites } = siteStore
 const { sites, page, pageSize, searchText, siteFilters } = storeToRefs(siteStore)
 
 const hasFilters = computed(() => {
-  const res =  Object.values(siteFilters.value).some(field => field)
+  const res = Object.values(siteFilters.value).some((field) => field)
   return res
 })
 
@@ -40,6 +42,7 @@ function fetchSites({ currentPage, currentPageSize }) {
 watchDebounced(
   searchText,
   () => {
+    filterPanelOpen.value = false
     getSites(currentMap.value?.id)
   },
   { debounce: 500, maxWait: 2000 },
@@ -67,6 +70,7 @@ const { resetForm, isSubmitting, handleSubmit } = useForm({
 })
 
 const applyFilters = handleSubmit(async (values) => {
+  filterPanelOpen.value = false
   getSites(currentMap.value?.id)
 })
 
@@ -85,11 +89,11 @@ async function clearFilters() {
 <template>
   <LeftPanelWrapper header="Sites">
     <template v-slot:header-actions>
-      <DropdownMenu>
+      <DropdownMenu v-model:open="filterPanelOpen">
         <DropdownMenuTrigger as-child>
           <Button size="icon" variant="secondary" class="rounded-full">
-            <SlidersHorizontal color="#AB1C28" v-show="hasFilters"/>
-            <SlidersHorizontal class="stroke-button-icon" v-show="!hasFilters"/>
+            <SlidersHorizontal color="#AB1C28" v-show="hasFilters" />
+            <SlidersHorizontal class="stroke-button-icon" v-show="!hasFilters" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent class="w-96 pb-4 text-sm">
