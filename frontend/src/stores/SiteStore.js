@@ -25,6 +25,11 @@ export const useSiteStore = defineStore('site', () => {
   const pageSize = ref(-1)
   const searchText = ref('')
   const siteMarker = ref(null)
+  const siteFilters = ref({
+    'english_name': '',
+    'french_name': '',
+    'khmer_name': ''
+  })
 
   const siteTypes = ref(null)
 
@@ -61,6 +66,7 @@ export const useSiteStore = defineStore('site', () => {
         limit: pageSize.value,
         offset: page.value,
         search: searchText.value,
+        ...siteFilters.value
       }
       const data = await siteService.getMapSites(mapId, params)
       sites.value = data
@@ -133,6 +139,7 @@ export const useSiteStore = defineStore('site', () => {
     page,
     pageSize,
     searchText,
+    siteFilters,
     selectedSiteFeature,
     selectedSite,
     siteTypes,
