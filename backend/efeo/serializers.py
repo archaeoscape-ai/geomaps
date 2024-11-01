@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from efeo.models import (
     FieldSeason,
+    Individuals,
     Map,
     MapConfig,
     MapNote,
@@ -82,6 +83,12 @@ class SiteTypeSerializer(serializers.ModelSerializer):
         fields = ("id", "name")
 
 
+class IndividualsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Individuals
+        fields = ("id", "name")
+
+
 class SiteSerializer(serializers.ModelSerializer):
 
     site_type_name = serializers.ReadOnlyField(source="site_type.name")
@@ -106,6 +113,12 @@ class SiteSerializer(serializers.ModelSerializer):
             "updated_on",
         )
         read_only_fields = ("map", "created_by", "created_on", "updated_on")
+
+
+class SiteGeomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Site
+        fields = ("id", "location")
 
 
 class WorksiteTypeSerializer(serializers.ModelSerializer):
@@ -206,7 +219,7 @@ class WorksiteResourceSerializer(serializers.ModelSerializer):
         model = WorksiteResource
         fields = (
             "id",
-            "site",
+            "worksite",
             "resource_type",
             "caption",
             "resource_date",
@@ -218,4 +231,4 @@ class WorksiteResourceSerializer(serializers.ModelSerializer):
             "created_by",
             "created_on",
         )
-        read_only_fields = ("site", "created_by", "created_on")
+        read_only_fields = ("worksite", "created_by", "created_on")

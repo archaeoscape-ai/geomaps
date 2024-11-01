@@ -5,9 +5,10 @@ from rest_framework import filters, generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from efeo.filters import CaseInsensitiveOrderingFilter
+from efeo.filters import CaseInsensitiveOrderingFilter, SiteFilter
 from efeo.models import (
     FieldSeason,
+    Individuals,
     Map,
     MapConfig,
     MapNote,
@@ -28,11 +29,13 @@ from efeo.permissions import (
 )
 from efeo.serializers import (
     FieldSeasonSerializer,
+    IndividualsSerializer,
     MapConfigSerializer,
     MapDetailSerializer,
     MapNoteGeomSerializer,
     MapNoteSerializer,
     MapSerializer,
+    SiteGeomSerializer,
     SiteResourceSerializer,
     SiteResourceTypeSerializer,
     SiteSerializer,
@@ -106,6 +109,7 @@ class MapConfigView(APIView):
 class SiteTypeListView(generics.ListAPIView):
     serializer_class = SiteTypeSerializer
     queryset = SiteType.objects.all()
+    pagination_class = CustomLimitOffsetPagination
 
 
 class WorksiteTypeListView(generics.ListAPIView):
@@ -116,6 +120,13 @@ class WorksiteTypeListView(generics.ListAPIView):
 class SiteResourceTypeListView(generics.ListAPIView):
     serializer_class = SiteResourceTypeSerializer
     queryset = SiteResourceType.objects.all()
+    pagination_class = CustomLimitOffsetPagination
+
+
+class IndividualsListView(generics.ListAPIView):
+    serializer_class = IndividualsSerializer
+    queryset = Individuals.objects.all()
+    pagination_class = CustomLimitOffsetPagination
 
 
 class MapSiteListView(generics.ListCreateAPIView):
@@ -128,10 +139,7 @@ class MapSiteListView(generics.ListCreateAPIView):
         filters.SearchFilter,
         DjangoFilterBackend,
     )
-    filterset_fields = (
-        "created_by",
-        "ik_id_starred",
-    )
+    filterset_class = SiteFilter
     search_fields = ("english_name", "french_name", "khmer_name")
     ordering_fields = ("english_name",)
     ordering = ("english_name",)
@@ -143,6 +151,11 @@ class MapSiteListView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         map = get_object_or_404(Map, pk=self.kwargs["pk"])
         serializer.save(map=map, created_by=self.request.user)
+
+
+class MapSiteListGeom(MapSiteListView):
+    pagination_class = None
+    serializer_class = SiteGeomSerializer
 
 
 class SiteDetailView(generics.RetrieveUpdateDestroyAPIView):
