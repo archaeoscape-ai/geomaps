@@ -115,6 +115,12 @@ class SiteSerializer(serializers.ModelSerializer):
         read_only_fields = ("map", "created_by", "created_on", "updated_on")
 
 
+class SiteGeomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Site
+        fields = ("id", "location")
+
+
 class WorksiteTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorksiteType
