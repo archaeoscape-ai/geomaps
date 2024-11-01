@@ -32,6 +32,11 @@ urlpatterns = [
         name="map-sites",
     ),
     path(
+        "maps/<int:pk>/sites/geom/",
+        views.MapSiteListGeom.as_view(),
+        name="map-sites-geom",
+    ),
+    path(
         "sites/<int:pk>/",
         views.SiteDetailView.as_view(),
         name="site-detail",
