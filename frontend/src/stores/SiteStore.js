@@ -26,9 +26,16 @@ export const useSiteStore = defineStore('site', () => {
   const searchText = ref('')
   const siteMarker = ref(null)
   const siteFilters = ref({
-    'english_name': '',
-    'french_name': '',
-    'khmer_name': ''
+    english_name: '',
+    french_name: '',
+    khmer_name: '',
+    alternative_name: '',
+    alternative_khmer_name: '',
+    description: '',
+    ik_id_starred: false,
+    created_on: '',
+    updated_on: '',
+    created_by: '',
   })
 
   const siteTypes = ref(null)
@@ -61,12 +68,14 @@ export const useSiteStore = defineStore('site', () => {
   async function getSites(mapId) {
     if (isLoading.value) return
 
+    console.log(siteFilters.value)
+
     try {
       const params = {
         limit: pageSize.value,
         offset: page.value,
         search: searchText.value,
-        ...siteFilters.value
+        ...siteFilters.value,
       }
       const data = await siteService.getMapSites(mapId, params)
       sites.value = data
