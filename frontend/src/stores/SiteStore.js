@@ -19,6 +19,7 @@ export const useSiteStore = defineStore('site', () => {
   const isLoading = ref(false)
   const isCreatingSite = ref(false)
   const isEditingSite = ref(false)
+  const isShowingFilter = ref(false)
 
   const sites = ref(null)
   const page = ref(0)
@@ -157,6 +158,7 @@ export const useSiteStore = defineStore('site', () => {
     selectSiteInteractionRef,
     siteMarker,
     isEditingSite,
+    isShowingFilter,
     newSiteFeatureRef,
     showIdentifyLayer,
 
