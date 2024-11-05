@@ -14,7 +14,7 @@ export const useSiteStore = defineStore('site', () => {
   const newSiteFeatureRef = ref(null)
   const selectSiteInteractionRef = ref(null)
   const selectedSiteFeature = ref(null)
-  const selectedSite = computed(() => selectedSiteFeature.value?.getProperties())
+  const selectedSite = ref(null)
 
   const isLoading = ref(false)
   const isCreatingSite = ref(false)
@@ -22,8 +22,9 @@ export const useSiteStore = defineStore('site', () => {
   const isShowingFilter = ref(false)
 
   const sites = ref(null)
+  const sitesGeom = ref(null)
   const page = ref(0)
-  const pageSize = ref(-1)
+  const pageSize = ref(20)
   const searchText = ref('')
   const siteMarker = ref(null)
   const siteFilters = ref({
@@ -69,12 +70,10 @@ export const useSiteStore = defineStore('site', () => {
   async function getSites(mapId) {
     if (isLoading.value) return
 
-    console.log(siteFilters.value)
-
     try {
       const params = {
         limit: pageSize.value,
-        offset: page.value,
+        offset: (page.value - 1) * pageSize.value,
         search: searchText.value,
         ...siteFilters.value,
       }
@@ -85,6 +84,24 @@ export const useSiteStore = defineStore('site', () => {
     } finally {
       isLoading.value = false
     }
+  }
+
+  async function getSitesGeom(mapId) {
+    if (isLoading.value) return
+
+    try {
+      const data = await siteService.getMapSitesGeom(mapId)
+      sitesGeom.value = data
+    } catch (err) {
+      console.log(err)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function getSiteDetail(siteId) {
+    const res = await siteService.siteDetail(siteId)
+    selectedSite.value = res
   }
 
   async function createSite(mapId, data) {
@@ -146,6 +163,7 @@ export const useSiteStore = defineStore('site', () => {
 
   return {
     sites,
+    sitesGeom,
     page,
     pageSize,
     searchText,
@@ -163,7 +181,9 @@ export const useSiteStore = defineStore('site', () => {
     showIdentifyLayer,
 
     getSites,
+    getSitesGeom,
     getSiteTypes,
+    getSiteDetail,
     updateSite,
     createSite,
     setSiteMarker,

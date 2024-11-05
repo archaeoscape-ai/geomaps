@@ -10,6 +10,7 @@ import { useMapStore } from '@/stores/MapStore'
 import { computed, ref } from 'vue'
 import SiteFilter from '../sites/SiteFilter.vue'
 import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
+import Pagination from '@/components/ui/pagination/Pagination.vue'
 import { ArrowLeft } from 'lucide-vue-next'
 
 const filterPanelOpen = ref(false)
@@ -27,9 +28,9 @@ const hasFilters = computed(() => {
 })
 
 function fetchSites({ currentPage, currentPageSize }) {
-  page.value = currentPage - 1
+  page.value = currentPage
   pageSize.value = currentPageSize
-  siteStore.getSites(currentMap.value?.id)
+  siteStore.getSites(currentMap.value.id)
 }
 
 watchDebounced(
@@ -89,13 +90,13 @@ watchDebounced(
       <SiteFilter />
     </template>
 
-    <!-- <div class="flex justify-center p-3">
+    <div class="flex justify-center p-3">
       <Pagination
         :totalRecords="sites?.count || 0"
         :page="page"
         :pageSize="pageSize"
         @fetchData="fetchSites"
       />
-    </div> -->
+    </div>
   </LeftPanelWrapper>
 </template>
