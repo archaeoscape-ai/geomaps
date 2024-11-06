@@ -214,7 +214,7 @@ async function clearFilters() {
     </div>
     <div class="flex items-center self-end">
       <Button
-        class="mr-4"
+        class="mr-4 hover:bg-gray-200"
         variant="secondary"
         @click.prevent="clearFilters"
         :disable="isSubmitting"
