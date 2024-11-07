@@ -18,7 +18,7 @@ import { Calendar as CalendarIcon } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
 const siteStore = useSiteStore()
-const { getSites } = siteStore
+const { getSites, getSitesGeom } = siteStore
 const { siteFilters, isShowingFilter } = storeToRefs(siteStore)
 
 const mapStore = useMapStore()
@@ -73,6 +73,7 @@ const updated_on_range = computed({
 
 const applyFilters = async () => {
   await getSites(currentMap.value?.id)
+  await getSitesGeom(currentMap.value?.id)
   isShowingFilter.value = !isShowingFilter.value
 }
 
@@ -104,6 +105,8 @@ async function clearFilters() {
     updated_on_lte: '',
     created_by: '',
   }
+
+  applyFilters()
 }
 </script>
 

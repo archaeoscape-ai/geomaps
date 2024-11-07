@@ -99,8 +99,16 @@ export const useSiteStore = defineStore('site', () => {
   async function getSitesGeom(mapId) {
     if (isLoading.value) return
 
+    let filters = Object.keys(siteFilters.value)
+      .filter((k) => siteFilters.value[k])
+      .reduce((a, k) => ({ ...a, [k]: siteFilters.value[k] }), {})
+
     try {
-      const data = await siteService.getMapSitesGeom(mapId)
+      const params = {
+        search: searchText.value,
+        ...filters
+      }
+      const data = await siteService.getMapSitesGeom(mapId, params)
       sitesGeom.value = data
     } catch (err) {
       console.log(err)
