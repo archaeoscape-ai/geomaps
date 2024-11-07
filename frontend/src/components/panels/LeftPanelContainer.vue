@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import CreateSite from '@/components/sites/CreateSite.vue'
 import IdentifySite from '@/components/sites/IdentifySite.vue'
-import SitePanel from '@/components/panels/SitePanel.vue'
+import SiteList from '@/components/panels/SiteList.vue'
 import { LEFT_PANELS } from '@/helpers/constants'
 import { useNoteStore } from '@/stores/NoteStore'
 import { useMapStore } from '@/stores/MapStore'
@@ -20,7 +20,7 @@ const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 const componentMapping = {
   [LEFT_PANELS.CREATE]: CreateSite,
   [LEFT_PANELS.IDENTIFY]: IdentifySite,
-  [LEFT_PANELS.LIST]: SitePanel,
+  [LEFT_PANELS.LIST]: SiteList,
 }
 
 function shouldDisable(id) {

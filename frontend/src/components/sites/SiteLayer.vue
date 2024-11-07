@@ -1,6 +1,6 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { LEFT_PANELS } from '@/helpers/constants'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
@@ -16,7 +16,8 @@ const { setTab } = leftPanelStore
 
 const siteStore = useSiteStore()
 const {
-  sites,
+  selectedSite,
+  sitesGeom,
   siteMarker,
   isEditingSite,
   isCreatingSite,
@@ -24,6 +25,7 @@ const {
   newSiteFeatureRef,
   selectSiteInteractionRef,
 } = storeToRefs(siteStore)
+const { getSiteDetail } = siteStore
 
 const layerConfigStore = useMapLayerConfigStore()
 const { showSiteLayer } = storeToRefs(layerConfigStore)
@@ -54,6 +56,14 @@ const selectInteactionFilter = (feature) => {
 function removeCondition() {
   return isEditingSite.value
 }
+
+watch(selectedSiteFeature, (feature) => {
+  if (feature) {
+    getSiteDetail(feature.getProperties().id)
+  } else {
+    selectedSite.value = null
+  }
+})
 </script>
 
 <template>
@@ -61,7 +71,7 @@ function removeCondition() {
     <ol-source-vector>
       <!-- list all sites -->
       <SiteFeature
-        v-for="site in sites?.results"
+        v-for="site in sitesGeom"
         :site="site"
         :key="site.id"
         :fillColor="fillColor"
@@ -88,10 +98,7 @@ function removeCondition() {
       >
         <ol-style zIndex="1">
           <ol-style-circle :radius="12">
-            <ol-style-stroke
-              :strokeWidth="1"
-              :color="strokeColor"
-            ></ol-style-stroke>
+            <ol-style-stroke :strokeWidth="1" :color="strokeColor"></ol-style-stroke>
             <ol-style-fill :color="fillColorSelected"></ol-style-fill>
           </ol-style-circle>
         </ol-style>

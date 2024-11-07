@@ -5,8 +5,12 @@ import { transform } from 'ol/proj'
 import { useLeftPanelStore } from './LeftPanelStore'
 import { LEFT_PANELS } from '@/helpers/constants'
 import { useMapStore } from './MapStore'
+import { getLocalTimeZone, today } from '@internationalized/date'
 
 export const useSiteStore = defineStore('site', () => {
+  const end = today(getLocalTimeZone())
+  const start = end.subtract({ days: 7 })
+
   /**
    * @type {import('vue').Ref<{ source: import('ol/source/Vector').default } | null>}
    */
@@ -14,21 +18,32 @@ export const useSiteStore = defineStore('site', () => {
   const newSiteFeatureRef = ref(null)
   const selectSiteInteractionRef = ref(null)
   const selectedSiteFeature = ref(null)
-  const selectedSite = computed(() => selectedSiteFeature.value?.getProperties())
+  const selectedSite = ref(null)
 
   const isLoading = ref(false)
   const isCreatingSite = ref(false)
   const isEditingSite = ref(false)
+  const isShowingFilter = ref(false)
 
   const sites = ref(null)
+  const sitesGeom = ref(null)
   const page = ref(0)
-  const pageSize = ref(-1)
+  const pageSize = ref(20)
   const searchText = ref('')
   const siteMarker = ref(null)
   const siteFilters = ref({
-    'english_name': '',
-    'french_name': '',
-    'khmer_name': ''
+    english_name: '',
+    french_name: '',
+    khmer_name: '',
+    alternative_name: '',
+    alternative_khmer_name: '',
+    description: '',
+    ik_id_starred: false,
+    created_on_gte: '',
+    created_on_lte: '',
+    updated_on_gte: '',
+    updated_on_lte: '',
+    created_by: '',
   })
 
   const siteTypes = ref(null)
@@ -61,12 +76,16 @@ export const useSiteStore = defineStore('site', () => {
   async function getSites(mapId) {
     if (isLoading.value) return
 
+    let filters = Object.keys(siteFilters.value)
+      .filter((k) => siteFilters.value[k])
+      .reduce((a, k) => ({ ...a, [k]: siteFilters.value[k] }), {})
+
     try {
       const params = {
         limit: pageSize.value,
-        offset: page.value,
+        offset: (page.value - 1) * pageSize.value,
         search: searchText.value,
-        ...siteFilters.value
+        ...filters
       }
       const data = await siteService.getMapSites(mapId, params)
       sites.value = data
@@ -75,6 +94,24 @@ export const useSiteStore = defineStore('site', () => {
     } finally {
       isLoading.value = false
     }
+  }
+
+  async function getSitesGeom(mapId) {
+    if (isLoading.value) return
+
+    try {
+      const data = await siteService.getMapSitesGeom(mapId)
+      sitesGeom.value = data
+    } catch (err) {
+      console.log(err)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function getSiteDetail(siteId) {
+    const res = await siteService.siteDetail(siteId)
+    selectedSite.value = res
   }
 
   async function createSite(mapId, data) {
@@ -136,6 +173,7 @@ export const useSiteStore = defineStore('site', () => {
 
   return {
     sites,
+    sitesGeom,
     page,
     pageSize,
     searchText,
@@ -148,11 +186,14 @@ export const useSiteStore = defineStore('site', () => {
     selectSiteInteractionRef,
     siteMarker,
     isEditingSite,
+    isShowingFilter,
     newSiteFeatureRef,
     showIdentifyLayer,
 
     getSites,
+    getSitesGeom,
     getSiteTypes,
+    getSiteDetail,
     updateSite,
     createSite,
     setSiteMarker,

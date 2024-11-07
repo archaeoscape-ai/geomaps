@@ -58,10 +58,10 @@ function handleClickMap(event) {
 
 const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
 
-watch(tempLayerConfigWithLayerDetail, () => console.log(tempLayerConfigWithLayerDetail.value))
 watch(currentMap, (newValue) => {
   if (newValue) {
-    siteStore.getSites(currentMap.value?.id)
+    siteStore.getSites(newValue.id)
+    siteStore.getSitesGeom(newValue.id)
   }
 })
 </script>

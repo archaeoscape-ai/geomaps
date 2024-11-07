@@ -6,6 +6,11 @@ export async function getMapSites(mapId, params) {
   return response.data
 }
 
+export async function getMapSitesGeom(mapId) {
+  const response = await axios.get(`${mapSiteResource}/${mapId}/sites/geom/`)
+  return response.data
+}
+
 export async function createSite(mapId, data) {
   const response = await axios.post(`${mapSiteResource}/${mapId}/sites/`, data)
   return response.data

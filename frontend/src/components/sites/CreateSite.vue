@@ -11,15 +11,13 @@ import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 
 const leftPanelStore = useLeftPanelStore()
 const siteStore = useSiteStore()
-const { isCreatingSite } = storeToRefs(siteStore)
+const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
 
 onMounted(() => {
-  isCreatingSite.value = true
   siteStore.setSiteMarker(null)
 })
 
 onBeforeUnmount(() => {
-  isCreatingSite.value = false
   siteStore.setSiteMarker(null)
 })
 
@@ -32,7 +30,7 @@ const cancelSiteCreation = () => {
 
 <template>
   <LeftPanelWrapper header="Create Site">
-    <template v-slot:header-actions v-if="isCreatingSite">
+    <template v-slot:header-actions v-if="isEditingSite">
       <IconTooltipButton tooltipText="Cancel" tooltipSide="bottom" @onBtnClick="cancelSiteCreation">
         <ArrowLeft size="20" />
       </IconTooltipButton>
