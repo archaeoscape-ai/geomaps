@@ -6,8 +6,8 @@ export async function getMapSites(mapId, params) {
   return response.data
 }
 
-export async function getMapSitesGeom(mapId) {
-  const response = await axios.get(`${mapSiteResource}/${mapId}/sites/geom/`)
+export async function getMapSitesGeom(mapId, params) {
+  const response = await axios.get(`${mapSiteResource}/${mapId}/sites/geom/`, { params })
   return response.data
 }
 

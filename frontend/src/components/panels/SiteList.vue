@@ -19,7 +19,7 @@ const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
 
 const siteStore = useSiteStore()
-const { getSites } = siteStore
+const { getSites, getSitesGeom } = siteStore
 const { sites, page, pageSize, searchText, siteFilters, isShowingFilter } = storeToRefs(siteStore)
 
 const hasFilters = computed(() => {
@@ -38,6 +38,7 @@ watchDebounced(
   () => {
     filterPanelOpen.value = false
     getSites(currentMap.value?.id)
+    getSitesGeom(currentMap.value?.id)
   },
   { debounce: 500, maxWait: 2000 },
 )
