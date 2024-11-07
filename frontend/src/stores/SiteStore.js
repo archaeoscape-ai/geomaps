@@ -76,16 +76,14 @@ export const useSiteStore = defineStore('site', () => {
   async function getSites(mapId) {
     if (isLoading.value) return
 
-    let filters = Object.keys(siteFilters.value)
-      .filter((k) => siteFilters.value[k])
-      .reduce((a, k) => ({ ...a, [k]: siteFilters.value[k] }), {})
+    const filters = getCleanFilters(siteFilters.value)
 
     try {
       const params = {
         limit: pageSize.value,
         offset: (page.value - 1) * pageSize.value,
         search: searchText.value,
-        ...filters
+        ...filters,
       }
       const data = await siteService.getMapSites(mapId, params)
       sites.value = data
@@ -99,14 +97,12 @@ export const useSiteStore = defineStore('site', () => {
   async function getSitesGeom(mapId) {
     if (isLoading.value) return
 
-    let filters = Object.keys(siteFilters.value)
-      .filter((k) => siteFilters.value[k])
-      .reduce((a, k) => ({ ...a, [k]: siteFilters.value[k] }), {})
+    const filters = getCleanFilters(siteFilters.value)
 
     try {
       const params = {
         search: searchText.value,
-        ...filters
+        ...filters,
       }
       const data = await siteService.getMapSitesGeom(mapId, params)
       sitesGeom.value = data
@@ -177,6 +173,26 @@ export const useSiteStore = defineStore('site', () => {
       center: center,
       duration: 1000,
     })
+  }
+
+  function getCleanFilters() {
+    let filters = Object.keys(siteFilters.value)
+      .filter((k) => siteFilters.value[k])
+      .reduce((a, k) => ({ ...a, [k]: siteFilters.value[k] }), {})
+
+    const fields = ['created_on', 'updated_on']
+
+    for (const field of fields) {
+      const lte = `${field}_lte`
+      const gte = `${field}_gte`
+      if (lte in filters && gte in filters && filters[lte] === filters[gte]) {
+        filters[field] = filters[gte]
+        delete filters[gte]
+        delete filters[lte]
+      }
+    }
+
+    return filters
   }
 
   return {

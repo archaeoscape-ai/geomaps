@@ -14,10 +14,12 @@ const siteStore = useSiteStore()
 const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
 
 onMounted(() => {
+  isCreatingSite.value = true
   siteStore.setSiteMarker(null)
 })
 
 onBeforeUnmount(() => {
+  isCreatingSite.value = false
   siteStore.setSiteMarker(null)
 })
 
