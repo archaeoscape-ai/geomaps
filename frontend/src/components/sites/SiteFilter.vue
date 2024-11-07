@@ -8,12 +8,11 @@ import FormCheckboxField from '@/components/ui/checkbox/FormCheckboxField.vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { useForm } from 'vee-validate'
-import { computed, ref } from 'vue'
-import { Calendar } from '@/components/ui/calendar'
-import { FormField, FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { computed } from 'vue'
+import { FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { DateFormatter, getLocalTimeZone, parseDate, today } from '@internationalized/date'
-import { toDate } from 'radix-vue/date'
+import { DateFormatter, getLocalTimeZone, parseDate } from '@internationalized/date'
+import { RangeCalendar } from '@/components/ui/range-calendar'
 
 import { Calendar as CalendarIcon } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
@@ -38,29 +37,37 @@ const formSchema = toTypedSchema(
     alternative_khmer_name: z.string().optional(),
     description: z.string().optional(),
     ik_id_starred: z.boolean().default(false).optional(),
-    created_on: z.string().optional(),
-    updated_on: z.string().optional(),
     created_by: z.string().optional(),
   }),
 )
 
-const placeholder = ref()
-
-const { resetForm, isSubmitting, setFieldValue } = useForm({
+const { resetForm, isSubmitting } = useForm({
   validationSchema: formSchema,
 })
 
-const created_on = computed({
-  get: () => (siteFilters.value.created_on ? parseDate(siteFilters.value.created_on) : undefined),
+const created_on_range = computed({
+  get: () => {
+    return {
+      start: siteFilters.value.created_on_gte ? parseDate(siteFilters.value.created_on_gte) : undefined,
+      end: siteFilters.value.created_on_lte ? parseDate(siteFilters.value.created_on_lte) : undefined,
+    }
+  },
   set: (val) => {
-    siteFilters.value.created_on = val.toString()
+    siteFilters.value.created_on_gte = val.start?.toString()
+    siteFilters.value.created_on_lte = val.end?.toString()
   },
 })
 
-const updated_on = computed({
-  get: () => (siteFilters.value.updated_on ? parseDate(siteFilters.value.updated_on) : undefined),
+const updated_on_range = computed({
+  get: () => {
+    return {
+      start: siteFilters.value.updated_on_gte ? parseDate(siteFilters.value.updated_on_gte) : undefined,
+      end: siteFilters.value.updated_on_lte ? parseDate(siteFilters.value.updated_on_lte) : undefined,
+    }
+  },
   set: (val) => {
-    siteFilters.value.updated_on = val.toString()
+    siteFilters.value.updated_on_gte = val.start?.toString()
+    siteFilters.value.updated_on_lte = val.end?.toString()
   },
 })
 
@@ -79,8 +86,6 @@ async function clearFilters() {
       alternative_khmer_name: '',
       description: '',
       ik_id_starred: false,
-      created_on: '',
-      updated_on: '',
       created_by: '',
     },
   })
@@ -93,12 +98,12 @@ async function clearFilters() {
     alternative_khmer_name: '',
     description: '',
     ik_id_starred: false,
-    created_on: '',
-    updated_on: '',
+    created_on_gte: '',
+    created_on_lte: '',
+    updated_on_gte: '',
+    updated_on_lte: '',
     created_by: '',
   }
-
-  applyFilters()
 }
 </script>
 
@@ -130,38 +135,35 @@ async function clearFilters() {
           <FormLabel>Created on</FormLabel>
           <Popover>
             <PopoverTrigger as-child>
-              <FormControl>
-                <Button
-                  variant="outline"
-                  :class="
-                    cn(
-                      'w-[240px] ps-3 text-start font-normal',
-                      !created_on && 'text-muted-foreground',
-                    )
-                  "
-                >
-                  <span>{{ created_on ? df.format(toDate(created_on)) : 'Pick a date' }}</span>
-                  <CalendarIcon class="ms-auto h-4 w-4 opacity-50" />
-                </Button>
-                <input hidden />
-              </FormControl>
+              <Button
+                variant="outline"
+                :class="
+                  cn(
+                    'w-full justify-start text-left font-normal',
+                    !created_on_range && 'text-muted-foreground',
+                  )
+                "
+              >
+                <CalendarIcon class="mr-2 h-4 w-4" />
+                <template v-if="created_on_range.start">
+                  <template v-if="created_on_range.end">
+                    {{ df.format(created_on_range.start.toDate(getLocalTimeZone())) }} -
+                    {{ df.format(created_on_range.end.toDate(getLocalTimeZone())) }}
+                  </template>
+
+                  <template v-else>
+                    {{ df.format(created_on_range.start.toDate(getLocalTimeZone())) }}
+                  </template>
+                </template>
+                <template v-else> Pick a date </template>
+              </Button>
             </PopoverTrigger>
             <PopoverContent class="w-auto p-0">
-              <Calendar
-                v-model:placeholder="placeholder"
-                v-model="created_on"
-                calendar-label="Created On"
+              <RangeCalendar
+                v-model="created_on_range"
                 initial-focus
-                :max-value="today(getLocalTimeZone())"
-                @update:model-value="
-                  (v) => {
-                    if (v) {
-                      setFieldValue('created_on', v.toString())
-                    } else {
-                      setFieldValue('created_on', undefined)
-                    }
-                  }
-                "
+                :number-of-months="2"
+                @update:start-value="(startDate) => (created_on_range.start = startDate)"
               />
             </PopoverContent>
           </Popover>
@@ -173,38 +175,35 @@ async function clearFilters() {
           <FormLabel>Updated on</FormLabel>
           <Popover>
             <PopoverTrigger as-child>
-              <FormControl>
-                <Button
-                  variant="outline"
-                  :class="
-                    cn(
-                      'w-[240px] ps-3 text-start font-normal',
-                      !updated_on && 'text-muted-foreground',
-                    )
-                  "
-                >
-                  <span>{{ updated_on ? df.format(toDate(updated_on)) : 'Pick a date' }}</span>
-                  <CalendarIcon class="ms-auto h-4 w-4 opacity-50" />
-                </Button>
-                <input hidden />
-              </FormControl>
+              <Button
+                variant="outline"
+                :class="
+                  cn(
+                    'w-full justify-start text-left font-normal',
+                    !updated_on_range && 'text-muted-foreground',
+                  )
+                "
+              >
+                <CalendarIcon class="mr-2 h-4 w-4" />
+                <template v-if="updated_on_range.start">
+                  <template v-if="updated_on_range.end">
+                    {{ df.format(updated_on_range.start.toDate(getLocalTimeZone())) }} -
+                    {{ df.format(updated_on_range.end.toDate(getLocalTimeZone())) }}
+                  </template>
+
+                  <template v-else>
+                    {{ df.format(updated_on_range.start.toDate(getLocalTimeZone())) }}
+                  </template>
+                </template>
+                <template v-else> Pick a date </template>
+              </Button>
             </PopoverTrigger>
             <PopoverContent class="w-auto p-0">
-              <Calendar
-                v-model:placeholder="placeholder"
-                v-model="updated_on"
-                calendar-label="Created On"
+              <RangeCalendar
+                v-model="updated_on_range"
                 initial-focus
-                :max-value="today(getLocalTimeZone())"
-                @update:model-value="
-                  (v) => {
-                    if (v) {
-                      setFieldValue('updated_on', v.toString())
-                    } else {
-                      setFieldValue('updated_on', undefined)
-                    }
-                  }
-                "
+                :number-of-months="2"
+                @update:start-value="(startDate) => (updated_on_range.start = startDate)"
               />
             </PopoverContent>
           </Popover>

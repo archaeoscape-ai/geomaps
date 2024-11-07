@@ -5,8 +5,12 @@ import { transform } from 'ol/proj'
 import { useLeftPanelStore } from './LeftPanelStore'
 import { LEFT_PANELS } from '@/helpers/constants'
 import { useMapStore } from './MapStore'
+import { getLocalTimeZone, today } from '@internationalized/date'
 
 export const useSiteStore = defineStore('site', () => {
+  const end = today(getLocalTimeZone())
+  const start = end.subtract({ days: 7 })
+
   /**
    * @type {import('vue').Ref<{ source: import('ol/source/Vector').default } | null>}
    */
@@ -35,8 +39,10 @@ export const useSiteStore = defineStore('site', () => {
     alternative_khmer_name: '',
     description: '',
     ik_id_starred: false,
-    created_on: '',
-    updated_on: '',
+    created_on_gte: '',
+    created_on_lte: '',
+    updated_on_gte: '',
+    updated_on_lte: '',
     created_by: '',
   })
 
@@ -70,12 +76,16 @@ export const useSiteStore = defineStore('site', () => {
   async function getSites(mapId) {
     if (isLoading.value) return
 
+    let filters = Object.keys(siteFilters.value)
+      .filter((k) => siteFilters.value[k])
+      .reduce((a, k) => ({ ...a, [k]: siteFilters.value[k] }), {})
+
     try {
       const params = {
         limit: pageSize.value,
         offset: (page.value - 1) * pageSize.value,
         search: searchText.value,
-        ...siteFilters.value,
+        ...filters
       }
       const data = await siteService.getMapSites(mapId, params)
       sites.value = data
