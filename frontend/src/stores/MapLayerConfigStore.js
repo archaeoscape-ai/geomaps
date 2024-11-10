@@ -7,6 +7,7 @@ import {
   updateCurrentMapLayerConfig,
 } from '@/api-services/MapService'
 import { LAYER_TYPE, LAYER_TYPE_LABEL } from '@/helpers/constants'
+import { zoomByDelta } from 'ol/interaction/Interaction'
 
 export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   const searchText = ref('')
@@ -44,7 +45,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
 
   const tempLayerConfigWithLayerDetail = computed(() => {
     if (!mapDetail.value) return []
-    
+
     let zIndex = tempLayerConfig.value.reduce((prev, curr) => prev + curr.items.length, 1)
 
     return tempLayerConfig.value.map((group) => {

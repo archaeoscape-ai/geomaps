@@ -12,7 +12,8 @@ import MeasureLayer from './MeasureLayer.vue'
 import GeolocationLayer from './GeolocationLayer.vue'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 import { VectorTile, Tile as TileLayer } from 'ol/layer'
-import { TileWMS, VectorTile as VectorTileSource, XYZ } from 'ol/source'
+import { ImageWMS, TileWMS, VectorTile as VectorTileSource, XYZ } from 'ol/source'
+import ImageLayer from 'ol/layer/Image'
 
 defineProps({
   isPanelActive: Boolean,
@@ -34,8 +35,6 @@ const { isCreatingSite, isEditingSite, selectedSiteFeature } = storeToRefs(siteS
 
 const projection = ref('EPSG:3857')
 const rotation = ref(0)
-const format = inject('ol-format')
-const mvtFormat = new format.MVT()
 
 function handleClickMap(event) {
   if (isDisplayingNoteCursor.value) {
@@ -90,12 +89,18 @@ watch(
             let source
 
             if (group.id === LAYER_TYPE.WMS) {
-              source = new TileWMS({
-                url: layerConfig.layerDetail?.wms_url,
-                params: {
-                  tiled: layerConfig.layerDetail?.use_as_tile_layer,
-                },
-              })
+              if (layerConfig.layerDetail?.use_as_tile_layer) {
+                source = new TileWMS({
+                  url: layerConfig.layerDetail?.wms_url,
+                })
+              } else {
+                layer = new ImageLayer()
+                source = new ImageWMS({
+                  url: layerConfig.layerDetail?.wms_url,
+                  ratio: 1,
+                  serverType: 'geoserver',
+                })
+              }
             } else if (group.id === LAYER_TYPE.XYZ) {
               source = new XYZ({
                 url: layerConfig.layerDetail?.tiles_url,
@@ -104,6 +109,8 @@ watch(
 
             layer.setSource(source)
           }
+
+          console.log(layer)
           mapRef.value.map.addLayer(layer)
         }
 
