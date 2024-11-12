@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import Switch from '@/components/ui/switch/Switch.vue'
 import Label from '@/components/ui/label/Label.vue'
 import Slider from '@/components/ui/slider/Slider.vue'
@@ -8,7 +8,9 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
-import { Polygon } from 'ol/geom'
+import { WMSCapabilities } from 'ol/format'
+import { Projection, transform } from 'ol/proj'
+import { fromEPSGCode } from 'ol/proj/proj4'
 
 const mapStore = useMapStore()
 const { mapRef } = storeToRefs(mapStore)
@@ -20,17 +22,6 @@ const props = defineProps({
   item: { type: Object, required: true },
 })
 
-const layer = computed(() => {
-  if (!mapRef.value) return null
-
-  return mapRef.value.map
-    .getLayers()
-    .getArray()
-    .find((item) => item.get('id') === props.item.layerId)
-})
-
-console.log(layer.value.get())
-
 const showLegend = ref(false)
 
 function toggleShowLegend() {
@@ -38,21 +29,38 @@ function toggleShowLegend() {
 }
 
 async function zoomToExtent() {
-  // const url = new URL('geoserver/efeo/wms', import.meta.env.VITE_BASE_API_URL)
-  // url.searchParams.set('REQUEST', 'GetCapabilities')
-  // url.searchParams.set('LAYER', props.item.layerDetail.alias)
-  // const response = await fetch(url.toString())
-  console.log('TODO')
-}
+  const transformProjection = async ([minX, minY, maxX, maxY]) => {
+    const source = await fromEPSGCode('EPSG:32648')
+    const dest = new Projection({ code: 'EPSG:3857' })
+    const bottomLeft = transform([minX, minY], source, dest)
+    const topRight = transform([maxX, maxY], source, dest)
 
-console.log(props.item)
+    return [...bottomLeft, ...topRight]
+  }
+
+  const wmsCapabilities = new WMSCapabilities()
+  const url = new URL('geoserver/efeo/wms', import.meta.env.VITE_BASE_API_URL)
+  url.searchParams.set('REQUEST', 'GetCapabilities')
+
+  const response = await fetch(url.toString())
+  const data = await response.text()
+  const result = wmsCapabilities.read(data)
+  const layer = result.Capability?.Layer?.Layer?.find((layer) => layer.Name === props.item.alias)
+  const extent = layer?.BoundingBox?.find((bb) => bb.crs === 'EPSG:32648')?.extent
+
+  const transformedExtent = await transformProjection(extent)
+
+  if (extent) {
+    mapRef.value.map.getView().fit(transformedExtent)
+  }
+}
 </script>
 
 <template>
   <Card class="mt-4">
     <CardHeader class="flex flex-row justify-between p-2">
       <div class="flex flex-grow items-center justify-start gap-2 overflow-hidden">
-        <GripVertical class="drag-handle cursor-pointer stroke-button-icon flex-shrink-0" />
+        <GripVertical class="drag-handle flex-shrink-0 cursor-pointer stroke-button-icon" />
         <Switch
           :id="`${parentId}-${item.layerId}`"
           :checked="item.isActive"

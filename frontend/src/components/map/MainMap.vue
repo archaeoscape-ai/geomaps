@@ -110,7 +110,6 @@ watch(
             layer.setSource(source)
           }
 
-          console.log(layer)
           mapRef.value.map.addLayer(layer)
         }
 
