@@ -16,6 +16,7 @@ const mapStore = useMapStore()
 const { mapRef } = storeToRefs(mapStore)
 
 const layerConfigStore = useMapLayerConfigStore()
+const { wmsCapabilities } = storeToRefs(layerConfigStore)
 
 const props = defineProps({
   parentId: { type: String, required: true },
@@ -38,14 +39,7 @@ async function zoomToExtent() {
     return [...bottomLeft, ...topRight]
   }
 
-  const wmsCapabilities = new WMSCapabilities()
-  const url = new URL('geoserver/efeo/wms', import.meta.env.VITE_BASE_API_URL)
-  url.searchParams.set('REQUEST', 'GetCapabilities')
-
-  const response = await fetch(url.toString())
-  const data = await response.text()
-  const result = wmsCapabilities.read(data)
-  const layer = result.Capability?.Layer?.Layer?.find((layer) => layer.Name === props.item.alias)
+  const layer = wmsCapabilities.value.Capability?.Layer?.Layer?.find((layer) => layer.Name === props.item.alias)
   const extent = layer?.BoundingBox?.find((bb) => bb.crs === 'EPSG:32648')?.extent
 
   const transformedExtent = await transformProjection(extent)
@@ -53,6 +47,14 @@ async function zoomToExtent() {
   if (extent) {
     mapRef.value.map.getView().fit(transformedExtent)
   }
+}
+
+function getLegendUrl() {
+  const url = new URL('geoserver/efeo/wms', import.meta.env.VITE_BASE_API_URL)
+  url.searchParams.set('REQUEST', 'GetLegendGraphic')
+  url.searchParams.set('LAYER', `efeo:${props.item.alias}`)
+  url.searchParams.set('FORMAT', 'image/png')
+  return url.toString()
 }
 </script>
 
@@ -116,7 +118,7 @@ async function zoomToExtent() {
       </div>
       <div class="mt-2" v-if="item.isActive && showLegend">
         <span class="divider"></span>
-        <h1>show legend</h1>
+        <img :src="getLegendUrl()" alt="">
       </div>
     </CardContent>
   </Card>

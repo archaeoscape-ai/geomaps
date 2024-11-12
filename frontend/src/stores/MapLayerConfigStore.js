@@ -8,6 +8,7 @@ import {
 } from '@/api-services/MapService'
 import { LAYER_TYPE, LAYER_TYPE_LABEL } from '@/helpers/constants'
 import { zoomByDelta } from 'ol/interaction/Interaction'
+import { WMSCapabilities } from 'ol/format'
 
 export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   const searchText = ref('')
@@ -18,6 +19,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   const tempLayerConfig = ref([])
   const isLoading = ref(false)
   const showSiteLayer = ref(true)
+  const wmsCapabilities = ref(null)
 
   const currentLayers = computed(() => {
     if (!mapDetail.value) return []
@@ -36,7 +38,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
 
     for (const layerType of Object.values(LAYER_TYPE)) {
       res[layerType] = mapDetail.value[layerType].reduce((prev, curr) => {
-        return { ...prev, [curr.id]: { ...curr }}
+        return { ...prev, [curr.id]: { ...curr } }
       }, {})
     }
 
@@ -51,7 +53,11 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     return tempLayerConfig.value.map((group) => {
       const items = group.items.map((layer) => {
         zIndex--
-        return { ...layer, zIndex: zIndex, layerDetail: mapDetailDict.value[group.id][layer.layerId] }
+        return {
+          ...layer,
+          zIndex: zIndex,
+          layerDetail: mapDetailDict.value[group.id][layer.layerId],
+        }
       })
       return { ...group, items }
     })
@@ -109,6 +115,17 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     isLoading.value = false
   }
 
+  async function getWMSCapabilities() {
+    const parser = new WMSCapabilities()
+    const url = new URL('geoserver/efeo/wms', import.meta.env.VITE_BASE_API_URL)
+    url.searchParams.set('REQUEST', 'GetCapabilities')
+
+    const response = await fetch(url.toString())
+    const data = await response.text()
+    const result = parser.read(data)
+    wmsCapabilities.value = result
+  }
+
   /**
    * Initialize map config and sync if the map config is stale
    * @param {number} id map id
@@ -116,7 +133,8 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   async function initializeMapConfig(id) {
     const p1 = getMapLayerConfig(id)
     const p2 = getMapDetail(id)
-    await Promise.all([p1, p2])
+    const p3 = getWMSCapabilities()
+    await Promise.all([p1, p2, p3])
     syncLayerConfig()
   }
 
