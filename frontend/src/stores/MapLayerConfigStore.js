@@ -89,7 +89,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
           ...mapDetail.value[layerType].map((l) => ({
             layerId: l.id,
             alias: l.alias,
-            isActive: true,
+            isActive: false,
             opacity: 100,
           })),
         ],
