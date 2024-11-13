@@ -1,29 +1,22 @@
 <script setup>
-import { computed, inject, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import MapControls from './MapControls.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import NoteLayer from '@/components/notes/NoteLayer.vue'
 import { useNoteStore } from '@/stores/NoteStore'
-import { BASEMAP_URLS, LAYER_TYPE } from '@/helpers/constants'
+import { BASEMAP_URLS } from '@/helpers/constants'
 import SiteLayer from '@/components/sites/SiteLayer.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import MeasureLayer from './MeasureLayer.vue'
 import GeolocationLayer from './GeolocationLayer.vue'
-import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
-import { VectorTile, Tile as TileLayer } from 'ol/layer'
-import { ImageWMS, TileWMS, VectorTile as VectorTileSource, XYZ } from 'ol/source'
-import ImageLayer from 'ol/layer/Image'
 
 defineProps({
   isPanelActive: Boolean,
 })
 
 const mapStore = useMapStore()
-const { mapRef, basemap, zoom, center, currentMap } = storeToRefs(mapStore)
-
-const mapLayerConfigStore = useMapLayerConfigStore()
-const { tempLayerConfigWithLayerDetail } = storeToRefs(mapLayerConfigStore)
+const { mapRef, basemap, zoom, center } = storeToRefs(mapStore)
 
 const noteStore = useNoteStore()
 const { addNewNoteMarker } = noteStore
@@ -57,71 +50,6 @@ function handleClickMap(event) {
 }
 
 const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
-
-watch(currentMap, (newValue) => {
-  if (newValue) {
-    siteStore.getSites(newValue.id)
-    siteStore.getSitesGeom(newValue.id)
-  }
-})
-
-watch(
-  tempLayerConfigWithLayerDetail,
-  (config) => {
-    if (!config || !mapRef.value) return
-
-    for (const group of config) {
-      for (const layerConfig of group.items) {
-        let layer = mapRef.value.map
-          .getLayers()
-          .getArray()
-          .find((item) => item.get('id') === layerConfig.layerId)
-
-        if (!layer) {
-          if (group.id === LAYER_TYPE.VECTOR) {
-            layer = new VectorTile({
-              source: new VectorTileSource({
-                url: layerConfig.layerDetail?.tiles_url,
-              }),
-            })
-          } else {
-            layer = new TileLayer()
-            let source
-
-            if (group.id === LAYER_TYPE.WMS) {
-              if (layerConfig.layerDetail?.use_as_tile_layer) {
-                source = new TileWMS({
-                  url: layerConfig.layerDetail?.wms_url,
-                })
-              } else {
-                layer = new ImageLayer()
-                source = new ImageWMS({
-                  url: layerConfig.layerDetail?.wms_url,
-                  ratio: 1,
-                  serverType: 'geoserver',
-                })
-              }
-            } else if (group.id === LAYER_TYPE.XYZ) {
-              source = new XYZ({
-                url: layerConfig.layerDetail?.tiles_url,
-              })
-            }
-
-            layer.setSource(source)
-          }
-
-          mapRef.value.map.addLayer(layer)
-        }
-
-        layer.set('id', layerConfig.layerId)
-        layer.setVisible(layerConfig.isActive)
-        layer.setOpacity(layerConfig.opacity / 100)
-        layer.setZIndex(layerConfig.zIndex)
-      }
-    }
-  },
-  { immediate: true },
-)
 </script>
 
 <template>

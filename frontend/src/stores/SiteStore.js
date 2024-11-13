@@ -120,11 +120,16 @@ export const useSiteStore = defineStore('site', () => {
 
   async function createSite(mapId, data) {
     const res = await siteService.createSite(mapId, data)
-    if (sites.value?.results) {
-      sites.value.results.push(res)
-    } else {
-      sites.value = { ...sites.value, results: [res] }
-    }
+    console.log(res)
+    sitesGeom.value.push({
+      id: res.id,
+      location: res.location
+    })
+    // if (sites.value?.results) {
+    //   sites.value.results.push(res)
+    // } else {
+    //   sites.value = { ...sites.value, results: [res] }
+    // }
 
     return res
   }

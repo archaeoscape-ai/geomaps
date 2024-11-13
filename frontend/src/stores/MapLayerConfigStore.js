@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { cloneDeep, isEqual, reverse } from 'lodash'
 import {
@@ -7,10 +7,16 @@ import {
   updateCurrentMapLayerConfig,
 } from '@/api-services/MapService'
 import { LAYER_TYPE, LAYER_TYPE_LABEL } from '@/helpers/constants'
-import { zoomByDelta } from 'ol/interaction/Interaction'
 import { WMSCapabilities } from 'ol/format'
+import { useMapStore } from './MapStore'
+import { VectorTile, Tile as TileLayer } from 'ol/layer'
+import { ImageWMS, TileWMS, VectorTile as VectorTileSource, XYZ } from 'ol/source'
+import ImageLayer from 'ol/layer/Image'
 
 export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
+  const mapStore = useMapStore()
+  const { mapRef } = storeToRefs(mapStore)
+
   const searchText = ref('')
   const expandedLayer = ref(new Map())
 
@@ -43,24 +49,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     }
 
     return res
-  })
-
-  const tempLayerConfigWithLayerDetail = computed(() => {
-    if (!mapDetail.value) return []
-
-    let zIndex = tempLayerConfig.value.reduce((prev, curr) => prev + curr.items.length, 1)
-
-    return tempLayerConfig.value.map((group) => {
-      const items = group.items.map((layer) => {
-        zIndex--
-        return {
-          ...layer,
-          zIndex: zIndex,
-          layerDetail: mapDetailDict.value[group.id][layer.layerId],
-        }
-      })
-      return { ...group, items }
-    })
   })
 
   const allLayersToggledOn = computed(() => {
@@ -136,6 +124,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     const p3 = getWMSCapabilities()
     await Promise.all([p1, p2, p3])
     syncLayerConfig()
+    initializeMap(tempLayerConfig.value)
   }
 
   /**
@@ -275,6 +264,8 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     if (!value) {
       updateLayerExpandedState(parentId, layerId, value)
     }
+    console.log('here')
+    initializeMap(tempLayerConfig.value)
   }
 
   /**
@@ -303,15 +294,22 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
 
   /**
    * Updates the opacity of a specific active layer.
-   *
-   * @param {string} parentId - The ID of the parent layer group.
-   * @param {number} layerId - The ID of the specific layer.
-   * @param {number} value - The new opacity value (0-100).
    */
-  function updateLayerOpacity(parentId, layerId, value) {
-    const layer = getLayer(parentId, layerId)
-    if (!layer || !layer.isActive) return
+  function updateLayerOpacity(layer, value) {
+    // console.log(layer, value)
+    // const layer = getLayer(parentId, layerId)
+    // if (!layer || !layer.isActive) return
 
+    // layer.opacity = value
+    let olLayer = mapRef.value.map
+      .getLayers()
+      .getArray()
+      .find((item) => item.get('id') === layer.layerId)
+
+    olLayer.setOpacity(value / 100)
+  }
+
+  function updateLayerOpacityConfig(layer, value) {
     layer.opacity = value
   }
 
@@ -319,12 +317,72 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     return `${parentId}-${layerId}`
   }
 
+  function initializeMap(config) {
+    if (!config || !mapRef.value) return
+
+    for (const group of config) {
+      for (const layerConfig of group.items) {
+        let layer = mapRef.value.map
+          .getLayers()
+          .getArray()
+          .find((item) => item.get('id') === layerConfig.layerId)
+
+        if (!layer && layerConfig.isActive) {
+          const sourceUrl = mapDetailDict.value[group.id][layerConfig.layerId].tiles_url
+          if (group.id === LAYER_TYPE.VECTOR) {
+            layer = new VectorTile({
+              source: new VectorTileSource({
+                url: sourceUrl,
+              }),
+            })
+          } else {
+            layer = new TileLayer()
+            let source
+
+            if (group.id === LAYER_TYPE.WMS) {
+              const sourceUrl = mapDetailDict.value[group.id][layerConfig.layerId].wms_url
+              if (layerConfig.layerDetail?.use_as_tile_layer) {
+                source = new TileWMS({
+                  url: sourceUrl,
+                })
+              } else {
+                layer = new ImageLayer()
+                source = new ImageWMS({
+                  url: sourceUrl,
+                  ratio: 1,
+                  serverType: 'geoserver',
+                })
+              }
+            } else if (group.id === LAYER_TYPE.XYZ) {
+              const sourceUrl = mapDetailDict.value[group.id][layerConfig.layerId].wms_url
+              source = new XYZ({
+                url: sourceUrl,
+              })
+            }
+
+            layer.setSource(source)
+          }
+
+          mapRef.value.map.addLayer(layer)
+        }
+
+        if (layer) {
+          console.log(layerConfig)
+          layer.set('id', layerConfig.layerId)
+          layer.setVisible(layerConfig.isActive)
+          layer.setOpacity(layerConfig.opacity / 100)
+          layer.setZIndex(layerConfig.zIndex)
+        }
+      }
+    }
+    console.log(mapRef.value.map.getLayers())
+  }
+
   return {
     showSiteLayer,
     searchText,
     layerConfig,
     tempLayerConfig,
-    tempLayerConfigWithLayerDetail,
     currentLayers,
     expandedLayer,
     allLayersToggledOn,
@@ -332,6 +390,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     hasLayerConfigChanged,
     mapDetail,
     wmsCapabilities,
+    mapDetailDict,
 
     getMapLayerConfig,
     getMapDetail,
@@ -345,6 +404,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     setAllLayersExpandedState,
     updateLayerExpandedState,
     updateLayerOpacity,
+    updateLayerOpacityConfig,
     initializeTempLayerConfig,
   }
 })

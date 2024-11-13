@@ -15,7 +15,7 @@ const mapStore = useMapStore()
 const { mapRef } = storeToRefs(mapStore)
 
 const layerConfigStore = useMapLayerConfigStore()
-const { wmsCapabilities } = storeToRefs(layerConfigStore)
+const { wmsCapabilities, mapDetailDict } = storeToRefs(layerConfigStore)
 
 const props = defineProps({
   parentId: { type: String, required: true },
@@ -38,15 +38,20 @@ async function zoomToExtent() {
     return [...bottomLeft, ...topRight]
   }
 
-  const url = new URL(props.item.layerDetail.wms_url)
+  console.log(mapDetailDict.value, props.parentId, props.item.layerId)
+  const url = new URL(mapDetailDict.value[props.parentId][props.item.layerId].wms_url)
   const layerName = url.searchParams.get('LAYERS').split(':')[1]
-  const layer = wmsCapabilities.value.Capability?.Layer?.Layer?.find((layer) => layer.Name === layerName)
+  const layer = wmsCapabilities.value.Capability?.Layer?.Layer?.find(
+    (layer) => layer.Name === layerName,
+  )
   const extent = layer?.BoundingBox?.find((bb) => bb.crs === 'EPSG:32648')?.extent
 
   const transformedExtent = await transformProjection(extent)
 
   if (extent) {
-    mapRef.value.map.getView().fit(transformedExtent)
+    mapRef.value.map.getView().fit(transformedExtent, {
+      padding: [10, 10, 10, 10],
+    })
   }
 }
 
@@ -111,15 +116,14 @@ function getLegendUrl() {
             :max="100"
             :step="1"
             :disabled="!item.isActive"
-            @update:modelValue="
-              (value) => layerConfigStore.updateLayerOpacity(parentId, item.layerId, value[0])
-            "
+            @update:modelValue="(value) => layerConfigStore.updateLayerOpacity(item, value[0])"
+            @valueCommit="(value) => layerConfigStore.updateLayerOpacityConfig(item, value[0])"
           />
         </div>
       </div>
       <div class="mt-2" v-if="item.isActive && showLegend">
         <span class="divider"></span>
-        <img :src="getLegendUrl()" alt="">
+        <img :src="getLegendUrl()" alt="" />
       </div>
     </CardContent>
   </Card>
