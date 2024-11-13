@@ -10,6 +10,10 @@ import { createPinia } from 'pinia'
 import { useAuthStore } from './stores/AuthStore'
 import { getCookie } from '@/helpers/cookies'
 import _ from 'lodash'
+import { register } from 'ol/proj/proj4'
+import proj4 from 'proj4'
+
+register(proj4)
 
 const app = createApp(App)
 const pinia = createPinia()

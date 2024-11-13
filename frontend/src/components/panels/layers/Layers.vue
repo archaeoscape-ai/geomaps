@@ -17,7 +17,12 @@ const parentExpanded = ref(false)
 const layerConfigStore = useMapLayerConfigStore()
 const { allLayersExpanded, searchText } = storeToRefs(layerConfigStore)
 
-const isParentActive = computed(() => props.layer.items.every((item) => item.isActive))
+const isEmpty = computed(() => props.layer.items.length === 0)
+
+const isParentActive = computed(
+  () => props.layer.items.length > 0 && props.layer.items.every((item) => item.isActive),
+)
+
 
 function handleParentExpansion() {
   parentExpanded.value = !parentExpanded.value
@@ -39,15 +44,23 @@ watch(allLayersExpanded, (newValue) => {
           <Switch
             :id="layer.id"
             :checked="isParentActive"
+            :disabled="isEmpty"
             @update:checked="(value) => layerConfigStore.setLayerItemsActiveState(layer, value)"
           />
-          <Label class="cursor-pointer font-semibold" :for="layer.id">{{ layer.title }}</Label>
+          <Label
+            class="cursor-pointer font-semibold"
+            :class="{
+              'text-black/50': isEmpty,
+            }"
+            :for="layer.id"
+            >{{ layer.title }}</Label
+          >
         </div>
 
         <ChevronDown
           class="cursor-pointer stroke-button-icon"
           @click="handleParentExpansion"
-          v-if="!parentExpanded"
+          v-if="!parentExpanded || isEmpty"
         />
         <ChevronUp
           class="cursor-pointer stroke-button-icon"

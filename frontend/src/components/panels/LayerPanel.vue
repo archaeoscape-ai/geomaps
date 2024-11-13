@@ -17,7 +17,7 @@ import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { useNoteStore } from '@/stores/NoteStore'
 
 const layerConfigStore = useMapLayerConfigStore()
-const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText, showSiteLayer } =
+const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText, showSiteLayer, tempLayerConfigWithLayerDetail } =
   storeToRefs(layerConfigStore)
 
 const noteStore = useNoteStore()
@@ -116,7 +116,7 @@ function searchLayer(evt) {
       </div>
 
       <draggable
-        :list="tempLayerConfig"
+        :list="tempLayerConfigWithLayerDetail"
         class="flex flex-grow flex-col"
         ghostClass="opacity-50"
         item-key="id"

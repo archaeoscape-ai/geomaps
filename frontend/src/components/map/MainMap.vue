@@ -11,6 +11,9 @@ import { useSiteStore } from '@/stores/SiteStore'
 import MeasureLayer from './MeasureLayer.vue'
 import GeolocationLayer from './GeolocationLayer.vue'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
+import { VectorTile, Tile as TileLayer } from 'ol/layer'
+import { ImageWMS, TileWMS, VectorTile as VectorTileSource, XYZ } from 'ol/source'
+import ImageLayer from 'ol/layer/Image'
 
 defineProps({
   isPanelActive: Boolean,
@@ -30,11 +33,8 @@ const siteStore = useSiteStore()
 const { setSiteMarker } = siteStore
 const { isCreatingSite, isEditingSite, selectedSiteFeature } = storeToRefs(siteStore)
 
-
 const projection = ref('EPSG:3857')
 const rotation = ref(0)
-const format = inject('ol-format')
-const mvtFormat = new format.MVT()
 
 function handleClickMap(event) {
   if (isDisplayingNoteCursor.value) {
@@ -64,6 +64,64 @@ watch(currentMap, (newValue) => {
     siteStore.getSitesGeom(newValue.id)
   }
 })
+
+watch(
+  tempLayerConfigWithLayerDetail,
+  (config) => {
+    if (!config || !mapRef.value) return
+
+    for (const group of config) {
+      for (const layerConfig of group.items) {
+        let layer = mapRef.value.map
+          .getLayers()
+          .getArray()
+          .find((item) => item.get('id') === layerConfig.layerId)
+
+        if (!layer) {
+          if (group.id === LAYER_TYPE.VECTOR) {
+            layer = new VectorTile({
+              source: new VectorTileSource({
+                url: layerConfig.layerDetail?.tiles_url,
+              }),
+            })
+          } else {
+            layer = new TileLayer()
+            let source
+
+            if (group.id === LAYER_TYPE.WMS) {
+              if (layerConfig.layerDetail?.use_as_tile_layer) {
+                source = new TileWMS({
+                  url: layerConfig.layerDetail?.wms_url,
+                })
+              } else {
+                layer = new ImageLayer()
+                source = new ImageWMS({
+                  url: layerConfig.layerDetail?.wms_url,
+                  ratio: 1,
+                  serverType: 'geoserver',
+                })
+              }
+            } else if (group.id === LAYER_TYPE.XYZ) {
+              source = new XYZ({
+                url: layerConfig.layerDetail?.tiles_url,
+              })
+            }
+
+            layer.setSource(source)
+          }
+
+          mapRef.value.map.addLayer(layer)
+        }
+
+        layer.set('id', layerConfig.layerId)
+        layer.setVisible(layerConfig.isActive)
+        layer.setOpacity(layerConfig.opacity / 100)
+        layer.setZIndex(layerConfig.zIndex)
+      }
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -91,33 +149,6 @@ watch(currentMap, (newValue) => {
       <NoteLayer />
       <SiteLayer />
       <MapControls :is-panel-active="isPanelActive" :map="mapRef" />
-
-      <template v-for="group in tempLayerConfigWithLayerDetail" :key="group.id">
-        <template v-for="layer in group.items" :key="`${group.id}-${layer.id}`">
-          <ol-vector-tile-layer
-            v-if="group.id === LAYER_TYPE.VECTOR"
-            :visible="layer.isActive"
-            :opacity="layer.opacity / 100"
-            :zIndex="layer.zIndex"
-          >
-            <ol-source-vector-tile :url="layer.layerDetail.tiles_url" :format="mvtFormat">
-            </ol-source-vector-tile>
-          </ol-vector-tile-layer>
-
-          <ol-tile-layer
-            v-else
-            :visible="layer.isActive"
-            :opacity="layer.opacity / 100"
-            :zIndex="layer.zIndex"
-          >
-            <ol-source-xyz v-if="group.id === LAYER_TYPE.XYZ" :url="layer.layerDetail.tiles_url" />
-            <ol-source-tile-wms
-              v-else-if="group.id === LAYER_TYPE.WMS"
-              :url="layer.layerDetail.wms_url"
-            />
-          </ol-tile-layer>
-        </template>
-      </template>
     </ol-map>
   </div>
 </template>
