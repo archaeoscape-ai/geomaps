@@ -35,7 +35,6 @@ export const useMapStore = defineStore('map', () => {
   })
 
   const zoom = computed(() => {
-    return 2
     if (route.query.zoom) {
       return route.query.zoom
     }

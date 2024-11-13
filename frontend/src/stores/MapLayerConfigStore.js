@@ -190,7 +190,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
             items.push({
               layerId: layer.id,
               alias: layer.alias,
-              isActive: true,
+              isActive: false,
               opacity: 100,
             })
           }
