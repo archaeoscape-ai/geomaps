@@ -148,9 +148,9 @@ export const useSiteStore = defineStore('site', () => {
 
   async function deleteSite(siteId) {
     await siteService.deleteSite(siteId)
-    const index = sites.value.results.findIndex((site) => site.id === siteId)
+    const index = sitesGeom.value.findIndex((site) => site.id === siteId)
     if (index !== -1) {
-      sites.value.results.splice(index, 1)
+      sitesGeom.value.splice(index, 1)
     }
 
     selectedSiteFeature.value = null
