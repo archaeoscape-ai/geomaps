@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
-import { WMSCapabilities } from 'ol/format'
 import { Projection, transform } from 'ol/proj'
 import { fromEPSGCode } from 'ol/proj/proj4'
 
@@ -39,7 +38,9 @@ async function zoomToExtent() {
     return [...bottomLeft, ...topRight]
   }
 
-  const layer = wmsCapabilities.value.Capability?.Layer?.Layer?.find((layer) => layer.Name === props.item.alias)
+  const url = new URL(props.item.layerDetail.wms_url)
+  const layerName = url.searchParams.get('LAYERS').split(':')[1]
+  const layer = wmsCapabilities.value.Capability?.Layer?.Layer?.find((layer) => layer.Name === layerName)
   const extent = layer?.BoundingBox?.find((bb) => bb.crs === 'EPSG:32648')?.extent
 
   const transformedExtent = await transformProjection(extent)

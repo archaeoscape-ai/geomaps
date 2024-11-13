@@ -220,7 +220,16 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
    * @param {boolean} value - The value to set for 'isActive' on all items (true or false).
    */
   function setLayerItemsActiveState(group, value) {
-    group.items.forEach((item) => (item.isActive = value))
+    // const groupConfig = tempLayerConfig.value.find((g) => g.id === group.id)
+    // console.log(groupConfig)
+    // group.items.forEach((item) => (item.isActive = value))
+    tempLayerConfig.value = tempLayerConfig.value.map((g) => {
+      if (g.id !== group.id) {
+        return g
+      }
+      const items = g.items.map((layer) => ({ ...layer, isActive: value }))
+      return { ...g, items }
+    })
   }
 
   /**
@@ -230,7 +239,10 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
    */
   function setAllLayersActiveState(value) {
     showSiteLayer.value = value
-    tempLayerConfig.value.forEach((group) => setLayerItemsActiveState(group, value))
+    tempLayerConfig.value = tempLayerConfig.value.map((g) => {
+      const items = g.items.map((layer) => ({ ...layer, isActive: value }))
+      return { ...g, items }
+    })
   }
 
   /**
@@ -319,6 +331,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     allLayersExpanded,
     hasLayerConfigChanged,
     mapDetail,
+    wmsCapabilities,
 
     getMapLayerConfig,
     getMapDetail,

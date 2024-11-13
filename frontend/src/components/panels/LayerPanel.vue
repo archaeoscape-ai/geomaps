@@ -116,7 +116,7 @@ function searchLayer(evt) {
       </div>
 
       <draggable
-        :list="tempLayerConfig"
+        :list="tempLayerConfigWithLayerDetail"
         class="flex flex-grow flex-col"
         ghostClass="opacity-50"
         item-key="id"
