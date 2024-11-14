@@ -36,15 +36,25 @@ class SiteFilter(filters.FilterSet):
     )
     description = filters.CharFilter(field_name="description", lookup_expr="icontains")
 
-    # Filter for boolean and datetime fields as is
+    # Custom date filters that ignore the time part
+    created_on = filters.DateFilter(
+        method="filter_by_exact_date", label="Created on (exact date)"
+    )
+    updated_on = filters.DateFilter(
+        method="filter_by_exact_date", label="Updated on (exact date)"
+    )
+
+    # Additional filters
     ik_id_starred = filters.BooleanFilter()
     created_by = filters.NumberFilter()
-    created_on = filters.DateTimeFilter()
-    updated_on = filters.DateTimeFilter()
     created_on_gte = filters.DateTimeFilter(field_name="created_on", lookup_expr="gte")
     created_on_lte = filters.DateTimeFilter(field_name="created_on", lookup_expr="lte")
     updated_on_gte = filters.DateTimeFilter(field_name="updated_on", lookup_expr="gte")
     updated_on_lte = filters.DateTimeFilter(field_name="updated_on", lookup_expr="lte")
+
+    def filter_by_exact_date(self, queryset, name, value):
+        # Cast datetime to date to match only the date part
+        return queryset.filter(**{f"{name}__date": value})
 
     class Meta:
         model = Site
