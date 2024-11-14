@@ -310,6 +310,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
 
         if (layer) {
           layer.set('id', layerConfig.layerId)
+          layer.set('type', 'user_created_layer')
           layer.setVisible(layerConfig.isActive)
           layer.setOpacity(layerConfig.opacity / 100)
           layer.setZIndex(totalLayer)

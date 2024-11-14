@@ -82,13 +82,6 @@ const resetSiteCreationState = () => {
   leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
 }
 
-const updateNewFeatureProperties = (properties) => {
-  if (newSiteFeatureRef.value?.feature) {
-    newSiteFeatureRef.value.feature.setProperties(properties)
-    newSiteFeatureRef.value.feature.setId(properties.id)
-  }
-}
-
 const setNewSiteAsSelected = (res) => {
   selectedSiteFeature.value = siteLayerSourceRef.value.getFeatureById(res.id)
   const selectedFeatures = selectSiteInteractionRef.value.select.getFeatures()
@@ -113,8 +106,12 @@ const onSubmit = form.handleSubmit(async (values) => {
       await siteStore.updateSite(selectedSite.value.id, data)
       toast({ description: 'Site updated!' })
     } else {
+      if (!newSiteFeatureRef.value) {
+        toast({ description: 'Please add a marker on the map.', variant: 'destructive' })
+        return
+      }
+
       const res = await siteStore.createSite(currentMap.value.id, data)
-      updateNewFeatureProperties({ ...res, type: 'site' })
       setNewSiteAsSelected(res)
       newSiteFeatureRef.value.feature = null
       toast({ description: 'Site created!' })

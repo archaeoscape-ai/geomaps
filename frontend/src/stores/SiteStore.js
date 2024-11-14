@@ -49,7 +49,7 @@ export const useSiteStore = defineStore('site', () => {
   const siteTypes = ref(null)
 
   const mapStore = useMapStore()
-  const { mapRef } = storeToRefs(mapStore)
+  const { mapRef, currentMap } = storeToRefs(mapStore)
 
   const leftPanelStore = useLeftPanelStore()
 
@@ -120,11 +120,11 @@ export const useSiteStore = defineStore('site', () => {
 
   async function createSite(mapId, data) {
     const res = await siteService.createSite(mapId, data)
-    console.log(res)
     sitesGeom.value.push({
       id: res.id,
       location: res.location
     })
+    await getSites(mapId)
     // if (sites.value?.results) {
     //   sites.value.results.push(res)
     // } else {
@@ -152,6 +152,7 @@ export const useSiteStore = defineStore('site', () => {
     if (index !== -1) {
       sitesGeom.value.splice(index, 1)
     }
+    await getSites(currentMap.value.id)
 
     selectedSiteFeature.value = null
     leftPanelStore.setTab(LEFT_PANELS.LIST)

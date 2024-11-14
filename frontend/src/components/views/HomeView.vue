@@ -19,7 +19,7 @@ const router = useRouter()
 const route = useRoute()
 
 const mapStore = useMapStore()
-const { currentMap } = storeToRefs(mapStore)
+const { currentMap, mapRef } = storeToRefs(mapStore)
 const { getListMaps, setMapById, setDefaultMap } = mapStore
 
 const siteStore = useSiteStore()
@@ -62,11 +62,19 @@ watch(
   () => route.params.id,
   (newId) => {
     if (newId) {
+      const layers = mapRef.value.map
+        .getLayers()
+        .getArray()
+        .filter((layer) => layer.get('type') === 'user_created_layer')
+      layers.forEach(layer => mapRef.value.map.removeLayer(layer))
+
       setMapById(newId)
       if (!currentMap.value) {
         redirectToDefaultMap()
       }
       initializeMapConfig(currentMap.value.id)
+      getSites(currentMap.value.id)
+      getSitesGeom(currentMap.value.id)
     }
   },
 )
