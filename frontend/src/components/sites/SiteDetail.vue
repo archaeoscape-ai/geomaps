@@ -6,6 +6,10 @@ import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
 import { Pencil } from 'lucide-vue-next'
 import { useMapStore } from '@/stores/MapStore'
 import { useNoteStore } from '@/stores/NoteStore'
+import { useAuthStore } from '@/stores/AuthStore'
+
+const authStore = useAuthStore()
+const { isReadOnly } = storeToRefs(authStore)
 
 const mapStore = useMapStore()
 const { measuringDistance } = storeToRefs(mapStore)
@@ -52,6 +56,7 @@ function getValue(site, key) {
         @onBtnClick="emit('toggleSiteEdit')"
         :disabled="measuringDistance || isDisplayingNoteCursor"
         btnClass="bg-white"
+        v-if="!isReadOnly"
       >
         <Pencil size="20" />
       </IconTooltipButton>

@@ -120,11 +120,16 @@ export const useSiteStore = defineStore('site', () => {
 
   async function createSite(mapId, data) {
     const res = await siteService.createSite(mapId, data)
-    if (sites.value?.results) {
-      sites.value.results.push(res)
-    } else {
-      sites.value = { ...sites.value, results: [res] }
-    }
+    console.log(res)
+    sitesGeom.value.push({
+      id: res.id,
+      location: res.location
+    })
+    // if (sites.value?.results) {
+    //   sites.value.results.push(res)
+    // } else {
+    //   sites.value = { ...sites.value, results: [res] }
+    // }
 
     return res
   }
@@ -143,9 +148,9 @@ export const useSiteStore = defineStore('site', () => {
 
   async function deleteSite(siteId) {
     await siteService.deleteSite(siteId)
-    const index = sites.value.results.findIndex((site) => site.id === siteId)
+    const index = sitesGeom.value.findIndex((site) => site.id === siteId)
     if (index !== -1) {
-      sites.value.results.splice(index, 1)
+      sitesGeom.value.splice(index, 1)
     }
 
     selectedSiteFeature.value = null

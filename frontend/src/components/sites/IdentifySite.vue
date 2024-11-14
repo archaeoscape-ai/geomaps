@@ -13,6 +13,10 @@ import LeftPanelWrapper from '@/components/panels/LeftPanelWrapper.vue'
 import DeleteSiteDialog from './DeleteSiteDialog.vue'
 import { Trash, ArrowLeft } from 'lucide-vue-next'
 import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
+import { useAuthStore } from '@/stores/AuthStore'
+
+const authStore = useAuthStore()
+const { isReadOnly } = storeToRefs(authStore)
 
 const mapStore = useMapStore()
 const { measuringDistance } = storeToRefs(mapStore)
@@ -72,7 +76,7 @@ watch(
   <LeftPanelWrapper :header="heading">
     <template v-slot:header-actions v-if="selectedSite">
       <template v-if="!isAddingResource && !updatingResource">
-        <DeleteSiteDialog :site-id="selectedSite?.id" v-if="!isEditingSite">
+        <DeleteSiteDialog :site-id="selectedSite?.id" v-if="!isEditingSite && !isReadOnly">
           <IconTooltipButton tooltipText="Delete" tooltipSide="bottom">
             <Trash class="stroke-primary" size="20" />
           </IconTooltipButton>

@@ -21,6 +21,7 @@ async function confirm() {
     await siteStore.deleteSite(props.siteId)
     toast({ description: 'Site deleted!' })
   } catch (error) {
+    console.log(error)
     toast({ description: 'Could not delete site!', variant: 'destructive' })
   } finally {
     open.value = false

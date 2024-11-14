@@ -13,6 +13,7 @@ import BaseMapButtons from '@/components/map/BaseMapButtons.vue'
 import { useMapStore } from '@/stores/MapStore'
 import { useRoute, useRouter } from 'vue-router'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
+import { useSiteStore } from '@/stores/SiteStore'
 
 const router = useRouter()
 const route = useRoute()
@@ -20,6 +21,9 @@ const route = useRoute()
 const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
 const { getListMaps, setMapById, setDefaultMap } = mapStore
+
+const siteStore = useSiteStore()
+const { getSites, getSitesGeom } = siteStore
 
 const mapLayerConfigStore = useMapLayerConfigStore()
 const { initializeMapConfig } = mapLayerConfigStore
@@ -48,6 +52,8 @@ async function initialize() {
       redirectToDefaultMap()
     } else {
       initializeMapConfig(currentMap.value.id)
+      getSites(currentMap.value.id)
+      getSitesGeom(currentMap.value.id)
     }
   }
 }

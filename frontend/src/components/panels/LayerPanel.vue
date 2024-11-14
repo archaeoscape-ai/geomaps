@@ -15,9 +15,13 @@ import CardContent from '../ui/card/CardContent.vue'
 import Separator from '../ui/separator/Separator.vue'
 import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { useNoteStore } from '@/stores/NoteStore'
+import { useAuthStore } from '@/stores/AuthStore'
+
+const authStore = useAuthStore()
+const { isReadOnly } = storeToRefs(authStore)
 
 const layerConfigStore = useMapLayerConfigStore()
-const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText, showSiteLayer, tempLayerConfigWithLayerDetail } =
+const { tempLayerConfig, allLayersToggledOn, allLayersExpanded, searchText, showSiteLayer } =
   storeToRefs(layerConfigStore)
 
 const noteStore = useNoteStore()
@@ -92,7 +96,7 @@ function searchLayer(evt) {
             <Switch
               v-model:checked="showSiteLayer"
               id="site-layer-switch"
-              :disabled="!!activeLeftPanel"
+              :disabled="!!activeLeftPanel && !isReadOnly"
             />
             <Label class="cursor-pointer font-semibold" for="site-layer-switch">Site Layer</Label>
           </div>
@@ -116,7 +120,7 @@ function searchLayer(evt) {
       </div>
 
       <draggable
-        :list="tempLayerConfigWithLayerDetail"
+        :list="tempLayerConfig"
         class="flex flex-grow flex-col"
         ghostClass="opacity-50"
         item-key="id"
