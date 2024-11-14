@@ -29,7 +29,7 @@ const { isCreatingSite, isEditingSite, selectedSiteFeature } = storeToRefs(siteS
 
 const mapLayerConfigStore = useMapLayerConfigStore()
 const { tempLayerConfig } = storeToRefs(mapLayerConfigStore)
-const { initializeMap } = mapLayerConfigStore
+const { refreshMap } = mapLayerConfigStore
 
 const projection = ref('EPSG:3857')
 const rotation = ref(0)

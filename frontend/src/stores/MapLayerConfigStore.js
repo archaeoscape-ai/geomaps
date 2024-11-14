@@ -124,7 +124,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     const p3 = getWMSCapabilities()
     await Promise.all([p1, p2, p3])
     syncLayerConfig()
-    initializeMap(tempLayerConfig.value)
+    refreshMap(tempLayerConfig.value)
   }
 
   /**
@@ -201,7 +201,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
       const items = g.items.map((layer) => ({ ...layer, isActive: value }))
       return { ...g, items }
     })
-    initializeMap(tempLayerConfig.value)
+    refreshMap(tempLayerConfig.value)
   }
 
   /**
@@ -215,7 +215,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
       const items = g.items.map((layer) => ({ ...layer, isActive: value }))
       return { ...g, items }
     })
-    initializeMap(tempLayerConfig.value)
+    refreshMap(tempLayerConfig.value)
   }
 
   /**
@@ -292,7 +292,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     return `${parentId}-${layerId}`
   }
 
-  function initializeMap(config) {
+  function refreshMap(config) {
     if (!config || !mapRef.value) return
 
     for (const group of config) {
@@ -343,6 +343,12 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     return layer
   }
 
+  /**
+   * Add layer to map with corresponding layer geoserver url
+   * @param {} parentId 
+   * @param {*} layerId 
+   * @returns 
+   */
   function addLayerToMap(parentId, layerId) {
     let layer
     const layerDetail = mapDetailDict.value[parentId][layerId]
@@ -416,6 +422,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     setLayerOpacity,
     setLayerOpacityConfig,
     initializeTempLayerConfig,
-    initializeMap,
+    refreshMap,
   }
 })
