@@ -10,6 +10,7 @@ import SiteLayer from '@/components/sites/SiteLayer.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import MeasureLayer from './MeasureLayer.vue'
 import GeolocationLayer from './GeolocationLayer.vue'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 
 defineProps({
   isPanelActive: Boolean,
@@ -25,6 +26,10 @@ const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 const siteStore = useSiteStore()
 const { setSiteMarker } = siteStore
 const { isCreatingSite, isEditingSite, selectedSiteFeature } = storeToRefs(siteStore)
+
+const mapLayerConfigStore = useMapLayerConfigStore()
+const { tempLayerConfig } = storeToRefs(mapLayerConfigStore)
+const { initializeMap } = mapLayerConfigStore
 
 const projection = ref('EPSG:3857')
 const rotation = ref(0)
@@ -50,6 +55,8 @@ function handleClickMap(event) {
 }
 
 const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
+
+// watch(tempLayerConfig, (config) => initializeMap(config))
 </script>
 
 <template>

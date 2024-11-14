@@ -146,7 +146,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
    * in case there are additions or deletions of layers on admin panel
    */
   function syncLayerConfig() {
-    // console.log(layerConfig.value, mapDetail.value, tempLayerConfig.value)
     if (tempLayerConfig.value.length === 0) {
       initializeTempLayerConfig()
     } else {
@@ -189,29 +188,12 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   }
 
   /**
-   * Retrieves a specific layer object from the configuration by parent layer group ID and layer ID.
-   *
-   * @param {string} parentId - The ID of the parent layer group (e.g., 'vector-layers').
-   * @param {number} layerId - The ID of the specific layer within the parent group.
-   * @returns {Object|null} - The layer object if found, or null if not.
-   */
-  function getLayer(parentId, layerId) {
-    const parent = tempLayerConfig.value.find((group) => group.id === parentId)
-    if (!parent) return null
-
-    return parent.items.find((layer) => layer.layerId === layerId)
-  }
-
-  /**
    * Sets the 'isActive' state for all items (layers) within a given layer group.
    *
    * @param {Object} layer - The layer group object that contains items.
    * @param {boolean} value - The value to set for 'isActive' on all items (true or false).
    */
   function setLayerItemsActiveState(group, value) {
-    // const groupConfig = tempLayerConfig.value.find((g) => g.id === group.id)
-    // console.log(groupConfig)
-    // group.items.forEach((item) => (item.isActive = value))
     tempLayerConfig.value = tempLayerConfig.value.map((g) => {
       if (g.id !== group.id) {
         return g
@@ -219,6 +201,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
       const items = g.items.map((layer) => ({ ...layer, isActive: value }))
       return { ...g, items }
     })
+    initializeMap(tempLayerConfig.value)
   }
 
   /**
@@ -232,6 +215,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
       const items = g.items.map((layer) => ({ ...layer, isActive: value }))
       return { ...g, items }
     })
+    initializeMap(tempLayerConfig.value)
   }
 
   /**
@@ -256,16 +240,16 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
    * @param {number} layerId - The ID of the specific layer within the parent group.
    * @param {boolean} value - The visibility state to set for the layer (true for visible, false for hidden).
    */
-  function updateLayerVisibility(parentId, layerId, value) {
+  function setLayerActiveState(parentId, layerId, value) {
     const layer = getLayer(parentId, layerId)
     if (!layer) return
 
     layer.isActive = value
+    const olLayer = getOLLayer(parentId, layerId)
+    olLayer.setVisible(value)
     if (!value) {
-      updateLayerExpandedState(parentId, layerId, value)
+      setLayerExpandedState(parentId, layerId, value)
     }
-    console.log('here')
-    initializeMap(tempLayerConfig.value)
   }
 
   /**
@@ -275,7 +259,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
    * @param {Object} layer - The layer object to update the expanded state.
    * @param {boolean} value - The expanded state to set (true or false).
    */
-  function updateLayerExpandedState(parentId, layer, value) {
+  function setLayerExpandedState(parentId, layer, value) {
     if (!layer.isActive) return
 
     expandedLayer.value.set(getKey(parentId, layer.layerId), value)
@@ -295,21 +279,12 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   /**
    * Updates the opacity of a specific active layer.
    */
-  function updateLayerOpacity(layer, value) {
-    // console.log(layer, value)
-    // const layer = getLayer(parentId, layerId)
-    // if (!layer || !layer.isActive) return
-
-    // layer.opacity = value
-    let olLayer = mapRef.value.map
-      .getLayers()
-      .getArray()
-      .find((item) => item.get('id') === layer.layerId)
-
+  function setLayerOpacity(parentId, layerId, value) {
+    const olLayer = getOLLayer(parentId, layerId)
     olLayer.setOpacity(value / 100)
   }
 
-  function updateLayerOpacityConfig(layer, value) {
+  function setLayerOpacityConfig(layer, value) {
     layer.opacity = value
   }
 
@@ -328,46 +303,10 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
           .find((item) => item.get('id') === layerConfig.layerId)
 
         if (!layer && layerConfig.isActive) {
-          const sourceUrl = mapDetailDict.value[group.id][layerConfig.layerId].tiles_url
-          if (group.id === LAYER_TYPE.VECTOR) {
-            layer = new VectorTile({
-              source: new VectorTileSource({
-                url: sourceUrl,
-              }),
-            })
-          } else {
-            layer = new TileLayer()
-            let source
-
-            if (group.id === LAYER_TYPE.WMS) {
-              const sourceUrl = mapDetailDict.value[group.id][layerConfig.layerId].wms_url
-              if (layerConfig.layerDetail?.use_as_tile_layer) {
-                source = new TileWMS({
-                  url: sourceUrl,
-                })
-              } else {
-                layer = new ImageLayer()
-                source = new ImageWMS({
-                  url: sourceUrl,
-                  ratio: 1,
-                  serverType: 'geoserver',
-                })
-              }
-            } else if (group.id === LAYER_TYPE.XYZ) {
-              const sourceUrl = mapDetailDict.value[group.id][layerConfig.layerId].wms_url
-              source = new XYZ({
-                url: sourceUrl,
-              })
-            }
-
-            layer.setSource(source)
-          }
-
-          mapRef.value.map.addLayer(layer)
+          layer = addLayerToMap(group.id, layerConfig.layerId)
         }
 
         if (layer) {
-          console.log(layerConfig)
           layer.set('id', layerConfig.layerId)
           layer.setVisible(layerConfig.isActive)
           layer.setOpacity(layerConfig.opacity / 100)
@@ -375,7 +314,78 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
         }
       }
     }
-    console.log(mapRef.value.map.getLayers())
+  }
+
+  /**
+   * Retrieves a specific layer object from the configuration by parent layer group ID and layer ID.
+   *
+   * @param {string} parentId - The ID of the parent layer group (e.g., 'vector-layers').
+   * @param {number} layerId - The ID of the specific layer within the parent group.
+   * @returns {Object|null} - The layer object if found, or null if not.
+   */
+  function getLayer(parentId, layerId) {
+    const parent = tempLayerConfig.value.find((group) => group.id === parentId)
+    if (!parent) return null
+
+    return parent.items.find((layer) => layer.layerId === layerId)
+  }
+
+  function getOLLayer(parentId, layerId) {
+    let layer = mapRef.value.map
+      .getLayers()
+      .getArray()
+      .find((item) => item.get('id') === layerId)
+
+    if (!layer) {
+      layer = addLayerToMap(parentId, layerId)
+    }
+
+    return layer
+  }
+
+  function addLayerToMap(parentId, layerId) {
+    let layer
+    const layerDetail = mapDetailDict.value[parentId][layerId]
+
+    if (parentId === LAYER_TYPE.VECTOR) {
+      const sourceUrl = layerDetail.tiles_url
+      layer = new VectorTile({
+        source: new VectorTileSource({
+          url: sourceUrl,
+        }),
+      })
+    } else {
+      layer = new TileLayer()
+      let source
+
+      if (parentId === LAYER_TYPE.WMS) {
+        const sourceUrl = layerDetail.wms_url
+        if (layerDetail.use_as_tile_layer) {
+          source = new TileWMS({
+            url: sourceUrl,
+          })
+        } else {
+          layer = new ImageLayer()
+          source = new ImageWMS({
+            url: sourceUrl,
+            ratio: 1,
+            serverType: 'geoserver',
+          })
+        }
+      } else if (parentId === LAYER_TYPE.XYZ) {
+        const sourceUrl = layerDetail.wms_url
+        source = new XYZ({
+          url: sourceUrl,
+        })
+      }
+
+      layer.setSource(source)
+    }
+
+    layer.set('id', layerId)
+    mapRef.value.map.addLayer(layer)
+
+    return layer
   }
 
   return {
@@ -399,12 +409,13 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     syncLayerConfig,
     setLayerItemsActiveState,
     setAllLayersActiveState,
-    updateLayerVisibility,
+    setLayerActiveState,
     isLayerExpanded,
     setAllLayersExpandedState,
-    updateLayerExpandedState,
-    updateLayerOpacity,
-    updateLayerOpacityConfig,
+    setLayerExpandedState,
+    setLayerOpacity,
+    setLayerOpacityConfig,
     initializeTempLayerConfig,
+    initializeMap,
   }
 })

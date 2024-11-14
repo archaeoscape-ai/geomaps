@@ -73,7 +73,7 @@ function getLegendUrl() {
           :id="`${parentId}-${item.layerId}`"
           :checked="item.isActive"
           @update:checked="
-            (value) => layerConfigStore.updateLayerVisibility(parentId, item.layerId, value)
+            (value) => layerConfigStore.setLayerActiveState(parentId, item.layerId, value)
           "
           class="flex-shrink-0"
         />
@@ -87,12 +87,12 @@ function getLegendUrl() {
 
       <ChevronDown
         class="flex-shrink-0 cursor-pointer stroke-button-icon"
-        @click="layerConfigStore.updateLayerExpandedState(parentId, item, true)"
+        @click="layerConfigStore.setLayerExpandedState(parentId, item, true)"
         v-if="!layerConfigStore.isLayerExpanded(parentId, item.layerId)"
       />
       <ChevronUp
         class="flex-shrink-0 cursor-pointer stroke-button-icon"
-        @click="layerConfigStore.updateLayerExpandedState(parentId, item, false)"
+        @click="layerConfigStore.setLayerExpandedState(parentId, item, false)"
         v-else
       />
     </CardHeader>
@@ -116,8 +116,8 @@ function getLegendUrl() {
             :max="100"
             :step="1"
             :disabled="!item.isActive"
-            @update:modelValue="(value) => layerConfigStore.updateLayerOpacity(item, value[0])"
-            @valueCommit="(value) => layerConfigStore.updateLayerOpacityConfig(item, value[0])"
+            @update:modelValue="(value) => layerConfigStore.setLayerOpacity(parentId, item.layerId, value[0])"
+            @valueCommit="(value) => layerConfigStore.setLayerOpacityConfig(item, value[0])"
           />
         </div>
       </div>
