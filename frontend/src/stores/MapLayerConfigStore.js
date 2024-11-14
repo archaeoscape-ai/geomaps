@@ -121,8 +121,8 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   async function initializeMapConfig(id) {
     const p1 = getMapLayerConfig(id)
     const p2 = getMapDetail(id)
-    const p3 = getWMSCapabilities()
-    await Promise.all([p1, p2, p3])
+    getWMSCapabilities()
+    await Promise.all([p1, p2])
     syncLayerConfig()
     refreshMap(tempLayerConfig.value)
   }
@@ -201,7 +201,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
       const items = g.items.map((layer) => ({ ...layer, isActive: value }))
       return { ...g, items }
     })
-    refreshMap(tempLayerConfig.value)
   }
 
   /**
@@ -215,7 +214,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
       const items = g.items.map((layer) => ({ ...layer, isActive: value }))
       return { ...g, items }
     })
-    refreshMap(tempLayerConfig.value)
   }
 
   /**
@@ -245,8 +243,6 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     if (!layer) return
 
     layer.isActive = value
-    const olLayer = getOLLayer(parentId, layerId)
-    olLayer.setVisible(value)
     if (!value) {
       setLayerExpandedState(parentId, layerId, value)
     }
@@ -295,6 +291,12 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   function refreshMap(config) {
     if (!config || !mapRef.value) return
 
+    let totalLayer = 0
+
+    for (const group of config) {
+        totalLayer += group.items.length
+    }
+
     for (const group of config) {
       for (const layerConfig of group.items) {
         let layer = mapRef.value.map
@@ -310,7 +312,8 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
           layer.set('id', layerConfig.layerId)
           layer.setVisible(layerConfig.isActive)
           layer.setOpacity(layerConfig.opacity / 100)
-          layer.setZIndex(layerConfig.zIndex)
+          layer.setZIndex(totalLayer)
+          totalLayer--
         }
       }
     }
@@ -351,7 +354,9 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
    */
   function addLayerToMap(parentId, layerId) {
     let layer
-    const layerDetail = mapDetailDict.value[parentId][layerId]
+    const layerDetail = mapDetailDict.value[parentId]?.[layerId]
+
+    if (!layerDetail) return null
 
     if (parentId === LAYER_TYPE.VECTOR) {
       const sourceUrl = layerDetail.tiles_url

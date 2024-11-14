@@ -75,7 +75,7 @@ watch(allLayersExpanded, (newValue) => {
         :list="layer.items"
         class="flex flex-col"
         ghostClass="opacity-50"
-        item-key="id"
+        item-key="layerId"
         handle=".drag-handle"
         :animation="250"
       >

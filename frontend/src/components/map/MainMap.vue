@@ -56,7 +56,13 @@ function handleClickMap(event) {
 
 const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])
 
-// watch(tempLayerConfig, (config) => initializeMap(config))
+watch(
+  tempLayerConfig,
+  (config) => {
+    refreshMap(config)
+  },
+  { deep: true },
+)
 </script>
 
 <template>
