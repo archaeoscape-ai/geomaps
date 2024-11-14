@@ -12,6 +12,10 @@ import { FilePlus } from 'lucide-vue-next'
 import Separator from '@/components/ui/separator/Separator.vue'
 import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
 import { useSiteStore } from '@/stores/SiteStore'
+import { useAuthStore } from '@/stores/AuthStore'
+
+const authStore = useAuthStore()
+const { isReadOnly } = storeToRefs(authStore)
 
 const siteStore = useSiteStore()
 const { isEditingSite } = storeToRefs(siteStore)
@@ -30,7 +34,7 @@ function addResources() {
 </script>
 
 <template>
-  <div class="rounded-lg mx-4 bg-white p-4 pb-4">
+  <div class="mx-4 rounded-lg bg-white p-4 pb-4">
     <div class="flex items-center justify-between">
       <h3 class="text-sm font-semibold">Linked Resources</h3>
       <IconTooltipButton
@@ -38,6 +42,7 @@ function addResources() {
         tooltipSide="bottom"
         @onBtnClick="addResources"
         btnClass="bg-white"
+        v-if="!isReadOnly"
       >
         <FilePlus size="20" />
       </IconTooltipButton>
@@ -74,7 +79,12 @@ function addResources() {
           <ResourceField label="Caption" :value="resource.caption" />
           <ResourceField label="Resource Type" :value="resource.resource_type" />
           <ResourceField label="Resource File">
-            <a :href="resource.resource_file" target="_blank" class="text-blue-500 underline font-semibold">File</a>
+            <a
+              :href="resource.resource_file"
+              target="_blank"
+              class="font-semibold text-blue-500 underline"
+              >File</a
+            >
           </ResourceField>
           <ResourceField label="Author" :value="resource.author" />
           <ResourceField label="Date" :value="resource.resource_date" />

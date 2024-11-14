@@ -7,6 +7,10 @@ import SiteList from '@/components/panels/SiteList.vue'
 import { LEFT_PANELS } from '@/helpers/constants'
 import { useNoteStore } from '@/stores/NoteStore'
 import { useMapStore } from '@/stores/MapStore'
+import { useAuthStore } from '@/stores/AuthStore'
+
+const authStore = useAuthStore()
+const { isReadOnly } = storeToRefs(authStore)
 
 const leftPanelStore = useLeftPanelStore()
 const { activePanel, tabs } = storeToRefs(leftPanelStore)
@@ -30,7 +34,7 @@ function shouldDisable(id) {
 
 <template>
   <div
-    class="absolute z-10 h-full w-full sm:w-96 flex-col bg-[#F2F5F8] shadow-[0px_2px_8px_0px_#0000001F] transition-all"
+    class="absolute z-10 h-full w-full flex-col bg-[#F2F5F8] shadow-[0px_2px_8px_0px_#0000001F] transition-all sm:w-96"
     :class="{
       'translate-x-0': activePanel !== null,
       '-translate-x-full': activePanel === null,
@@ -38,20 +42,21 @@ function shouldDisable(id) {
   >
     <div class="flex h-full flex-col">
       <div class="flex items-center divide-x">
-        <button
-          v-for="tab in tabs"
-          :key="tab.id"
-          class="flex h-8 flex-grow items-center justify-center text-center text-sm font-bold text-primary-foreground basis-0"
-          @click="leftPanelStore.setTab(tab.id)"
-          :class="{
-            'bg-primary-darker': activePanel?.id === tab.id,
-            'bg-primary': activePanel?.id !== tab.id,
-            'opacity-70': shouldDisable(tab.id),
-          }"
-          :disabled="shouldDisable(tab.id)"
-        >
-          {{ tab.name }}
-        </button>
+        <template v-for="tab in tabs" :key="tab.id">
+          <button
+            v-if="!isReadOnly || tab.id !== LEFT_PANELS.CREATE"
+            class="flex h-8 flex-grow basis-0 items-center justify-center text-center text-sm font-bold text-primary-foreground"
+            @click="leftPanelStore.setTab(tab.id)"
+            :class="{
+              'bg-primary-darker': activePanel?.id === tab.id,
+              'bg-primary': activePanel?.id !== tab.id,
+              'opacity-70': shouldDisable(tab.id),
+            }"
+            :disabled="shouldDisable(tab.id)"
+          >
+            {{ tab.name }}
+          </button>
+        </template>
       </div>
 
       <!-- panel content -->

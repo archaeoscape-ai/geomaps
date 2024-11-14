@@ -1,5 +1,5 @@
 import { defineStore, getActivePinia } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import * as authService from '@/api-services/AuthService'
 import { removeCookie, setCookie } from '@/helpers/cookies'
 
@@ -9,6 +9,10 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggingIn = ref(false)
   const error = ref(null)
   const isLoggedIn = ref(false)
+
+  const isReadOnly = computed(() => {
+    return user.value && user.value.app_role_name === 'Read-Only'
+  })
 
   /**
    * Log in with email and password
@@ -79,6 +83,7 @@ export const useAuthStore = defineStore('auth', () => {
     isLoggedIn,
     isLoggingIn,
     error,
+    isReadOnly,
 
     login,
     logout,
