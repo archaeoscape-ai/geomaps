@@ -108,6 +108,7 @@ class SiteSerializer(serializers.ModelSerializer):
             "alternative_khmer_name",
             "description",
             "ik_id_starred",
+            "db_resolved",
             "created_by",
             "created_on",
             "updated_on",
