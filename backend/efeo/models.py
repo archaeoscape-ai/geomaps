@@ -149,6 +149,8 @@ class Site(SoftDeletableModel):
     description = models.TextField(blank=True)
     ik_id_starred = models.BooleanField(null=True)
 
+    db_resolved = models.SmallIntegerField(null=True)
+
     created_by = models.ForeignKey(
         "accounts.User", blank=True, null=True, on_delete=models.SET_NULL
     )
