@@ -32,6 +32,7 @@ const {
   selectedSiteFeature,
   selectSiteInteractionRef,
 } = storeToRefs(siteStore)
+const { getSiteDetail } = siteStore
 
 const isSubmitting = ref(false)
 const { toast } = useToast()
@@ -51,6 +52,7 @@ const formSchema = toTypedSchema(
     alternative_khmer_name: z.string().optional(),
     description: z.string().optional(),
     ik_id_starred: z.boolean().default(false).optional(),
+    db_resolved: z.boolean().default(false).optional(),
     site_type: z.string().optional(),
     inventaire_khmere_id: z.string().optional(),
     monuments_hostoriques_id: z.string().optional(),
@@ -65,6 +67,7 @@ const initialFormValues = computed(() => ({
   alternative_khmer_name: selectedSite.value?.alternative_khmer_name || '',
   description: selectedSite.value?.description || '',
   ik_id_starred: selectedSite.value?.ik_id_starred || false,
+  db_resolved: selectedSite.value?.db_resolved === 1,
   site_type: selectedSite.value?.site_type?.toString() || '',
   latitude: selectedSite.value?.location.coordinates[1] || '',
   longitude: selectedSite.value?.location.coordinates[0] || '',
@@ -100,10 +103,12 @@ const onSubmit = form.handleSubmit(async (values) => {
         type: 'Point',
         coordinates: [values.longitude, values.latitude],
       },
+      db_resolved: values.db_resolved ? 1 : 0
     }
 
     if (isEditingSite.value && selectedSite.value) {
       await siteStore.updateSite(selectedSite.value.id, data)
+      await getSiteDetail(selectedSite.value.id)
       toast({ description: 'Site updated!' })
     } else {
       if (!newSiteFeatureRef.value) {
@@ -147,6 +152,7 @@ watch(isCreatingSite, (newValue) => {
         site_type: '',
         latitude: '',
         longitude: '',
+        db_resolved: false,
       },
     })
   } else {
@@ -182,6 +188,7 @@ watch(siteMarker, (newValue) => {
       <Separator />
 
       <FormCheckboxField name="ik_id_starred" label="IK ID Starred" />
+      <FormCheckboxField name="db_resolved" label="Validated Record (2014 SDG Check)" />
       <FormInputField name="inventaire_khmere_id" label="Inventaire Khmere (IK) ID" />
       <FormInputField name="monuments_hostoriques_id" label="Monuments Historiques (MH) ID" />
       <Button type="submit" class="my-4 w-full" :disabled="isSubmitting">Save</Button>

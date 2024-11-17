@@ -33,6 +33,7 @@ const siteFields = [
   { label: 'Longitude', key: 'location.coordinates[0]' },
   { label: 'Description', key: 'description' },
   { label: 'IK ID Starred', key: 'ik_id_starred', isBoolean: true },
+  { label: 'Validated Record (2014 SDG Check)', key: 'db_resolved', isBoolean: true },
 ]
 
 function getValue(site, key) {

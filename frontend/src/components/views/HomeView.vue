@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import MainMap from '@/components/map/MainMap.vue'
 import LeftPanelButtons from '@/components/map/LeftPanelButtons.vue'
