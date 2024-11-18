@@ -26,7 +26,7 @@ onMounted(() => {
     <ol-style>
       <ol-style-circle :radius="radius">
         <ol-style-stroke :strokeWidth="1" :color="strokeColor"></ol-style-stroke>
-        <ol-style-fill :color="props.site?.db_resolved === 1 ? '#AB1C28' : strokeColor"></ol-style-fill>
+        <ol-style-fill :color="props.site?.db_resolved === 1 ? '#AB1C28' : fillColor"></ol-style-fill>
       </ol-style-circle>
     </ol-style>
   </ol-feature>

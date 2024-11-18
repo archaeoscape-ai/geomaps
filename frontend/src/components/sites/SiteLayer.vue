@@ -99,7 +99,7 @@ watch(selectedSiteFeature, (feature) => {
         <ol-style zIndex="1">
           <ol-style-circle :radius="12">
             <ol-style-stroke :strokeWidth="1" :color="strokeColor"></ol-style-stroke>
-            <ol-style-fill :color="fillColorSelected"></ol-style-fill>
+            <!-- <ol-style-fill :color="fillColorSelected"></ol-style-fill> -->
           </ol-style-circle>
         </ol-style>
       </ol-interaction-select>
