@@ -119,7 +119,7 @@ class SiteSerializer(serializers.ModelSerializer):
 class SiteGeomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Site
-        fields = ("id", "location")
+        fields = ("id", "location", "db_resolved")
 
 
 class WorksiteTypeSerializer(serializers.ModelSerializer):
