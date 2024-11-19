@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -103,7 +103,7 @@ const onSubmit = form.handleSubmit(async (values) => {
         type: 'Point',
         coordinates: [values.longitude, values.latitude],
       },
-      db_resolved: values.db_resolved ? 1 : 0
+      db_resolved: values.db_resolved ? 1 : 0,
     }
 
     if (isEditingSite.value && selectedSite.value) {
@@ -165,6 +165,13 @@ watch(siteMarker, (newValue) => {
     const [longitude, latitude] = transform(newValue, 'EPSG:3857', 'EPSG:4326')
     form.setFieldValue('latitude', latitude)
     form.setFieldValue('longitude', longitude)
+  }
+})
+
+onUnmounted(() => {
+  if (selectedSite.value) {
+    const [x, y] = transform(selectedSite.value.location.coordinates, 'EPSG:4326', 'EPSG:3857')
+    selectedSiteFeature.value?.getGeometry()?.setCoordinates([x, y])
   }
 })
 </script>

@@ -12,6 +12,7 @@ import { useMapStore } from './MapStore'
 import { VectorTile, Tile as TileLayer } from 'ol/layer'
 import { ImageWMS, TileWMS, VectorTile as VectorTileSource, XYZ } from 'ol/source'
 import ImageLayer from 'ol/layer/Image'
+import { TileGrid } from 'ol/tilegrid'
 
 export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   const mapStore = useMapStore()
@@ -294,7 +295,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
     let totalLayer = 0
 
     for (const group of config) {
-        totalLayer += group.items.length
+      totalLayer += group.items.length
     }
 
     for (const group of config) {
@@ -349,13 +350,16 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
 
   /**
    * Add layer to map with corresponding layer geoserver url
-   * @param {} parentId 
-   * @param {*} layerId 
-   * @returns 
+   * @param {} parentId
+   * @param {*} layerId
+   * @returns
    */
   function addLayerToMap(parentId, layerId) {
     let layer
     const layerDetail = mapDetailDict.value[parentId]?.[layerId]
+    // const tileGrid = new TileGrid({
+    //   tileSize: [512, 512],
+    // })
 
     if (!layerDetail) return null
 
@@ -375,6 +379,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
         if (layerDetail.use_as_tile_layer) {
           source = new TileWMS({
             url: sourceUrl,
+            // tileGrid,
           })
         } else {
           layer = new ImageLayer()
@@ -382,15 +387,18 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
             url: sourceUrl,
             ratio: 1,
             serverType: 'geoserver',
+            // tileGrid,
           })
         }
       } else if (parentId === LAYER_TYPE.XYZ) {
         const sourceUrl = layerDetail.wms_url
         source = new XYZ({
           url: sourceUrl,
+          // tileGrid,
         })
       }
 
+      source.setTile
       layer.setSource(source)
     }
 
