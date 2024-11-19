@@ -13,6 +13,8 @@ import { VectorTile, Tile as TileLayer } from 'ol/layer'
 import { ImageWMS, TileWMS, VectorTile as VectorTileSource, XYZ } from 'ol/source'
 import ImageLayer from 'ol/layer/Image'
 import { TileGrid } from 'ol/tilegrid'
+import { get as getProjection } from 'ol/proj.js'
+import { getWidth } from 'ol/extent'
 
 export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   const mapStore = useMapStore()
@@ -357,9 +359,17 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
   function addLayerToMap(parentId, layerId) {
     let layer
     const layerDetail = mapDetailDict.value[parentId]?.[layerId]
-    // const tileGrid = new TileGrid({
-    //   tileSize: [512, 512],
-    // })
+    const projExtent = getProjection('EPSG:3857').getExtent()
+    const startResolution = getWidth(projExtent) / 256
+    const resolutions = new Array(22)
+    for (let i = 0, ii = resolutions.length; i < ii; ++i) {
+      resolutions[i] = startResolution / Math.pow(2, i)
+    }
+    const tileGrid = new TileGrid({
+      extent: [-20026376.39, -20048966.10, 20026376.39, 20048966.10],
+      resolutions: resolutions,
+      tileSize: [512, 512],
+    })
 
     if (!layerDetail) return null
 
@@ -368,6 +378,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
       layer = new VectorTile({
         source: new VectorTileSource({
           url: sourceUrl,
+          tileGrid,
         }),
       })
     } else {
@@ -379,7 +390,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
         if (layerDetail.use_as_tile_layer) {
           source = new TileWMS({
             url: sourceUrl,
-            // tileGrid,
+            tileGrid,
           })
         } else {
           layer = new ImageLayer()
@@ -387,14 +398,14 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
             url: sourceUrl,
             ratio: 1,
             serverType: 'geoserver',
-            // tileGrid,
+            tileGrid,
           })
         }
       } else if (parentId === LAYER_TYPE.XYZ) {
         const sourceUrl = layerDetail.wms_url
         source = new XYZ({
           url: sourceUrl,
-          // tileGrid,
+          tileGrid,
         })
       }
 
