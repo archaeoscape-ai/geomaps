@@ -15,7 +15,7 @@ export const useLeftPanelStore = defineStore('left-panel', () => {
     },
     {
       id: LEFT_PANELS.IDENTIFY,
-      name: 'Identify/Edit',
+      name: 'Identify / Edit',
     },
     {
       id: LEFT_PANELS.CREATE,

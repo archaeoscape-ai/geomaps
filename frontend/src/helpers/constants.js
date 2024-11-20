@@ -31,21 +31,6 @@ export const LEFT_PANELS = {
   LIST: 'sites',
 }
 
-export const LEFT_PANEL_MAPPING = {
-  [LEFT_PANELS.LIST]: {
-    id: LEFT_PANELS.LIST,
-    name: 'Sites',
-  },
-  [LEFT_PANELS.CREATE]: {
-    id: LEFT_PANELS.CREATE,
-    name: 'Create',
-  },
-  [LEFT_PANELS.IDENTIFY]: {
-    id: LEFT_PANELS.IDENTIFY,
-    name: 'Identify/Edit',
-  },
-}
-
 export const LAYER_TYPE = {
   VECTOR: 'vector_tile_layers',
   WMS: 'wms_layers',
