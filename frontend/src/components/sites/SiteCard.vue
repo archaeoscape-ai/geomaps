@@ -17,10 +17,14 @@ const siteStore = useSiteStore()
 const { selectedSiteFeature, selectedSite, siteLayerSourceRef, selectSiteInteractionRef } =
   storeToRefs(siteStore)
 
-function handleCardClick() {
+async function handleCardClick() {
+  if (!selectSiteInteractionRef.value) return 
+
   const selectedFeature = siteLayerSourceRef.value.getFeatureById(props.site.id)
-  selectSiteInteractionRef.value.select.getFeatures().clear()
-  selectSiteInteractionRef.value?.select?.getFeatures().push(selectedFeature)
+  if (!selectedFeature) return
+
+  selectSiteInteractionRef.value.select?.getFeatures()?.clear()
+  selectSiteInteractionRef.value.select?.getFeatures()?.push(selectedFeature)
   selectedSiteFeature.value = selectedFeature
   siteStore.centerSelectedSite()
 

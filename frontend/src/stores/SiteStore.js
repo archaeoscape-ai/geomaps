@@ -74,8 +74,7 @@ export const useSiteStore = defineStore('site', () => {
   }
 
   async function getSites(mapId) {
-    if (isLoading.value) return
-
+    isLoading.value = true
     const filters = getCleanFilters(siteFilters.value)
 
     try {
@@ -95,7 +94,7 @@ export const useSiteStore = defineStore('site', () => {
   }
 
   async function getSitesGeom(mapId) {
-    if (isLoading.value) return
+    isLoading.value = true
 
     const filters = getCleanFilters(siteFilters.value)
 
@@ -114,15 +113,20 @@ export const useSiteStore = defineStore('site', () => {
   }
 
   async function getSiteDetail(siteId) {
-    const res = await siteService.siteDetail(siteId)
-    selectedSite.value = res
+    try {
+      isLoading.value = true
+      const res = await siteService.siteDetail(siteId)
+      selectedSite.value = res
+    } finally {
+      isLoading.value = false
+    }
   }
 
   async function createSite(mapId, data) {
     const res = await siteService.createSite(mapId, data)
     sitesGeom.value.push({
       id: res.id,
-      location: res.location
+      location: res.location,
     })
     await getSites(mapId)
     // if (sites.value?.results) {
@@ -202,6 +206,7 @@ export const useSiteStore = defineStore('site', () => {
   }
 
   return {
+    isLoading,
     sites,
     sitesGeom,
     page,

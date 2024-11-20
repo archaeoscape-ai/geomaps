@@ -18,7 +18,7 @@ const noteStore = useNoteStore()
 const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 
 const siteStore = useSiteStore()
-const { selectedSite } = storeToRefs(siteStore)
+const { selectedSite, isLoading } = storeToRefs(siteStore)
 
 const emit = defineEmits(['toggleSiteEdit'])
 
@@ -63,7 +63,8 @@ function getValue(site, key) {
       </IconTooltipButton>
     </CardHeader>
     <CardContent class="flex flex-col px-4">
-      <div v-for="(field, index) in siteFields" :key="field.key">
+      <div v-if="isLoading">loading</div>
+      <div v-else v-for="(field, index) in siteFields" :key="field.key">
         <div class="grid grid-cols-2 items-center gap-2 break-words py-2">
           <div class="font-semibold">{{ field.label }}</div>
           <div>

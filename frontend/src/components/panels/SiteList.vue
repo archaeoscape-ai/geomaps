@@ -1,7 +1,7 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import { watchDebounced } from '@vueuse/core'
-import { Search, SlidersHorizontal } from 'lucide-vue-next'
+import { RefreshCcw, Search, SlidersHorizontal } from 'lucide-vue-next'
 import Input from '@/components/ui/input/Input.vue'
 import SiteCard from '@/components/sites/SiteCard.vue'
 import { useSiteStore } from '@/stores/SiteStore'
@@ -20,7 +20,7 @@ const { currentMap } = storeToRefs(mapStore)
 
 const siteStore = useSiteStore()
 const { getSites, getSitesGeom } = siteStore
-const { sites, page, pageSize, searchText, siteFilters, isShowingFilter } = storeToRefs(siteStore)
+const { sites, page, pageSize, searchText, siteFilters, isShowingFilter, isLoading } = storeToRefs(siteStore)
 
 const hasFilters = computed(() => {
   const res = Object.values(siteFilters.value).some((field) => field)
@@ -82,7 +82,11 @@ watchDebounced(
       <hr class="my-3" />
     </div>
 
-    <template v-if="!isShowingFilter">
+    <div v-if="isLoading" class="mx-4 flex flex-grow justify-center items-center">
+      <RefreshCcw class="w-4 h-4 mr-2 animate-spin" />
+      Loading
+    </div>
+    <template v-else-if="!isShowingFilter">
       <div class="flex flex-grow flex-col gap-4 overflow-auto pb-4 pl-4 pr-2.5">
         <SiteCard :site="site" v-for="site in sites?.results" :key="site.id" />
       </div>

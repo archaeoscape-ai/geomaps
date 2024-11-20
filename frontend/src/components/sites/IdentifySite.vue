@@ -11,9 +11,10 @@ import SiteDetail from '@/components/sites/SiteDetail.vue'
 import SiteResources from '@/components/sites/resources/SiteResources.vue'
 import LeftPanelWrapper from '@/components/panels/LeftPanelWrapper.vue'
 import DeleteSiteDialog from './DeleteSiteDialog.vue'
-import { Trash, ArrowLeft } from 'lucide-vue-next'
+import { Trash, ArrowLeft, RefreshCcw } from 'lucide-vue-next'
 import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
 import { useAuthStore } from '@/stores/AuthStore'
+
 
 const authStore = useAuthStore()
 const { isReadOnly } = storeToRefs(authStore)
@@ -25,7 +26,7 @@ const noteStore = useNoteStore()
 const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 
 const siteStore = useSiteStore()
-const { selectedSite, isEditingSite, selectedSiteFeature } = storeToRefs(siteStore)
+const { selectedSite, isEditingSite, selectedSiteFeature, isLoading } = storeToRefs(siteStore)
 
 const siteResourceStore = useSiteResourceStore()
 const { isAddingResource, updatingResource } = storeToRefs(siteResourceStore)
@@ -101,7 +102,11 @@ onMounted(() => {
       </template>
     </template>
 
-    <div class="flex flex-grow flex-col gap-4 overflow-auto" v-if="selectedSite">
+    <div v-if="isLoading" class="mx-4 flex flex-grow justify-center items-center">
+      <RefreshCcw class="w-4 h-4 mr-2 animate-spin" />
+      Loading
+    </div>
+    <div class="flex flex-grow flex-col gap-4 overflow-auto" v-else-if="selectedSite">
       <CreateSiteForm v-if="isEditingSite" class="px-4" />
 
       <CreateSiteResourceForm v-else-if="isAddingResource || updatingResource" class="px-4" />
