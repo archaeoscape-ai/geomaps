@@ -1,6 +1,6 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-import { computed, onBeforeUnmount, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useMapStore } from '@/stores/MapStore'
 import { useNoteStore } from '@/stores/NoteStore'
@@ -25,7 +25,7 @@ const noteStore = useNoteStore()
 const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 
 const siteStore = useSiteStore()
-const { selectedSite, isEditingSite } = storeToRefs(siteStore)
+const { selectedSite, isEditingSite, selectedSiteFeature } = storeToRefs(siteStore)
 
 const siteResourceStore = useSiteResourceStore()
 const { isAddingResource, updatingResource } = storeToRefs(siteResourceStore)
@@ -59,17 +59,15 @@ onBeforeUnmount(() => {
   updatingResource.value = null
 })
 
-watch(
-  selectedSite,
-  async (newSite) => {
-    if (newSite) {
-      isAddingResource.value = false
-      updatingResource.value = null
-      await siteResourceStore.getSiteResources(newSite.id)
-    }
-  },
-  { immediate: true },
-)
+onMounted(() => {
+  const id = selectedSite.id
+  if (!id) return
+  if (id === selectedSiteFeature.value.get('id')) return
+
+  isAddingResource.value = false
+  updatingResource.value = null
+  siteResourceStore.getSiteResources(id)
+})
 </script>
 
 <template>
