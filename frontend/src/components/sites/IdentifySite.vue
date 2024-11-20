@@ -106,7 +106,7 @@ onMounted(() => {
       <RefreshCcw class="w-4 h-4 mr-2 animate-spin" />
       Loading
     </div>
-    <div class="flex flex-grow flex-col gap-4 overflow-auto" v-else-if="selectedSite">
+    <div class="flex flex-grow flex-col gap-4 overflow-auto pb-4" v-else-if="selectedSite">
       <CreateSiteForm v-if="isEditingSite" class="px-4" />
 
       <CreateSiteResourceForm v-else-if="isAddingResource || updatingResource" class="px-4" />

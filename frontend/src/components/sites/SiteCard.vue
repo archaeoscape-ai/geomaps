@@ -21,7 +21,6 @@ async function handleCardClick() {
   if (!selectSiteInteractionRef.value) return 
 
   const selectedFeature = siteLayerSourceRef.value.getFeatureById(props.site.id)
-  if (!selectedFeature) return
 
   selectSiteInteractionRef.value.select?.getFeatures()?.clear()
   selectSiteInteractionRef.value.select?.getFeatures()?.push(selectedFeature)
