@@ -5,9 +5,13 @@ import { computed } from 'vue'
 import { Pencil, Trash } from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 import DeleteNoteDialog from './DeleteNoteDialog.vue'
+import { useAuthStore } from '@/stores/AuthStore'
 
 const noteStore = useNoteStore()
 const { selectedNoteDetail, isEditingNote } = storeToRefs(noteStore)
+
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
 
 const initials = computed(() => {
   if (!selectedNoteDetail.value) return
@@ -24,10 +28,14 @@ const initials = computed(() => {
 function handleEditNote() {
   isEditingNote.value = true
 }
+
+const canEditNote = computed(() => {
+  return user.value.id === selectedNoteDetail?.value.created_by || user.value.is_admin
+})
 </script>
 
 <template>
-  <div class="flex flex-col gap-2 max-w-[300px]" v-if="selectedNoteDetail">
+  <div class="flex max-w-[300px] flex-col gap-2" v-if="selectedNoteDetail">
     <h3 class="line-clamp-1 text-sm font-semibold">{{ selectedNoteDetail?.title }}</h3>
     <p class="line-clamp-3 text-sm">{{ selectedNoteDetail?.body }}</p>
     <div class="flex items-center justify-between">
@@ -44,10 +52,19 @@ function handleEditNote() {
         <p class="text-xs font-semibold">{{ selectedNoteDetail?.owner_name }}</p>
       </div>
       <div class="flex items-center gap-2">
-        <Button size="icon" variant="secondary" class="bg-white" @click="handleEditNote">
+        <Button
+          size="icon"
+          variant="secondary"
+          class="bg-white"
+          @click="handleEditNote"
+          v-if="canEditNote"
+        >
           <Pencil size="20" />
         </Button>
-        <DeleteNoteDialog :note-id="selectedNoteDetail?.id">
+        <DeleteNoteDialog
+          :note-id="selectedNoteDetail?.id"
+          v-if="canEditNote"
+        >
           <Button size="icon" variant="secondary" class="bg-white">
             <Trash class="stroke-primary" size="20" />
           </Button>

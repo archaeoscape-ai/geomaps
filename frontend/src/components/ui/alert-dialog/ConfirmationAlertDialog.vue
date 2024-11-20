@@ -35,7 +35,7 @@ const emit = defineEmits(['confirm', 'cancel', 'tiggerDialog'])
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel @click="emit('cancel')">Cancel</AlertDialogCancel>
-        <AlertDialogAction @click="emit('confirm')">
+        <AlertDialogAction @click="emit('confirm')" asChild>
           <Button :disabled="isLoading">
             <Loader2 v-show="isLoading" class="mr-2 h-4 w-4 animate-spin" />
             Delete
