@@ -76,14 +76,14 @@ watch(selectedSiteFeature, (feature) => {
         :key="site.id"
         :fillColor="fillColor"
         :strokeColor="strokeColor"
-        :radius="8"
+        :radius="6"
       />
 
       <!-- for create -->
       <ol-feature v-if="siteMarker && isCreatingSite" ref="newSiteFeatureRef">
         <ol-geom-point :coordinates="siteMarker" />
         <ol-style zIndex="1">
-          <ol-style-circle :radius="8">
+          <ol-style-circle :radius="6">
             <ol-style-stroke :strokeWidth="1" color="strokeColor"></ol-style-stroke>
             <ol-style-fill :color="fillColor"></ol-style-fill>
           </ol-style-circle>
@@ -97,7 +97,7 @@ watch(selectedSiteFeature, (feature) => {
         :removeCondition="removeCondition"
       >
         <ol-style zIndex="1">
-          <ol-style-circle :radius="12">
+          <ol-style-circle :radius="8">
             <ol-style-stroke :strokeWidth="1" :color="strokeColor"></ol-style-stroke>
             <!-- <ol-style-fill :color="fillColorSelected"></ol-style-fill> -->
           </ol-style-circle>
