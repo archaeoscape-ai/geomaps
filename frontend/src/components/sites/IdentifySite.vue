@@ -109,7 +109,7 @@ watch(
       Loading
     </div>
     <div class="flex flex-grow flex-col gap-4 overflow-auto pb-4" v-else-if="selectedSite">
-      <CreateSiteForm v-if="isEditingSite" class="px-4" />
+      <CreateSiteForm v-if="isEditingSite" />
 
       <CreateSiteResourceForm v-else-if="isAddingResource || updatingResource" class="px-4" />
 

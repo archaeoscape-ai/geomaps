@@ -39,7 +39,7 @@ const cancelSiteCreation = () => {
     </template>
 
     <div class="flex flex-grow flex-col gap-4 overflow-auto">
-      <CreateSiteForm class="px-4" />
+      <CreateSiteForm />
     </div>
   </LeftPanelWrapper>
 </template>

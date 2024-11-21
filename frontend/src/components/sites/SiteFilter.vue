@@ -214,6 +214,7 @@ async function clearFilters() {
         </FormItem>
       </FormField>
     </div>
+    <hr>
     <div class="flex items-center self-end">
       <Button
         class="mr-4 hover:bg-gray-200"

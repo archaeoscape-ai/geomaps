@@ -178,28 +178,27 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <form @submit="onSubmit" class="flex flex-col gap-4">
+  <form @submit="onSubmit" class="flex flex-grow flex-col gap-4 overflow-hidden">
+    <div class="flex flex-grow flex-col gap-4 overflow-auto p-4 pr-2.5">
       <FormSelectField name="site_type" label="Site Type" :options="siteTypes?.results" />
       <Separator />
-
       <FormInputField name="english_name" label="English Name" />
-      <FormInputField name="french_name" label="French Name" />
-      <FormInputField name="khmer_name" label="Khmer Name" />
-      <FormInputField name="alternative_name" label="Alternative Name(s)" />
-      <FormInputField name="alternative_khmer_name" label="Alternative Khmer Name(s)" />
-      <Separator />
-
-      <FormInputField name="latitude" label="Latitude" />
-      <FormInputField name="longitude" label="Longitude" />
-      <FormTextareaField name="description" label="Description" />
-      <Separator />
-
-      <FormCheckboxField name="ik_id_starred" label="IK ID Starred" />
-      <FormCheckboxField name="db_resolved" label="Validated Record (2014 SDG Check)" />
-      <FormInputField name="inventaire_khmere_id" label="Inventaire Khmere (IK) ID" />
-      <FormInputField name="monuments_hostoriques_id" label="Monuments Historiques (MH) ID" />
+        <FormInputField name="french_name" label="French Name" />
+        <FormInputField name="khmer_name" label="Khmer Name" />
+        <FormInputField name="alternative_name" label="Alternative Name(s)" />
+        <FormInputField name="alternative_khmer_name" label="Alternative Khmer Name(s)" />
+        <Separator />
+        <FormInputField name="latitude" label="Latitude" />
+        <FormInputField name="longitude" label="Longitude" />
+        <FormTextareaField name="description" label="Description" />
+        <Separator />
+        <FormCheckboxField name="ik_id_starred" label="IK ID Starred" />
+        <FormCheckboxField name="db_resolved" label="Validated Record (2014 SDG Check)" />
+        <FormInputField name="inventaire_khmere_id" label="Inventaire Khmere (IK) ID" />
+        <FormInputField name="monuments_hostoriques_id" label="Monuments Historiques (MH) ID" />
+    </div>
+    <div class="px-4">
       <Button type="submit" class="my-4 w-full" :disabled="isSubmitting">Save</Button>
-    </form>
-  </div>
+    </div>
+  </form>
 </template>

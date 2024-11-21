@@ -55,7 +55,10 @@ watch(currentIndex, (newValue, oldValue) => {
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent class="mr-4 w-56">
-      <DropdownMenuLabel>{{ user?.email }}</DropdownMenuLabel>
+      <DropdownMenuLabel as-child>
+        <div>{{ user?.first_name }} {{ user?.last_name }}</div>
+        <div class="font-normal text-sm px-2 text-muted-foreground">{{ user?.email }}</div>
+      </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuRadioGroup v-model="currentIndex" class="max-h-[300px] overflow-auto">
         <DropdownMenuRadioItem
