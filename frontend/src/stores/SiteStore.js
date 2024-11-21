@@ -124,25 +124,32 @@ export const useSiteStore = defineStore('site', () => {
 
   async function createSite(mapId, data) {
     const res = await siteService.createSite(mapId, data)
+
     sitesGeom.value.push({
       id: res.id,
       location: res.location,
+      db_resolved: res.db_resolved,
     })
+
     await getSites(mapId)
-    // if (sites.value?.results) {
-    //   sites.value.results.push(res)
-    // } else {
-    //   sites.value = { ...sites.value, results: [res] }
-    // }
 
     return res
   }
 
   async function updateSite(siteId, data) {
     const res = await siteService.updateSite(siteId, data)
-    const index = sites.value.results.findIndex((site) => site.id === siteId)
+    let index = sites.value.results.findIndex((site) => site.id === siteId)
     if (index !== -1) {
       sites.value.results[index] = res
+    }
+
+    index = sitesGeom.value.findIndex((site) => site.id === siteId)
+    if (index !== -1) {
+      sitesGeom.value[index] = {
+        id: res.id,
+        location: res.location,
+        db_resolved: res.db_resolved,
+      }
     }
   }
 

@@ -32,7 +32,7 @@ const {
   selectedSiteFeature,
   selectSiteInteractionRef,
 } = storeToRefs(siteStore)
-const { getSiteDetail } = siteStore
+const { getSiteDetail, updateSite, createSite } = siteStore
 
 const isSubmitting = ref(false)
 const { toast } = useToast()
@@ -107,7 +107,7 @@ const onSubmit = form.handleSubmit(async (values) => {
     }
 
     if (isEditingSite.value && selectedSite.value) {
-      await siteStore.updateSite(selectedSite.value.id, data)
+      await updateSite(selectedSite.value.id, data)
       await getSiteDetail(selectedSite.value.id)
       toast({ description: 'Site updated!' })
     } else {
@@ -116,7 +116,7 @@ const onSubmit = form.handleSubmit(async (values) => {
         return
       }
 
-      const res = await siteStore.createSite(currentMap.value.id, data)
+      const res = await createSite(currentMap.value.id, data)
       setNewSiteAsSelected(res)
       newSiteFeatureRef.value.feature = null
       toast({ description: 'Site created!' })
@@ -131,6 +131,7 @@ const onSubmit = form.handleSubmit(async (values) => {
     } else {
       toast({ description: 'Could not save site!', variant: 'destructive' })
     }
+    console.log(error)
   } finally {
     isSubmitting.value = false
   }
