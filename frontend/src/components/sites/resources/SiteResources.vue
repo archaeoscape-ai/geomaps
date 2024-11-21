@@ -13,6 +13,8 @@ import Separator from '@/components/ui/separator/Separator.vue'
 import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useAuthStore } from '@/stores/AuthStore'
+import DeleteResourceDialog from './DeleteResourceDialog.vue'
+import { Button } from '@/components/ui/button'
 
 const authStore = useAuthStore()
 const { isReadOnly } = storeToRefs(authStore)
@@ -34,7 +36,7 @@ function addResources() {
 </script>
 
 <template>
-  <div class="mx-4 rounded-lg bg-white p-4 pb-4">
+  <div class="mx-4 rounded-lg bg-white p-4">
     <div class="flex items-center justify-between">
       <h3 class="text-sm font-semibold">Linked Resources</h3>
       <IconTooltipButton
@@ -63,8 +65,8 @@ function addResources() {
         <AccordionTrigger class="text-xs font-bold capitalize hover:no-underline">
           {{ resource.caption }}
         </AccordionTrigger>
-        <AccordionContent class="text-xs">
-          <div class="grid grid-cols-2 items-center gap-2 break-words py-1">
+        <AccordionContent class="text-xs pb-0">
+          <div class="grid grid-cols-2 items-center gap-2 break-words py-2">
             <div class="font-semibold">
               Resource ID [<button
                 class="text-blue-500 underline"
@@ -89,7 +91,12 @@ function addResources() {
           <ResourceField label="Author" :value="resource.author" />
           <ResourceField label="Date" :value="resource.resource_date" />
           <ResourceField label="Added By" :value="resource.created_by" />
-          <ResourceField label="Notes" :value="resource.notes" :showDivider="false" />
+          <ResourceField label="Notes" :value="resource.notes"/>
+          <div>
+            <DeleteResourceDialog :site-resource-id="resource.id" v-if="!isReadOnly">
+              <Button variant="link" class="px-0 text-xs font-semibold underline">Delete Resource</Button>
+            </DeleteResourceDialog>
+          </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>

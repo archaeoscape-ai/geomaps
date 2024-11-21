@@ -20,12 +20,12 @@ defineProps({
   isLoading: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['confirm', 'cancel', 'tiggerDialog'])
+const emit = defineEmits(['confirm', 'cancel', 'triggerDialog'])
 </script>
 
 <template>
   <AlertDialog :open="open">
-    <AlertDialogTrigger @click="emit('tiggerDialog')">
+    <AlertDialogTrigger @click="emit('triggerDialog')">
       <slot></slot>
     </AlertDialogTrigger>
     <AlertDialogContent>

@@ -1,16 +1,16 @@
 <script setup>
 import { ref } from 'vue'
-import ConfirmationAlertDialog from '../ui/alert-dialog/ConfirmationAlertDialog.vue'
-import { useSiteStore } from '@/stores/SiteStore'
+import ConfirmationAlertDialog from '@/components/ui/alert-dialog/ConfirmationAlertDialog.vue'
 import { useToast } from '@/components/ui/toast'
+import { useSiteResourceStore } from '@/stores/SiteResourceStore';
 
 const props = defineProps({
-  siteId: { type: Number, required: false },
+  siteResourceId: { type: Number, required: false },
 })
 
 const open = ref(false)
 const { toast } = useToast()
-const siteStore = useSiteStore()
+const siteResourceStore = useSiteResourceStore()
 const isLoading = ref(false)
 
 async function confirm() {
@@ -18,11 +18,11 @@ async function confirm() {
 
   isLoading.value = true
   try {
-    await siteStore.deleteSite(props.siteId)
-    toast({ description: 'Site deleted!' })
+    await siteResourceStore.deleteSiteResource(props.siteResourceId)
+    toast({ description: 'Site resource deleted!' })
   } catch (error) {
     console.log(error)
-    toast({ description: 'Could not delete site!', variant: 'destructive' })
+    toast({ description: 'Could not delete site resource!', variant: 'destructive' })
   } finally {
     open.value = false
     isLoading.value = false
@@ -41,8 +41,8 @@ function triggerDialog() {
 <template>
   <ConfirmationAlertDialog
     :open="open"
-    title="Delete Site"
-    description="Are you sure you want to remove this site"
+    title="Delete Site Resource"
+    description="Are you sure you want to remove this site resource"
     @cancel="cancelDeletion"
     @confirm="confirm"
     @triggerDialog="triggerDialog"

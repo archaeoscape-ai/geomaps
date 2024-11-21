@@ -30,7 +30,7 @@ function cancelDeletion() {
   open.value = false
 }
 
-function tiggerDialog() {
+function triggerDialog() {
   open.value = true
 }
 </script>
@@ -42,7 +42,7 @@ function tiggerDialog() {
     description="Are you sure you want to remove this note"
     @cancel="cancelDeletion"
     @confirm="confirm"
-    @tiggerDialog="tiggerDialog"
+    @triggerDialog="triggerDialog"
     :isLoading="isLoading"
   >
     <slot />

@@ -61,9 +61,9 @@ onBeforeUnmount(() => {
 })
 
 onMounted(() => {
-  const id = selectedSite.id
+  const id = selectedSiteFeature.value?.get('id')
   if (!id) return
-  if (id === selectedSiteFeature.value.get('id')) return
+  if (id === selectedSite.value?.id) return
 
   isAddingResource.value = false
   updatingResource.value = null
