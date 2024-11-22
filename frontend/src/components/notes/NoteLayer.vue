@@ -34,7 +34,6 @@ const { isCreatingSite, isEditingSite } = storeToRefs(siteStore)
 function featureSelected(event) {
   const deselectedFeatures = event.deselected
 
-  console.log('here')
   if (deselectedFeatures.length > 0) {
     resetNoteOverlay()
   }
@@ -62,9 +61,6 @@ const selectInteactionFilter = (feature) => {
   return !isCreatingSite.value && !isEditingSite.value && feature.getProperties().type === 'note'
 }
 
-// onUnmounted(() => {
-//   isDisplayingNoteCursor.value = false
-// })
 </script>
 
 <template>
@@ -89,7 +85,7 @@ const selectInteactionFilter = (feature) => {
         <ol-style>
           <ol-style-circle :radius="radius">
             <ol-style-fill :color="fillColor"></ol-style-fill>
-            <ol-style-stroke :color="strokeColor" :width="8"></ol-style-stroke>
+            <ol-style-stroke :color="strokeColor" :width="6"></ol-style-stroke>
           </ol-style-circle>
         </ol-style>
       </ol-feature>
@@ -102,9 +98,9 @@ const selectInteactionFilter = (feature) => {
     :filter="selectInteactionFilter"
   >
     <ol-style>
-      <ol-style-circle :radius="12">
+      <ol-style-circle :radius="8">
         <ol-style-fill :color="fillColor"></ol-style-fill>
-        <ol-style-stroke :color="strokeColor" :width="12"></ol-style-stroke>
+        <ol-style-stroke :color="strokeColor" :strokeWidth="1"></ol-style-stroke>
       </ol-style-circle>
     </ol-style>
   </ol-interaction-select>

@@ -21,18 +21,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <ol-feature
-    ref="featureRef"
-    :key="site.id"
-    :properties="{ ...site, type: 'site' }"
-  >
+  <ol-feature ref="featureRef" :key="site.id" :properties="{ ...site, type: 'site' }">
     <ol-geom-point :coordinates="transfromSiteCoordinate(site?.location?.coordinates)" />
     <ol-style>
       <ol-style-circle :radius="radius">
         <ol-style-stroke :strokeWidth="1" :color="strokeColor"></ol-style-stroke>
-        <ol-style-fill
-          :color="site?.db_resolved === 1 ? fillColor : '#AB1C28'"
-        ></ol-style-fill>
+        <ol-style-fill :color="fillColor"></ol-style-fill>
       </ol-style-circle>
     </ol-style>
   </ol-feature>
