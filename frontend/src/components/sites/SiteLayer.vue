@@ -84,7 +84,7 @@ const redStyle = new Style({
   }),
 })
 
-function styleFunc(feature, currentStyle) {
+function styleFunc(feature) {
   if (feature.getProperties()['db_resolved'] === 0) {
     return redStyle
   }
@@ -130,7 +130,7 @@ watch(selectedSiteFeature, (feature) => {
         ref="selectSiteInteractionRef"
         :removeCondition="removeCondition"
       >
-        <ol-style zIndex="1" :overrideStyleFunction="styleFunc"> </ol-style>
+        <ol-style :overrideStyleFunction="styleFunc"></ol-style>
       </ol-interaction-select>
     </ol-source-vector>
   </ol-vector-layer>

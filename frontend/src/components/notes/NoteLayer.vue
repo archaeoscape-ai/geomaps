@@ -1,15 +1,12 @@
 <script setup>
 import { useNoteStore } from '@/stores/NoteStore'
 import { storeToRefs } from 'pinia'
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
 import MapNoteOverlay from './MapNoteOverlay.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useRightPanelStore } from '@/stores/RightPanelStore'
 import { RIGHT_PANELS } from '@/helpers/constants'
-
-const strokeColor = ref('rgba(255, 255, 255, 0.4)')
-const fillColor = ref('#FFFFFF')
-const radius = ref(10)
+import MarkerIcon from '@/assets/marker.svg?url'
 
 const rightPanelStore = useRightPanelStore()
 const { activePanel } = storeToRefs(rightPanelStore)
@@ -60,7 +57,6 @@ watch(selectedNote, (value) => {
 const selectInteactionFilter = (feature) => {
   return !isCreatingSite.value && !isEditingSite.value && feature.getProperties().type === 'note'
 }
-
 </script>
 
 <template>
@@ -83,10 +79,7 @@ const selectInteactionFilter = (feature) => {
       >
         <ol-geom-point :coordinates="data.geom.coordinates"></ol-geom-point>
         <ol-style>
-          <ol-style-circle :radius="radius">
-            <ol-style-fill :color="fillColor"></ol-style-fill>
-            <ol-style-stroke :color="strokeColor" :width="6"></ol-style-stroke>
-          </ol-style-circle>
+          <ol-style-icon :src="MarkerIcon" :scale="1"></ol-style-icon>
         </ol-style>
       </ol-feature>
     </ol-source-vector>
@@ -98,10 +91,7 @@ const selectInteactionFilter = (feature) => {
     :filter="selectInteactionFilter"
   >
     <ol-style>
-      <ol-style-circle :radius="8">
-        <ol-style-fill :color="fillColor"></ol-style-fill>
-        <ol-style-stroke :color="strokeColor" :strokeWidth="1"></ol-style-stroke>
-      </ol-style-circle>
+      <ol-style-icon :src="MarkerIcon" :scale="1.3"></ol-style-icon>
     </ol-style>
   </ol-interaction-select>
 
