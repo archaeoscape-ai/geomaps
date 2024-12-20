@@ -29,7 +29,6 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = data
       isLoggedIn.value = true
     } catch (err) {
-      console.log(err)
       error.value = err
     } finally {
       isLoggingIn.value = false

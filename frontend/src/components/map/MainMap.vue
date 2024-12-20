@@ -5,12 +5,13 @@ import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import NoteLayer from '@/components/notes/NoteLayer.vue'
 import { useNoteStore } from '@/stores/NoteStore'
-import { BASEMAP_URLS } from '@/helpers/constants'
+import { BASEMAP_URLS, LEFT_PANELS } from '@/helpers/constants'
 import SiteLayer from '@/components/sites/SiteLayer.vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import MeasureLayer from './MeasureLayer.vue'
 import GeolocationLayer from './GeolocationLayer.vue'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
+import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 
 defineProps({
   isPanelActive: Boolean,
@@ -31,6 +32,10 @@ const mapLayerConfigStore = useMapLayerConfigStore()
 const { tempLayerConfig } = storeToRefs(mapLayerConfigStore)
 const { refreshMap } = mapLayerConfigStore
 
+const leftPanelStore = useLeftPanelStore()
+const { setTab } = leftPanelStore
+const { activePanel } = storeToRefs(leftPanelStore)
+
 const projection = ref('EPSG:3857')
 const rotation = ref(0)
 
@@ -41,17 +46,23 @@ function handleClickMap(event) {
     return
   }
 
-  // update the coordinate of selected site while editing
-  if (selectedSiteFeature.value && isEditingSite.value) {
-    selectedSiteFeature.value?.getGeometry()?.setCoordinates(event.coordinate)
+  if (isCreatingSite.value || isEditingSite.value) {
     setSiteMarker(event.coordinate)
     return
   }
 
-  if (isCreatingSite.value) {
-    setSiteMarker(event.coordinate)
+  const features = mapRef.value.map.getFeaturesAtPixel(event.pixel, {
+    layerFilter: (layerCandidate) => layerCandidate.get('name') === 'efeo:efeo_site',
+  })
+
+  if (features.length === 0) {
+    selectedSiteFeature.value = null
+    activePanel.value = null
     return
   }
+
+  selectedSiteFeature.value = features[0]
+  setTab(LEFT_PANELS.IDENTIFY)
 }
 
 const basemapUrl = computed(() => BASEMAP_URLS[basemap.value])

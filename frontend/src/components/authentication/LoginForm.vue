@@ -34,7 +34,6 @@ const onSubmit = form.handleSubmit(async (values) => {
   await authStore.login({ email, password })
 
   if (!error.value) {
-    console.log(route, route.query)
     await router.push({
       name: 'home',
       params: { id: route.query.mapId },
@@ -54,7 +53,7 @@ const onSubmit = form.handleSubmit(async (values) => {
 </script>
 
 <template>
-  <form @submit="onSubmit" class="flex w-full sm:w-80 flex-col gap-4">
+  <form @submit="onSubmit" class="flex w-full flex-col gap-4 sm:w-80">
     <FormInputField name="email" label="Email Address" type="email" />
     <FormInputField name="password" label="Password" type="password" />
 

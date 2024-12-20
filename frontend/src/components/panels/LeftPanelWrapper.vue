@@ -9,12 +9,12 @@ const leftPanelStore = useLeftPanelStore()
 const { activePanel } = storeToRefs(leftPanelStore)
 
 const siteStore = useSiteStore()
-const { selectSiteInteractionRef } = storeToRefs(siteStore)
+const { siteMarker } = storeToRefs(siteStore)
 
 function handlePanelClose() {
   siteStore.resetSitePosition()
   activePanel.value = null
-  selectSiteInteractionRef.value.select.getFeatures().clear()
+  siteMarker.value = null
 }
 
 defineProps({

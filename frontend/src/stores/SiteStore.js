@@ -1,22 +1,18 @@
 import { computed, ref } from 'vue'
 import { defineStore, storeToRefs } from 'pinia'
 import * as siteService from '@/api-services/SiteService'
-import { transform } from 'ol/proj'
+import { fromLonLat, transform } from 'ol/proj'
 import { useLeftPanelStore } from './LeftPanelStore'
 import { LEFT_PANELS } from '@/helpers/constants'
 import { useMapStore } from './MapStore'
 import { getLocalTimeZone, today } from '@internationalized/date'
+import { Point } from 'ol/geom'
+import { Feature } from 'ol'
 
 export const useSiteStore = defineStore('site', () => {
   const end = today(getLocalTimeZone())
   const start = end.subtract({ days: 7 })
 
-  /**
-   * @type {import('vue').Ref<{ source: import('ol/source/Vector').default } | null>}
-   */
-  // const siteLayerSourceRef = ref(null)
-  const newSiteFeatureRef = ref(null)
-  const selectSiteInteractionRef = ref(null)
   const selectedSiteFeature = ref(null)
   const selectedSite = ref(null)
 
@@ -24,9 +20,9 @@ export const useSiteStore = defineStore('site', () => {
   const isCreatingSite = ref(false)
   const isEditingSite = ref(false)
   const isShowingFilter = ref(false)
+  const showIdentifyLayer = ref(true)
 
   const sites = ref(null)
-  const sitesGeom = ref(null)
   const page = ref(0)
   const pageSize = ref(20)
   const searchText = ref('')
@@ -49,19 +45,15 @@ export const useSiteStore = defineStore('site', () => {
   const siteTypes = ref(null)
 
   const mapStore = useMapStore()
-  const { mapRef, currentMap } = storeToRefs(mapStore)
+  const { currentMap, mapRef } = storeToRefs(mapStore)
 
   const leftPanelStore = useLeftPanelStore()
 
-  const showIdentifyLayer = ref(true)
-
-  const siteLayerSourceRef = computed(() => {
-    const siteVectorLayer = mapRef.value.map
+  const siteVectorLayerRef = computed(() => {
+    return mapRef.value.map
       .getLayers()
       .getArray()
-      .find((item) => item.get('name') === 'siteVectorLayer')
-
-    return siteVectorLayer.getSource()
+      .find((item) => item.get('name') === 'efeo:efeo_site')
   })
 
   async function getSiteTypes() {
@@ -93,25 +85,6 @@ export const useSiteStore = defineStore('site', () => {
     }
   }
 
-  async function getSitesGeom(mapId) {
-    isLoading.value = true
-
-    const filters = getCleanFilters(siteFilters.value)
-
-    try {
-      const params = {
-        search: searchText.value,
-        ...filters,
-      }
-      const data = await siteService.getMapSitesGeom(mapId, params)
-      sitesGeom.value = data
-    } catch (err) {
-      console.log(err)
-    } finally {
-      isLoading.value = false
-    }
-  }
-
   async function getSiteDetail(siteId) {
     try {
       isLoading.value = true
@@ -125,12 +98,6 @@ export const useSiteStore = defineStore('site', () => {
   async function createSite(mapId, data) {
     const res = await siteService.createSite(mapId, data)
 
-    sitesGeom.value.push({
-      id: res.id,
-      location: res.location,
-      db_resolved: res.db_resolved,
-    })
-
     await getSites(mapId)
 
     return res
@@ -143,14 +110,7 @@ export const useSiteStore = defineStore('site', () => {
       sites.value.results[index] = res
     }
 
-    index = sitesGeom.value.findIndex((site) => site.id === siteId)
-    if (index !== -1) {
-      sitesGeom.value[index] = {
-        id: res.id,
-        location: res.location,
-        db_resolved: res.db_resolved,
-      }
-    }
+    return res
   }
 
   function setSiteMarker(coordinates) {
@@ -159,14 +119,11 @@ export const useSiteStore = defineStore('site', () => {
 
   async function deleteSite(siteId) {
     await siteService.deleteSite(siteId)
-    const index = sitesGeom.value.findIndex((site) => site.id === siteId)
-    if (index !== -1) {
-      sitesGeom.value.splice(index, 1)
-    }
-    await getSites(currentMap.value.id)
 
+    await getSites(currentMap.value.id)
     selectedSiteFeature.value = null
     leftPanelStore.setTab(LEFT_PANELS.LIST)
+    refreshSiteVectorLayer()
   }
 
   function resetSitePosition() {
@@ -178,18 +135,6 @@ export const useSiteStore = defineStore('site', () => {
       )
       selectedSite.value?.geometry?.setCoordinates(oldCoordinates)
     }
-  }
-
-  function centerSelectedSite() {
-    if (!selectedSiteFeature.value) return
-
-    const geometry = selectedSiteFeature.value.getGeometry()
-    const center = geometry.getExtent()
-
-    mapRef.value.map.getView().animate({
-      center: center,
-      duration: 1000,
-    })
   }
 
   function getCleanFilters() {
@@ -212,10 +157,29 @@ export const useSiteStore = defineStore('site', () => {
     return filters
   }
 
+  function createFeatureFromSite(site) {
+    const point = new Point(fromLonLat(site.location.coordinates))
+    const extent = point.getExtent()
+    const feature = new Feature({
+      geometry: point,
+      extent: extent,
+    })
+    feature.setId(site.id)
+    feature.setProperties(site)
+
+    return feature
+  }
+
+  const refreshSiteVectorLayer = () => {
+    const source = siteVectorLayerRef.value?.getSource()
+    if (source) {
+      source.refresh()
+    }
+  }
+
   return {
     isLoading,
     sites,
-    sitesGeom,
     page,
     pageSize,
     searchText,
@@ -224,16 +188,13 @@ export const useSiteStore = defineStore('site', () => {
     selectedSite,
     siteTypes,
     isCreatingSite,
-    siteLayerSourceRef,
-    selectSiteInteractionRef,
     siteMarker,
     isEditingSite,
     isShowingFilter,
-    newSiteFeatureRef,
     showIdentifyLayer,
+    siteVectorLayerRef,
 
     getSites,
-    getSitesGeom,
     getSiteTypes,
     getSiteDetail,
     updateSite,
@@ -241,6 +202,7 @@ export const useSiteStore = defineStore('site', () => {
     setSiteMarker,
     deleteSite,
     resetSitePosition,
-    centerSelectedSite,
+    createFeatureFromSite,
+    refreshSiteVectorLayer,
   }
 })

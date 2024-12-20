@@ -21,17 +21,8 @@ const leftPanelStore = useLeftPanelStore()
 const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
 const siteStore = useSiteStore()
-const {
-  selectedSite,
-  siteTypes,
-  isCreatingSite,
-  siteMarker,
-  isEditingSite,
-  newSiteFeatureRef,
-  siteLayerSourceRef,
-  selectedSiteFeature,
-  selectSiteInteractionRef,
-} = storeToRefs(siteStore)
+const { selectedSite, siteTypes, isCreatingSite, siteMarker, isEditingSite, selectedSiteFeature } =
+  storeToRefs(siteStore)
 const { getSiteDetail, updateSite, createSite } = siteStore
 
 const isSubmitting = ref(false)
@@ -86,14 +77,18 @@ const resetSiteCreationState = () => {
 }
 
 const setNewSiteAsSelected = (res) => {
-  selectedSiteFeature.value = siteLayerSourceRef.value.getFeatureById(res.id)
-  const selectedFeatures = selectSiteInteractionRef.value.select.getFeatures()
-  selectedFeatures.clear()
-  selectedFeatures.push(selectedSiteFeature.value)
+  const feature = siteStore.createFeatureFromSite(res)
+  selectedSiteFeature.value = feature
+  leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
 }
 
 const onSubmit = form.handleSubmit(async (values) => {
   if (isSubmitting.value) return
+
+  if (values.longitude === 0 || values.latitude === 0) {
+    toast({ description: 'Please add a marker on the map.', variant: 'destructive' })
+    return
+  }
 
   try {
     isSubmitting.value = true
@@ -109,16 +104,15 @@ const onSubmit = form.handleSubmit(async (values) => {
     if (isEditingSite.value && selectedSite.value) {
       await updateSite(selectedSite.value.id, data)
       await getSiteDetail(selectedSite.value.id)
+
+      siteStore.refreshSiteVectorLayer()
       toast({ description: 'Site updated!' })
     } else {
-      if (!newSiteFeatureRef.value) {
-        toast({ description: 'Please add a marker on the map.', variant: 'destructive' })
-        return
-      }
-
       const res = await createSite(currentMap.value.id, data)
+
       setNewSiteAsSelected(res)
-      newSiteFeatureRef.value.feature = null
+      siteStore.refreshSiteVectorLayer()
+
       toast({ description: 'Site created!' })
     }
 
@@ -131,7 +125,6 @@ const onSubmit = form.handleSubmit(async (values) => {
     } else {
       toast({ description: 'Could not save site!', variant: 'destructive' })
     }
-    console.log(error)
   } finally {
     isSubmitting.value = false
   }
@@ -168,13 +161,6 @@ watch(siteMarker, (newValue) => {
     form.setFieldValue('longitude', longitude)
   }
 })
-
-onUnmounted(() => {
-  if (selectedSite.value) {
-    const [x, y] = transform(selectedSite.value.location.coordinates, 'EPSG:4326', 'EPSG:3857')
-    selectedSiteFeature.value?.getGeometry()?.setCoordinates([x, y])
-  }
-})
 </script>
 
 <template>
@@ -183,19 +169,19 @@ onUnmounted(() => {
       <FormSelectField name="site_type" label="Site Type" :options="siteTypes?.results" />
       <Separator />
       <FormInputField name="english_name" label="English Name" />
-        <FormInputField name="french_name" label="French Name" />
-        <FormInputField name="khmer_name" label="Khmer Name" />
-        <FormInputField name="alternative_name" label="Alternative Name(s)" />
-        <FormInputField name="alternative_khmer_name" label="Alternative Khmer Name(s)" />
-        <Separator />
-        <FormInputField name="latitude" label="Latitude" />
-        <FormInputField name="longitude" label="Longitude" />
-        <FormTextareaField name="description" label="Description" />
-        <Separator />
-        <FormCheckboxField name="ik_id_starred" label="IK ID Starred" />
-        <FormCheckboxField name="db_resolved" label="Validated Record (2014 SDG Check)" />
-        <FormInputField name="inventaire_khmere_id" label="Inventaire Khmere (IK) ID" />
-        <FormInputField name="monuments_hostoriques_id" label="Monuments Historiques (MH) ID" />
+      <FormInputField name="french_name" label="French Name" />
+      <FormInputField name="khmer_name" label="Khmer Name" />
+      <FormInputField name="alternative_name" label="Alternative Name(s)" />
+      <FormInputField name="alternative_khmer_name" label="Alternative Khmer Name(s)" />
+      <Separator />
+      <FormInputField name="latitude" label="Latitude" />
+      <FormInputField name="longitude" label="Longitude" />
+      <FormTextareaField name="description" label="Description" />
+      <Separator />
+      <FormCheckboxField name="ik_id_starred" label="IK ID Starred" />
+      <FormCheckboxField name="db_resolved" label="Validated Record (2014 SDG Check)" />
+      <FormInputField name="inventaire_khmere_id" label="Inventaire Khmere (IK) ID" />
+      <FormInputField name="monuments_hostoriques_id" label="Monuments Historiques (MH) ID" />
     </div>
     <div class="px-4">
       <Button type="submit" class="my-4 w-full" :disabled="isSubmitting">Save</Button>

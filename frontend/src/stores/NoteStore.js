@@ -129,7 +129,6 @@ export const useNoteStore = defineStore('note', () => {
         coordinates,
       },
     }
-    console.log(selectedNote.value)
   }
 
   function resetNoteOverlay() {
@@ -159,7 +158,12 @@ export const useNoteStore = defineStore('note', () => {
             payload: { note },
           })
 
-          mapRef.value.map.getView().animate({ center: [ note.geom.coordinates[0] + 80000, note.geom.coordinates[1] ], duration: 1000 })
+          mapRef.value.map
+            .getView()
+            .animate({
+              center: [note.geom.coordinates[0] + 80000, note.geom.coordinates[1]],
+              duration: 1000,
+            })
         }
       }
     } else {

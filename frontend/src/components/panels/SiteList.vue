@@ -19,8 +19,9 @@ const mapStore = useMapStore()
 const { currentMap } = storeToRefs(mapStore)
 
 const siteStore = useSiteStore()
-const { getSites, getSitesGeom } = siteStore
-const { sites, page, pageSize, searchText, siteFilters, isShowingFilter, isLoading } = storeToRefs(siteStore)
+const { getSites } = siteStore
+const { sites, page, pageSize, searchText, siteFilters, isShowingFilter, isLoading } =
+  storeToRefs(siteStore)
 
 const hasFilters = computed(() => {
   const res = Object.values(siteFilters.value).some((field) => field)
@@ -38,7 +39,6 @@ watchDebounced(
   () => {
     filterPanelOpen.value = false
     getSites(currentMap.value?.id)
-    getSitesGeom(currentMap.value?.id)
   },
   { debounce: 500, maxWait: 2000 },
 )
@@ -82,8 +82,8 @@ watchDebounced(
       <hr class="my-3" />
     </div>
 
-    <div v-if="isLoading" class="mx-4 flex flex-grow justify-center items-center">
-      <RefreshCcw class="w-4 h-4 mr-2 animate-spin" />
+    <div v-if="isLoading" class="mx-4 flex flex-grow items-center justify-center">
+      <RefreshCcw class="mr-2 h-4 w-4 animate-spin" />
       Loading
     </div>
     <template v-else-if="!isShowingFilter">

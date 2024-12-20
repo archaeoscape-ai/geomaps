@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import ConfirmationAlertDialog from '@/components/ui/alert-dialog/ConfirmationAlertDialog.vue'
 import { useToast } from '@/components/ui/toast'
-import { useSiteResourceStore } from '@/stores/SiteResourceStore';
+import { useSiteResourceStore } from '@/stores/SiteResourceStore'
 
 const props = defineProps({
   siteResourceId: { type: Number, required: false },
@@ -21,7 +21,6 @@ async function confirm() {
     await siteResourceStore.deleteSiteResource(props.siteResourceId)
     toast({ description: 'Site resource deleted!' })
   } catch (error) {
-    console.log(error)
     toast({ description: 'Could not delete site resource!', variant: 'destructive' })
   } finally {
     open.value = false

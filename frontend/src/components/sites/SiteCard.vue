@@ -6,27 +6,31 @@ import { useLeftPanelStore } from '@/stores/LeftPanelStore'
 import { useSiteStore } from '@/stores/SiteStore'
 import { ChevronRight } from 'lucide-vue-next'
 import { LEFT_PANELS } from '@/helpers/constants'
+import { useMapStore } from '@/stores/MapStore'
 
 const props = defineProps({
   site: { type: Object, required: true },
 })
 
+const mapStore = useMapStore()
+const { mapRef } = storeToRefs(mapStore)
+
 const leftPanelStore = useLeftPanelStore()
 
 const siteStore = useSiteStore()
-const { selectedSiteFeature, selectedSite, siteLayerSourceRef, selectSiteInteractionRef } =
-  storeToRefs(siteStore)
+const { selectedSiteFeature, selectedSite } = storeToRefs(siteStore)
 
 async function handleCardClick() {
-  if (!selectSiteInteractionRef.value) return 
+  const feature = siteStore.createFeatureFromSite(props.site)
 
-  const selectedFeature = siteLayerSourceRef.value.getFeatureById(props.site.id)
+  const mapView = mapRef.value.map.getView()
+  mapView.fit(feature.getGeometry().getExtent(), {
+    padding: [200, 200, 200, 200],
+    maxZoom: 14,
+    duration: 1000,
+  })
 
-  selectSiteInteractionRef.value.select?.getFeatures()?.clear()
-  selectSiteInteractionRef.value.select?.getFeatures()?.push(selectedFeature)
-  selectedSiteFeature.value = selectedFeature
-  siteStore.centerSelectedSite()
-
+  selectedSiteFeature.value = feature
   leftPanelStore.setTab(LEFT_PANELS.IDENTIFY)
 }
 

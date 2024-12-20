@@ -25,7 +25,8 @@ const noteStore = useNoteStore()
 const { isDisplayingNoteCursor } = storeToRefs(noteStore)
 
 const siteStore = useSiteStore()
-const { selectedSite, isEditingSite, selectedSiteFeature, isLoading } = storeToRefs(siteStore)
+const { selectedSite, isEditingSite, selectedSiteFeature, isLoading, siteMarker } =
+  storeToRefs(siteStore)
 
 const siteResourceStore = useSiteResourceStore()
 const { isAddingResource, updatingResource } = storeToRefs(siteResourceStore)
@@ -44,6 +45,7 @@ function toggleSiteEdit() {
   isEditingSite.value = !isEditingSite.value
   isAddingResource.value = false
   if (!isEditingSite.value && selectedSite.value) {
+    siteMarker.value = null
     siteStore.resetSitePosition()
   }
 }

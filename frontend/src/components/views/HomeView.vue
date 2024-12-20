@@ -18,12 +18,12 @@ import { useSiteStore } from '@/stores/SiteStore'
 const router = useRouter()
 const route = useRoute()
 
+const siteStore = useSiteStore()
+const { getSites } = siteStore
+
 const mapStore = useMapStore()
 const { currentMap, mapRef } = storeToRefs(mapStore)
 const { getListMaps, setMapById, setDefaultMap } = mapStore
-
-const siteStore = useSiteStore()
-const { getSites, getSitesGeom } = siteStore
 
 const mapLayerConfigStore = useMapLayerConfigStore()
 const { initializeMapConfig } = mapLayerConfigStore
@@ -53,7 +53,6 @@ async function initialize() {
     } else {
       initializeMapConfig(currentMap.value.id)
       getSites(currentMap.value.id)
-      getSitesGeom(currentMap.value.id)
     }
   }
 }
@@ -66,7 +65,7 @@ watch(
         .getLayers()
         .getArray()
         .filter((layer) => layer.get('type') === 'user_created_layer')
-      layers.forEach(layer => mapRef.value.map.removeLayer(layer))
+      layers.forEach((layer) => mapRef.value.map.removeLayer(layer))
 
       setMapById(newId)
       if (!currentMap.value) {
@@ -74,7 +73,6 @@ watch(
       }
       initializeMapConfig(currentMap.value.id)
       getSites(currentMap.value.id)
-      getSitesGeom(currentMap.value.id)
     }
   },
 )
