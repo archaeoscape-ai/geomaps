@@ -5,55 +5,21 @@ from rest_framework import filters, generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from efeo.filters import CaseInsensitiveOrderingFilter, SiteFilter
-from efeo.models import (
-    FieldSeason,
-    Individuals,
-    Map,
-    MapConfig,
-    MapNote,
-    Site,
-    SiteResource,
-    SiteResourceType,
-    SiteType,
-    Trench,
-    Worksite,
-    WorksiteResource,
-    WorksiteType,
-)
-from efeo.paginations import CustomLimitOffsetPagination
-from efeo.permissions import (
-    AdminOrCreatorPermission,
-    AdminOrStandardPermission,
-    MapNotePermission,
-)
+from efeo.filters import CaseInsensitiveOrderingFilter
+from efeo.models import Map, MapConfig, MapNote, Site, SiteType
+from efeo.permissions import AdminOrStandardPermission, MapNotePermission
 from efeo.serializers import (
-    FieldSeasonSerializer,
-    IndividualsSerializer,
     MapConfigSerializer,
-    MapDetailSerializer,
     MapNoteGeomSerializer,
     MapNoteSerializer,
     MapSerializer,
-    SiteGeomSerializer,
-    SiteResourceSerializer,
-    SiteResourceTypeSerializer,
     SiteSerializer,
     SiteTypeSerializer,
-    TrenchSerializer,
-    WorksiteResourceSerializer,
-    WorksiteSerializer,
-    WorksiteTypeSerializer,
 )
 
 
 class MapListView(generics.ListAPIView):
     serializer_class = MapSerializer
-    queryset = Map.objects.all()
-
-
-class MapDetailView(generics.RetrieveAPIView):
-    serializer_class = MapDetailSerializer
     queryset = Map.objects.all()
 
 
@@ -109,37 +75,21 @@ class MapConfigView(APIView):
 class SiteTypeListView(generics.ListAPIView):
     serializer_class = SiteTypeSerializer
     queryset = SiteType.objects.all()
-    pagination_class = CustomLimitOffsetPagination
-
-
-class WorksiteTypeListView(generics.ListAPIView):
-    serializer_class = WorksiteTypeSerializer
-    queryset = WorksiteType.objects.all()
-
-
-class SiteResourceTypeListView(generics.ListAPIView):
-    serializer_class = SiteResourceTypeSerializer
-    queryset = SiteResourceType.objects.all()
-    pagination_class = CustomLimitOffsetPagination
-
-
-class IndividualsListView(generics.ListAPIView):
-    serializer_class = IndividualsSerializer
-    queryset = Individuals.objects.all()
-    pagination_class = CustomLimitOffsetPagination
 
 
 class MapSiteListView(generics.ListCreateAPIView):
     serializer_class = SiteSerializer
     permission_classes = [AdminOrStandardPermission]
-    pagination_class = CustomLimitOffsetPagination
 
     filter_backends = (
         CaseInsensitiveOrderingFilter,
         filters.SearchFilter,
         DjangoFilterBackend,
     )
-    filterset_class = SiteFilter
+    filterset_fields = (
+        "created_by",
+        "ik_id_starred",
+    )
     search_fields = ("english_name", "french_name", "khmer_name")
     ordering_fields = ("english_name",)
     ordering = ("english_name",)
@@ -153,34 +103,10 @@ class MapSiteListView(generics.ListCreateAPIView):
         serializer.save(map=map, created_by=self.request.user)
 
 
-class MapSiteListGeom(MapSiteListView):
-    pagination_class = None
-    serializer_class = SiteGeomSerializer
-
-
 class SiteDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [AdminOrStandardPermission]
     serializer_class = SiteSerializer
     queryset = Site.objects.all()
-
-
-class SiteResourceListView(generics.ListCreateAPIView):
-    permission_classes = [AdminOrStandardPermission]
-    serializer_class = SiteResourceSerializer
-
-    def get_queryset(self):
-        site = get_object_or_404(Site, pk=self.kwargs["pk"])
-        return SiteResource.objects.filter(site=site)
-
-    def perform_create(self, serializer):
-        site = get_object_or_404(Site, pk=self.kwargs["pk"])
-        serializer.save(site=site, created_by=self.request.user)
-
-
-class SiteResourceDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [AdminOrCreatorPermission]
-    serializer_class = SiteResourceSerializer
-    queryset = SiteResource.objects.all()
 
 
 class MapNoteList(generics.ListCreateAPIView):
@@ -222,49 +148,3 @@ class MapNoteDetail(generics.RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         map = get_object_or_404(Map, pk=self.kwargs["map_pk"])
         serializer.save(map=map)
-
-
-class FieldSeasonListView(generics.ListAPIView):
-    serializer_class = FieldSeasonSerializer
-    queryset = FieldSeason.objects.all()
-
-
-class TrenchListView(generics.ListAPIView):
-    serializer_class = TrenchSerializer
-    queryset = Trench.objects.all()
-
-
-class WorksiteListView(generics.ListCreateAPIView):
-    serializer_class = WorksiteSerializer
-    permission_classes = [AdminOrStandardPermission]
-
-    filter_backends = (
-        CaseInsensitiveOrderingFilter,
-        filters.SearchFilter,
-        DjangoFilterBackend,
-    )
-    filterset_fields = ("created_by", "cultivated", "cleared", "threatened")
-    search_fields = ("name",)
-    ordering_fields = ("name",)
-    ordering = ("name",)
-
-    def get_queryset(self):
-        site = get_object_or_404(Site, pk=self.kwargs["pk"])
-        return Worksite.objects.filter(archsite=site)
-
-    def perform_create(self, serializer):
-        site = get_object_or_404(Site, pk=self.kwargs["pk"])
-        serializer.save(archsite=site, created_by=self.request.user)
-
-
-class WorksiteResourceListView(generics.ListCreateAPIView):
-    permission_classes = [AdminOrStandardPermission]
-    serializer_class = WorksiteResourceSerializer
-
-    def get_queryset(self):
-        worksite = get_object_or_404(Worksite, pk=self.kwargs["pk"])
-        return WorksiteResource.objects.filter(worksite=worksite)
-
-    def perform_create(self, serializer):
-        worksite = get_object_or_404(Worksite, pk=self.kwargs["pk"])
-        serializer.save(worksite=worksite, created_by=self.request.user)
