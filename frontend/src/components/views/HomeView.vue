@@ -1,0 +1,94 @@
+<script setup>
+import { computed, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import MainMap from '@/components/map/MainMap.vue'
+import LeftPanelButtons from '@/components/map/LeftPanelButtons.vue'
+import RightPanelButtons from '@/components/map/RightPanelButtons.vue'
+import LeftPanelContainer from '@/components/panels/LeftPanelContainer.vue'
+import RightPanelContainer from '@/components/panels/RightPanelContainer.vue'
+
+import { useRightPanelStore } from '@/stores/RightPanelStore'
+import { useLeftPanelStore } from '@/stores/LeftPanelStore'
+import BaseMapButtons from '@/components/map/BaseMapButtons.vue'
+import { useMapStore } from '@/stores/MapStore'
+import { useRoute, useRouter } from 'vue-router'
+import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
+import { useSiteStore } from '@/stores/SiteStore'
+
+const router = useRouter()
+const route = useRoute()
+
+const siteStore = useSiteStore()
+const { getSites } = siteStore
+
+const mapStore = useMapStore()
+const { currentMap, mapRef } = storeToRefs(mapStore)
+const { getListMaps, setMapById, setDefaultMap } = mapStore
+
+const mapLayerConfigStore = useMapLayerConfigStore()
+const { initializeMapConfig } = mapLayerConfigStore
+
+const leftPanelStore = useLeftPanelStore()
+const { activePanel } = storeToRefs(leftPanelStore)
+
+const rightPanelStore = useRightPanelStore()
+const { activePanel: activeRightPanel } = storeToRefs(rightPanelStore)
+
+const isLeftPanelActive = computed(() => activePanel.value !== null)
+const isRightPanelActive = computed(() => activeRightPanel.value !== null)
+
+function redirectToDefaultMap() {
+  setDefaultMap()
+  router.push({ name: 'home', params: { id: currentMap.value.id }, query: route.query })
+}
+
+async function initialize() {
+  await getListMaps()
+  if (!route.params.id) {
+    redirectToDefaultMap()
+  } else {
+    setMapById(route.params.id)
+    if (!currentMap.value) {
+      redirectToDefaultMap()
+    } else {
+      initializeMapConfig(currentMap.value.id)
+      getSites(currentMap.value.id)
+    }
+  }
+}
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    if (newId) {
+      const layers = mapRef.value.map
+        .getLayers()
+        .getArray()
+        .filter((layer) => layer.get('type') === 'user_created_layer')
+      layers.forEach((layer) => mapRef.value.map.removeLayer(layer))
+
+      setMapById(newId)
+      if (!currentMap.value) {
+        redirectToDefaultMap()
+      }
+      initializeMapConfig(currentMap.value.id)
+      getSites(currentMap.value.id)
+    }
+  },
+)
+
+initialize()
+</script>
+
+<template>
+  <div class="relative h-screen w-full overflow-hidden">
+    <MainMap :isPanelActive="isLeftPanelActive" />
+    <LeftPanelContainer :isPanelActive="isLeftPanelActive" />
+    <LeftPanelButtons :isPanelActive="isLeftPanelActive" />
+    <RightPanelButtons :isPanelActive="isRightPanelActive" />
+    <RightPanelContainer :isPanelActive="isRightPanelActive" />
+    <BaseMapButtons :isPanelActive="isRightPanelActive" />
+  </div>
+</template>
+
+<style lang="postcss" scoped></style>

@@ -1,0 +1,107 @@
+<script setup>
+import { storeToRefs } from 'pinia'
+import { useSiteResourceStore } from '@/stores/SiteResourceStore'
+import ResourceField from '@/components/sites/resources/ResourceField.vue'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import { FilePlus } from 'lucide-vue-next'
+import Separator from '@/components/ui/separator/Separator.vue'
+import IconTooltipButton from '@/components/ui/tooltip/IconTooltipButton.vue'
+import { useSiteStore } from '@/stores/SiteStore'
+import { useAuthStore } from '@/stores/AuthStore'
+import DeleteResourceDialog from './DeleteResourceDialog.vue'
+import { Button } from '@/components/ui/button'
+
+const authStore = useAuthStore()
+const { isReadOnly } = storeToRefs(authStore)
+
+const siteStore = useSiteStore()
+const { isEditingSite } = storeToRefs(siteStore)
+
+const siteResourceStore = useSiteResourceStore()
+const { siteResources, updatingResource, isAddingResource } = storeToRefs(siteResourceStore)
+
+function onEditResourceClick(resource) {
+  updatingResource.value = resource
+}
+
+function addResources() {
+  isEditingSite.value = false
+  isAddingResource.value = true
+}
+</script>
+
+<template>
+  <div class="mx-4 rounded-lg bg-white p-4">
+    <div class="flex items-center justify-between">
+      <h3 class="text-sm font-semibold">Linked Resources</h3>
+      <IconTooltipButton
+        tooltipText="Add resources"
+        tooltipSide="bottom"
+        @onBtnClick="addResources"
+        btnClass="bg-white"
+        v-if="!isReadOnly"
+      >
+        <FilePlus size="20" />
+      </IconTooltipButton>
+    </div>
+    <Accordion
+      type="multiple"
+      collapsible
+      orientation="horizontal"
+      v-if="siteResources?.results.length > 0"
+    >
+      <AccordionItem
+        :value="resource.id.toString()"
+        v-for="resource in siteResources?.results"
+        :key="resource.id"
+        class="mt-2 rounded text-sm"
+        orientation="horizontal"
+      >
+        <AccordionTrigger class="text-xs font-bold capitalize hover:no-underline">
+          {{ resource.caption }}
+        </AccordionTrigger>
+        <AccordionContent class="text-xs pb-0">
+          <div class="grid grid-cols-2 items-center gap-2 break-words py-2">
+            <div class="font-semibold">
+              Resource ID [<button
+                class="text-blue-500 underline"
+                @click="() => onEditResourceClick(resource)"
+              >
+                Edit</button
+              >]
+            </div>
+            <div>{{ resource.id }}</div>
+          </div>
+          <Separator />
+          <ResourceField label="Caption" :value="resource.caption" />
+          <ResourceField label="Resource Type" :value="resource.resource_type" />
+          <ResourceField label="Resource File">
+            <a
+              :href="resource.resource_file"
+              target="_blank"
+              class="font-semibold text-blue-500 underline"
+              >File</a
+            >
+          </ResourceField>
+          <ResourceField label="Author" :value="resource.author" />
+          <ResourceField label="Date" :value="resource.resource_date" />
+          <ResourceField label="Added By" :value="resource.created_by" />
+          <ResourceField label="Notes" :value="resource.notes"/>
+          <div>
+            <DeleteResourceDialog :site-resource-id="resource.id" v-if="!isReadOnly">
+              <Button variant="link" class="px-0 text-xs font-semibold underline">Delete Resource</Button>
+            </DeleteResourceDialog>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+    <div v-else class="my-16 flex items-center justify-center text-xs italic">
+      No resources linked to the site.
+    </div>
+  </div>
+</template>
