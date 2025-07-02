@@ -5,7 +5,7 @@ import { useSiteStore } from '@/stores/SiteStore'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 import { Circle, Fill, Stroke, Style } from 'ol/style'
 
-const GEOSERVER_BASE_URL = 'https://efeo-staging.lunageo.com/geoserver'
+const GEOSERVER_BASE_URL = import.meta.env.VITE_GEOSERVER_BASE_URL
 
 const strokeColor = ref('#fafafa')
 const fillColor = ref('#16a34a')
