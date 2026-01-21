@@ -1,0 +1,270 @@
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import filters, generics, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from efeo.filters import CaseInsensitiveOrderingFilter, SiteFilter
+from efeo.models import (
+    FieldSeason,
+    Individuals,
+    Map,
+    MapConfig,
+    MapNote,
+    Site,
+    SiteResource,
+    SiteResourceType,
+    SiteType,
+    Trench,
+    Worksite,
+    WorksiteResource,
+    WorksiteType,
+)
+from efeo.paginations import CustomLimitOffsetPagination
+from efeo.permissions import (
+    AdminOrCreatorPermission,
+    AdminOrStandardPermission,
+    MapNotePermission,
+)
+from efeo.serializers import (
+    FieldSeasonSerializer,
+    IndividualsSerializer,
+    MapConfigSerializer,
+    MapDetailSerializer,
+    MapNoteGeomSerializer,
+    MapNoteSerializer,
+    MapSerializer,
+    SiteGeomSerializer,
+    SiteResourceSerializer,
+    SiteResourceTypeSerializer,
+    SiteSerializer,
+    SiteTypeSerializer,
+    TrenchSerializer,
+    WorksiteResourceSerializer,
+    WorksiteSerializer,
+    WorksiteTypeSerializer,
+)
+
+
+class MapListView(generics.ListAPIView):
+    serializer_class = MapSerializer
+    queryset = Map.objects.all()
+
+
+class MapDetailView(generics.RetrieveAPIView):
+    serializer_class = MapDetailSerializer
+    queryset = Map.objects.all()
+
+
+class MapConfigView(APIView):
+
+    @swagger_auto_schema(
+        responses={
+            "200": "OK",
+            "400": "Bad Request",
+            "403": "Forbidden",
+            "201": "Created",
+        },
+        operation_id="MaLayerConfiguration",
+        operation_description="Map layer configurations",
+    )
+    def get(self, request, *args, **kwargs):
+        map = get_object_or_404(Map, pk=self.kwargs["pk"])
+        user = self.request.user
+
+        if not user.is_authenticated:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        config_obj = MapConfig.objects.filter(map=map, user=user).last()
+
+        if not config_obj:
+            return Response(status=status.HTTP_200_OK, data=[])
+
+        res = MapConfigSerializer(config_obj).data
+        return Response(status=status.HTTP_200_OK, data=res)
+
+    def post(self, request, *args, **kwargs):
+        map = get_object_or_404(Map, pk=self.kwargs["pk"])
+        user = self.request.user
+
+        if not user.is_authenticated:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        obj = MapConfig.objects.filter(map=map, user=user).last()
+
+        config_json = request.data.get("config", {})
+
+        if not obj:
+            obj = MapConfig.objects.create(map=map, user=user, config=config_json)
+            res = MapConfigSerializer(obj).data
+            return Response(status=status.HTTP_200_OK, data=res)
+
+        obj.config = config_json
+        obj.save()
+        res = MapConfigSerializer(obj).data
+        return Response(status=status.HTTP_200_OK, data=res)
+
+
+class SiteTypeListView(generics.ListAPIView):
+    serializer_class = SiteTypeSerializer
+    queryset = SiteType.objects.all()
+    pagination_class = CustomLimitOffsetPagination
+
+
+class WorksiteTypeListView(generics.ListAPIView):
+    serializer_class = WorksiteTypeSerializer
+    queryset = WorksiteType.objects.all()
+
+
+class SiteResourceTypeListView(generics.ListAPIView):
+    serializer_class = SiteResourceTypeSerializer
+    queryset = SiteResourceType.objects.all()
+    pagination_class = CustomLimitOffsetPagination
+
+
+class IndividualsListView(generics.ListAPIView):
+    serializer_class = IndividualsSerializer
+    queryset = Individuals.objects.all()
+    pagination_class = CustomLimitOffsetPagination
+
+
+class MapSiteListView(generics.ListCreateAPIView):
+    serializer_class = SiteSerializer
+    permission_classes = [AdminOrStandardPermission]
+    pagination_class = CustomLimitOffsetPagination
+
+    filter_backends = (
+        CaseInsensitiveOrderingFilter,
+        filters.SearchFilter,
+        DjangoFilterBackend,
+    )
+    filterset_class = SiteFilter
+    search_fields = ("english_name", "french_name", "khmer_name")
+    ordering_fields = ("english_name",)
+    ordering = ("english_name",)
+
+    def get_queryset(self):
+        map = get_object_or_404(Map, pk=self.kwargs["pk"])
+        return Site.objects.filter(map=map)
+
+    def perform_create(self, serializer):
+        map = get_object_or_404(Map, pk=self.kwargs["pk"])
+        serializer.save(map=map, created_by=self.request.user)
+
+
+class MapSiteListGeom(MapSiteListView):
+    pagination_class = None
+    serializer_class = SiteGeomSerializer
+
+
+class SiteDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [AdminOrStandardPermission]
+    serializer_class = SiteSerializer
+    queryset = Site.objects.all()
+
+
+class SiteResourceListView(generics.ListCreateAPIView):
+    permission_classes = [AdminOrStandardPermission]
+    serializer_class = SiteResourceSerializer
+
+    def get_queryset(self):
+        site = get_object_or_404(Site, pk=self.kwargs["pk"])
+        return SiteResource.objects.filter(site=site)
+
+    def perform_create(self, serializer):
+        site = get_object_or_404(Site, pk=self.kwargs["pk"])
+        serializer.save(site=site, created_by=self.request.user)
+
+
+class SiteResourceDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [AdminOrCreatorPermission]
+    serializer_class = SiteResourceSerializer
+    queryset = SiteResource.objects.all()
+
+
+class MapNoteList(generics.ListCreateAPIView):
+    filter_backends = (
+        CaseInsensitiveOrderingFilter,
+        filters.SearchFilter,
+        DjangoFilterBackend,
+    )
+    filterset_fields = ("created_by",)
+    search_fields = ("title", "body")
+    ordering_fields = ("title",)
+    ordering = ("title",)
+
+    serializer_class = MapNoteSerializer
+    permission_classes = [MapNotePermission]
+
+    def get_queryset(self):
+        map = get_object_or_404(Map, pk=self.kwargs["pk"])
+        return MapNote.objects.filter(map=map)
+
+    def perform_create(self, serializer):
+        map = get_object_or_404(Map, pk=self.kwargs["pk"])
+        serializer.save(map=map, created_by=self.request.user)
+
+
+class MapNoteListForMap(MapNoteList):
+    pagination_class = None
+    serializer_class = MapNoteGeomSerializer
+
+
+class MapNoteDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = MapNoteSerializer
+    permission_classes = [MapNotePermission]
+
+    def get_queryset(self):
+        map = get_object_or_404(Map, pk=self.kwargs["map_pk"])
+        return MapNote.objects.filter(map=map)
+
+    def perform_update(self, serializer):
+        map = get_object_or_404(Map, pk=self.kwargs["map_pk"])
+        serializer.save(map=map)
+
+
+class FieldSeasonListView(generics.ListAPIView):
+    serializer_class = FieldSeasonSerializer
+    queryset = FieldSeason.objects.all()
+
+
+class TrenchListView(generics.ListAPIView):
+    serializer_class = TrenchSerializer
+    queryset = Trench.objects.all()
+
+
+class WorksiteListView(generics.ListCreateAPIView):
+    serializer_class = WorksiteSerializer
+    permission_classes = [AdminOrStandardPermission]
+
+    filter_backends = (
+        CaseInsensitiveOrderingFilter,
+        filters.SearchFilter,
+        DjangoFilterBackend,
+    )
+    filterset_fields = ("created_by", "cultivated", "cleared", "threatened")
+    search_fields = ("name",)
+    ordering_fields = ("name",)
+    ordering = ("name",)
+
+    def get_queryset(self):
+        site = get_object_or_404(Site, pk=self.kwargs["pk"])
+        return Worksite.objects.filter(archsite=site)
+
+    def perform_create(self, serializer):
+        site = get_object_or_404(Site, pk=self.kwargs["pk"])
+        serializer.save(archsite=site, created_by=self.request.user)
+
+
+class WorksiteResourceListView(generics.ListCreateAPIView):
+    permission_classes = [AdminOrStandardPermission]
+    serializer_class = WorksiteResourceSerializer
+
+    def get_queryset(self):
+        worksite = get_object_or_404(Worksite, pk=self.kwargs["pk"])
+        return WorksiteResource.objects.filter(worksite=worksite)
+
+    def perform_create(self, serializer):
+        worksite = get_object_or_404(Worksite, pk=self.kwargs["pk"])
+        serializer.save(worksite=worksite, created_by=self.request.user)
