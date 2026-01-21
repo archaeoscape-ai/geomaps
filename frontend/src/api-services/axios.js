@@ -1,8 +1,10 @@
 import axios from 'axios'
 import { getCookie, removeCookie, setCookie } from '@/helpers/cookies'
 
+const baseURL = import.meta.env.VITE_BASE_API_URL
+
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_BASE_API_URL,
+  baseURL: baseURL,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',

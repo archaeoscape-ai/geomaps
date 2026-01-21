@@ -7,6 +7,7 @@ import {
   updateCurrentMapLayerConfig,
 } from '@/api-services/MapService'
 import { LAYER_TYPE, LAYER_TYPE_LABEL } from '@/helpers/constants'
+import { GEOSERVER_WMS_URL } from '@/config/urls'
 import { WMSCapabilities } from 'ol/format'
 import { useMapStore } from './MapStore'
 import { VectorTile, Tile as TileLayer } from 'ol/layer'
@@ -108,7 +109,7 @@ export const useMapLayerConfigStore = defineStore('mapLayerConfig', () => {
 
   async function getWMSCapabilities() {
     const parser = new WMSCapabilities()
-    const url = new URL('geoserver/efeo/wms', import.meta.env.VITE_BASE_API_URL)
+    const url = new URL(GEOSERVER_WMS_URL)
     url.searchParams.set('REQUEST', 'GetCapabilities')
 
     const response = await fetch(url.toString())

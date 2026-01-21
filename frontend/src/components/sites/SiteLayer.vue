@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { inject, ref, watch } from 'vue'
 import { useSiteStore } from '@/stores/SiteStore'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
+import { GEOSERVER_BASE_URL } from '@/config/urls'
 import { Circle, Fill, Stroke, Style } from 'ol/style'
 
 const GEOSERVER_BASE_URL = 'https://efeo-staging.lunageo.com/geoserver'

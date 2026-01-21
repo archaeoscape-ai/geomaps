@@ -6,6 +6,7 @@ import Slider from '@/components/ui/slider/Slider.vue'
 import { GripVertical, ChevronDown, ChevronUp, Scan, List } from 'lucide-vue-next'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
+import { GEOSERVER_WMS_URL } from '@/config/urls'
 import { useMapStore } from '@/stores/MapStore'
 import { storeToRefs } from 'pinia'
 import { Projection, transform } from 'ol/proj'
@@ -55,7 +56,7 @@ async function zoomToExtent() {
 }
 
 function getLegendUrl() {
-  const url = new URL('geoserver/efeo/wms', import.meta.env.VITE_BASE_API_URL)
+  const url = new URL(GEOSERVER_WMS_URL)
   url.searchParams.set('REQUEST', 'GetLegendGraphic')
   url.searchParams.set('LAYER', `efeo:${props.item.alias}`)
   url.searchParams.set('FORMAT', 'image/png')
