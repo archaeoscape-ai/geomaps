@@ -6,8 +6,6 @@ import { useMapLayerConfigStore } from '@/stores/MapLayerConfigStore'
 import { GEOSERVER_BASE_URL } from '@/config/urls'
 import { Circle, Fill, Stroke, Style } from 'ol/style'
 
-const GEOSERVER_BASE_URL = 'https://efeo-staging.lunageo.com/geoserver'
-
 const strokeColor = ref('#fafafa')
 const fillColor = ref('#16a34a')
 
